@@ -9,6 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import org.khelekore.rnio.BufferHandler;
 import org.khelekore.rnio.NioHandler;
 import org.khelekore.rnio.ReadHandler;
 import org.khelekore.rnio.StatisticsHolder;
@@ -16,6 +17,7 @@ import org.khelekore.rnio.WriteHandler;
 import org.khelekore.rnio.impl.Acceptor;
 import org.khelekore.rnio.impl.AcceptorListener;
 import org.khelekore.rnio.impl.BasicStatisticsHolder;
+import org.khelekore.rnio.impl.CachingBufferHandler;
 import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 
@@ -26,6 +28,7 @@ import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 public class EchoServer {
     private final NioHandler nioHandler;
     private final ServerSocketChannel ssc;
+    private final BufferHandler bufferHandler;
     private final AcceptListener acceptHandler;
     private final Logger logger = Logger.getLogger ("org.khelekore.rnio.echoserver");
 
@@ -48,6 +51,7 @@ public class EchoServer {
 	ssc.configureBlocking (false);
 	ServerSocket ss = ssc.socket ();
 	ss.bind (new InetSocketAddress (port));
+	bufferHandler = new CachingBufferHandler ();
 
 	ExecutorService es = Executors.newCachedThreadPool ();
 	StatisticsHolder stats = new BasicStatisticsHolder ();
@@ -62,11 +66,11 @@ public class EchoServer {
     }
 
     public ByteBuffer getBuffer () {
-	return ByteBuffer.allocate (1024);
+	return bufferHandler.getBuffer ();
     }
 
     public void returnBuffer (ByteBuffer buf) {
-	// nothing.
+	bufferHandler.putBuffer (buf);
     }
     
     private class AcceptListener implements AcceptorListener {
