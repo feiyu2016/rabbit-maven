@@ -8,6 +8,8 @@ import org.khelekore.rnio.AcceptHandler;
 import org.khelekore.rnio.NioHandler;
 
 /** A standard acceptor.
+ *  <p>This AcceptHandler will never timeout, will never use a separate thread
+ *  and will keep accepting connections until you remove it.
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
@@ -18,6 +20,11 @@ public class Acceptor implements AcceptHandler {
 
     private final Logger logger = Logger.getLogger ("org.khelekore.rnio.impl");
 
+    /** Create a new Acceptor that will wait for accepts on the given channel.
+     * @param ssc the channel to accept connections from
+     * @param nioHandler the NioHandler to use for waiting
+     * @param listener the listener waiting for connections
+     */
     public Acceptor (ServerSocketChannel ssc, 
 		     NioHandler nioHandler,
 		     AcceptorListener listener) {
@@ -45,9 +52,11 @@ public class Acceptor implements AcceptHandler {
     }
 
     public String getDescription () {
-	return "Acceptor: ssc: " + ssc;
+	return "Acceptor: channel: " + ssc;
     }
 
+    /** Will return null to indicate no timeout on accepts.
+     */
     public Long getTimeout () {
 	return null;
     }
