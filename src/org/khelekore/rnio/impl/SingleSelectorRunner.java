@@ -28,7 +28,7 @@ import org.khelekore.rnio.WriteHandler;
 class SingleSelectorRunner implements Runnable {
     private final Selector selector;
     private final AtomicBoolean running = new AtomicBoolean (false);
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private final Logger logger = Logger.getLogger ("org.khelekore.rnio");
     private final ExecutorService executorService;
 
     /** The queue to get back on the main thread. */

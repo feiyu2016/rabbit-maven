@@ -26,7 +26,7 @@ public class MultiSelectorNioHandler implements NioHandler {
     /** The executor service. */
     private final ExecutorService executorService;
     private final List<SingleSelectorRunner> selectorRunners;
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private final Logger logger = Logger.getLogger ("org.khelekore.rnio");
     private final StatisticsHolder stats;
     private int nextIndex = 0;
 
@@ -89,12 +89,14 @@ public class MultiSelectorNioHandler implements NioHandler {
      */
     private void runSelectorTask (SelectableChannel channel,
 				  SelectorRunnable sr) {
+	// If the channel is already being served by someone, favor that one.
 	for (SingleSelectorRunner ssr : selectorRunners) {
 	    if (ssr.handlesChannel (channel)) {
 		ssr.runSelectorTask (sr);
 		return;
 	    }
 	}
+	// Put it on any selector
 	SingleSelectorRunner ssr = getSelectorRunner ();
 	ssr.runSelectorTask (sr);
     }
