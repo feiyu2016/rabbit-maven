@@ -15,23 +15,28 @@ import org.khelekore.rnio.statistics.TotalTimeSpent;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class BasicStatisticsHolder implements StatisticsHolder {
-    private Map<String, List<TaskIdentifier>> pendingTasks = 
+    // Map is group id to TaskIdentifier
+    private Map<String, List<TaskIdentifier>> pendingTasks =
 	new HashMap<String, List<TaskIdentifier>> ();
+
+    // Map is group id to TaskIdentifier
     private Map<String, List<TaskIdentifier>> runningTasks =
 	new HashMap<String, List<TaskIdentifier>> ();
 
     private int maxLatest = 10;
-    private Map<String, List<CompletionEntry>> latest = 
+    // Map is group id to CompletionEntry
+    private Map<String, List<CompletionEntry>> latest =
 	new HashMap<String, List<CompletionEntry>> ();
-    
+
     private int maxLongest = 10;
-    private Map<String, List<CompletionEntry>> longest = 
+    // Map is group id to CompletionEntry
+    private Map<String, List<CompletionEntry>> longest =
 	new HashMap<String, List<CompletionEntry>> ();
 
     private Map<String, TotalTimeSpent> total =
 	new HashMap<String, TotalTimeSpent> ();
 
-    private <T> List<T> getList (String id, 
+    private <T> List<T> getList (String id,
 				 Map<String, List<T>> tasks) {
 	List<T> ls = tasks.get (id);
 	if (ls == null) {
@@ -41,44 +46,33 @@ public class BasicStatisticsHolder implements StatisticsHolder {
 	return ls;
     }
 
-    private void addTask (TaskIdentifier ti, 
+    private void addTask (TaskIdentifier ti,
 			  Map<String, List<TaskIdentifier>> tasks) {
 	getList (ti.getGroupId (), tasks).add (ti);
     }
 
-    private void removeTask (TaskIdentifier ti, 
+    private void removeTask (TaskIdentifier ti,
 			     Map<String, List<TaskIdentifier>> tasks) {
 	List<TaskIdentifier> ls = tasks.get (ti.getGroupId ());
 	if (ls == null)
-	    throw new NullPointerException ("No pending taks for group: " + 
+	    throw new NullPointerException ("No pending taks for group: " +
 					    ti.getGroupId ());
 	if (!ls.remove (ti))
 	    throw new IllegalArgumentException ("Given task was not pending: " +
 						ti);
     }
 
-    /** A new task is put in the queue, waiting to be handled.
-     * @param ti the identifier of the new task.
-     */
     public synchronized void addPendingTask (TaskIdentifier ti) {
 	addTask (ti, pendingTasks);
     }
 
-    /** A pending task is about to be run.
-     * @param ti the identifier of the task that will start to run. 
-     */
     public synchronized void changeTaskStatusToRunning (TaskIdentifier ti) {
 	removeTask (ti, pendingTasks);
 	addTask (ti, runningTasks);
     }
 
-    /** A task has been completed. 
-     * @param ti the identifier of the task that has completed. 
-     * @param wasOk true if the task completed without errors, false otherwise.
-     * @param timeSpent wall clock time spent on the task.
-     */
-    public synchronized void changeTaskStatusToFinished (TaskIdentifier ti, 
-							 boolean wasOk, 
+    public synchronized void changeTaskStatusToFinished (TaskIdentifier ti,
+							 boolean wasOk,
 							 long timeSpent) {
 	removeTask (ti, runningTasks);
 	CompletionEntry ce = new CompletionEntry (ti, wasOk, timeSpent);
@@ -119,7 +113,7 @@ public class BasicStatisticsHolder implements StatisticsHolder {
 	}
 	return false;
     }
-    
+
     private void addToTotal (CompletionEntry ce) {
 	TotalTimeSpent tts = total.get (ce.ti.getGroupId ());
 	if (tts == null) {
@@ -136,32 +130,22 @@ public class BasicStatisticsHolder implements StatisticsHolder {
 	return ret;
     }
 
-    /** Get information about the currently pending tasks. 
-     */
     public synchronized Map<String, List<TaskIdentifier>> getPendingTasks () {
 	return copy (pendingTasks);
     }
 
-    /** Get information about the currently running tasks. 
-     */
     public synchronized Map<String, List<TaskIdentifier>> getRunningTasks () {
 	return copy (runningTasks);
     }
 
-    /** Get information about the most recent completed tasks 
-     */
     public synchronized Map<String, List<CompletionEntry>> getLatest () {
 	return copy (latest);
     }
 
-    /** Get information about the longest running task.
-     */
     public synchronized Map<String, List<CompletionEntry>> getLongest () {
 	return copy (longest);
     }
 
-    /** Get the total time spent for each task.
-     */
     public synchronized Map<String, TotalTimeSpent> getTotalTimeSpent () {
 	return Collections.unmodifiableMap (total);
     }

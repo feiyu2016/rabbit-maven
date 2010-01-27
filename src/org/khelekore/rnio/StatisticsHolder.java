@@ -31,22 +31,27 @@ public interface StatisticsHolder {
 				     long timeSpent);
 
     /** Get information about the currently pending tasks.
+     * @return a mapping from group ids to the task identifiers
      */
     Map<String, List<TaskIdentifier>> getPendingTasks ();
 
     /** Get information about the currently running tasks.
+     * @return a mapping from group ids to the task identifiers
      */
     Map<String, List<TaskIdentifier>> getRunningTasks ();
 
     /** Get information about the most recent completed tasks
+     * @return a mapping from group ids to the task identifiers
      */
     Map<String, List<CompletionEntry>> getLatest ();
 
     /** Get information about the longest running task.
+     * @return a mapping from group ids to the task identifiers
      */
     Map<String, List<CompletionEntry>> getLongest ();
 
     /** Get the total time spent for each task.
+     * @return a mapping from group ids to the task identifiers
      */
     Map<String, TotalTimeSpent> getTotalTimeSpent ();
 }
