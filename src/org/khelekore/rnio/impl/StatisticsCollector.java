@@ -8,7 +8,7 @@ import org.khelekore.rnio.TaskIdentifier;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class StatisticsCollector implements Runnable {
+class StatisticsCollector implements Runnable {
     private final StatisticsHolder stats;
     private final Runnable realTask;
     private final TaskIdentifier ti;
