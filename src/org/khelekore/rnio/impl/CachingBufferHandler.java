@@ -5,11 +5,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.khelekore.rnio.BufferHandler;
 
-/** A ByteBuffer handler that re uses returned buffers.
+/** A buffer handler that re-uses returned buffers.
  *
- *  This class uses no synchronization.
+ *  <p>This class uses no synchronization.
  *
- *  This class only allocates direct buffers.
+ *  <p>This class only allocates direct buffers.
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
