@@ -114,9 +114,13 @@ public class EchoServer {
 	    try {
 		ByteBuffer buf = getBuffer ();
 		int read = sc.read (buf);
-		if (read < 0) {
+		if (read == -1) {
 		    returnBuffer (buf);
 		    closed ();
+		    return;
+		}
+		if (read == 0) {
+		    register ();
 		} else {
 		    buf.flip ();
 		    Writer writer = new Writer (sc, buf, this);
