@@ -37,7 +37,7 @@
 
     <target name="dist.bin" depends="compile" description="generate the binary distribution">
         <mkdir dir="${dist}/jars"/>
-        <jar jarfile="${dist}/jars/rnio${major_version}.jar" basedir="${build}"/>
+        <jar jarfile="${dist}/jars/rnio-${major_version}.jar" basedir="${build}"/>
         <javadoc sourcepath="${src}" destdir="${dist}/javadoc" classpathref="project.classpath"/>
     </target>
 
