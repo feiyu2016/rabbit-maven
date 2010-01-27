@@ -189,7 +189,7 @@ class SingleSelectorRunner implements Runnable {
 		    counter = 0;
 
 		if (logger.isLoggable (Level.FINEST))
-		    logger.finest (id + ":after select");
+		    logger.finest (id + ": after select, time taken: " + diff);
 		cancelTimeouts (now);
 		int num = handleSelects ();
 		int rt = 0;

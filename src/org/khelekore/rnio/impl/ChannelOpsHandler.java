@@ -22,6 +22,7 @@ class ChannelOpsHandler {
 	public void write () {}
 	public void accept () {}
 	public void connect () {}
+	@Override public String toString () { return "NullHandler"; }
     }
 
     private static final NullHandler NULL_HANDLER = new NullHandler ();
