@@ -19,8 +19,6 @@ import org.khelekore.rnio.ConnectHandler;
 import org.khelekore.rnio.ReadHandler;
 import org.khelekore.rnio.SelectorVisitor;
 import org.khelekore.rnio.SocketChannelHandler;
-import org.khelekore.rnio.StatisticsHolder;
-import org.khelekore.rnio.TaskIdentifier;
 import org.khelekore.rnio.WriteHandler;
 
 /** A selector handler.
