@@ -55,14 +55,6 @@ public class EchoServer {
 	as.start ();
     }
 
-    public ByteBuffer getBuffer () {
-	return bufferHandler.getBuffer ();
-    }
-
-    public void returnBuffer (ByteBuffer buf) {
-	bufferHandler.putBuffer (buf);
-    }
-
     private void quit () {
 	as.shutdown ();
     }
@@ -82,10 +74,10 @@ public class EchoServer {
 
 	public void read () {
 	    try {
-		ByteBuffer buf = getBuffer ();
+		ByteBuffer buf = bufferHandler.getBuffer ();
 		int read = sc.read (buf);
 		if (read == -1) {
-		    returnBuffer (buf);
+		    bufferHandler.putBuffer (buf);
 		    closed ();
 		    return;
 		}
@@ -136,7 +128,7 @@ public class EchoServer {
 		if (buf.hasRemaining ()) {
 		    register ();
 		} else {
-		    returnBuffer (buf);
+		    bufferHandler.putBuffer (buf);
 		    reader.register ();
 		}
 	    } catch (IOException e) {
