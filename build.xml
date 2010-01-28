@@ -46,6 +46,7 @@
 	   destdir="${dist}/javadoc"
 	   classpathref="project.classpath"
 	   link="http://java.sun.com/javase/6/docs/api/"
+	   overview="src/org/khelekore/rnio/overview.html"
 	   />
     </target>
 
