@@ -20,8 +20,10 @@ import org.khelekore.rnio.impl.BasicStatisticsHolder;
 import org.khelekore.rnio.impl.CachingBufferHandler;
 import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.MultiSelectorNioHandler;
+import org.khelekore.rnio.impl.UnlimitedSocketHandler;
 
-/** An echo server built using rnio.
+/** An echo server built using rnio. This echo server will handle
+ *  many concurrent clients without any problems.
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
@@ -84,35 +86,8 @@ public class EchoServer {
 	}
     }
 
-    private abstract class SockHandler {
-	public final SocketChannel sc;
-
-	public SockHandler (SocketChannel sc) {
-	    this.sc = sc;
-	}
-
-	public Long getTimeout () {
-	    return null;
-	}
-
-	public String getDescription () {
-	    return getClass ().getSimpleName ();
-	}
-
-	public boolean useSeparateThread () {
-	    return false;
-	}
-
-	public void timeout () {
-	    throw new IllegalStateException ("Should not get timeout");
-	}
-
-	public void closed () {
-	    Closer.close (sc, logger);
-	}
-    }
-
-    private class Reader extends SockHandler implements ReadHandler {
+    private class Reader extends UnlimitedSocketHandler 
+	implements ReadHandler {
 	public Reader (SocketChannel sc) {
 	    super (sc);
 	}
@@ -156,7 +131,8 @@ public class EchoServer {
 	}
     }
 
-    private class Writer extends SockHandler implements WriteHandler {
+    private class Writer extends UnlimitedSocketHandler 
+	implements WriteHandler {
 	private final ByteBuffer buf;
 	private final Reader reader;
 
