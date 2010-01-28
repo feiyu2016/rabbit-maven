@@ -85,15 +85,15 @@ public class EchoServer {
 
     private class AcceptListener implements AcceptorListener {
 	public void connectionAccepted (SocketChannel sc) throws IOException {
-	    Reader rh = new Reader (sc);
+	    Reader rh = new Reader (sc, nioHandler);
 	    rh.register ();
 	}
     }
 
-    private class Reader extends UnlimitedSocketHandler 
+    private class Reader extends UnlimitedSocketHandler<SocketChannel>
 	implements ReadHandler {
-	public Reader (SocketChannel sc) {
-	    super (sc);
+	public Reader (SocketChannel sc, NioHandler nioHandler) {
+	    super (sc, nioHandler);
 	}
 
 	public void read () {
@@ -112,7 +112,7 @@ public class EchoServer {
 		    if (quitMessage (buf)) {
 			quit ();
 		    } else {
-			Writer writer = new Writer (sc, buf, this);
+			Writer writer = new Writer (sc, nioHandler, buf, this);
 			writer.write ();
 		    }
 		}
@@ -131,13 +131,14 @@ public class EchoServer {
 	}
     }
 
-    private class Writer extends UnlimitedSocketHandler 
+    private class Writer extends UnlimitedSocketHandler<SocketChannel>
 	implements WriteHandler {
 	private final ByteBuffer buf;
 	private final Reader reader;
 
-	public Writer (SocketChannel sc, ByteBuffer buf, Reader reader) {
-	    super (sc);
+	public Writer (SocketChannel sc, NioHandler nioHandler,
+		       ByteBuffer buf, Reader reader) {
+	    super (sc, nioHandler);
 	    this.buf = buf;
 	    this.reader = reader;
 	}
