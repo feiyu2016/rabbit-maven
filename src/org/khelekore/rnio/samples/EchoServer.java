@@ -79,6 +79,10 @@ public class EchoServer {
 	bufferHandler.putBuffer (buf);
     }
 
+    private void quit () {
+	nioHandler.shutdown ();
+    }
+
     private class AcceptListener implements AcceptorListener {
 	public void connectionAccepted (SocketChannel sc) throws IOException {
 	    Reader rh = new Reader (sc);
@@ -120,10 +124,6 @@ public class EchoServer {
 
 	private boolean quitMessage (ByteBuffer buf) {
 	    return buf.compareTo (QUIT) == 0;
-	}
-
-	private void quit () {
-	    nioHandler.shutdown ();
 	}
 
 	public void register () {
