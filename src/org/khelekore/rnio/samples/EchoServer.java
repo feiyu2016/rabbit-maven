@@ -1,25 +1,18 @@
 package org.khelekore.rnio.samples;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import org.khelekore.rnio.BufferHandler;
 import org.khelekore.rnio.NioHandler;
 import org.khelekore.rnio.ReadHandler;
-import org.khelekore.rnio.StatisticsHolder;
 import org.khelekore.rnio.WriteHandler;
-import org.khelekore.rnio.impl.Acceptor;
+import org.khelekore.rnio.impl.AcceptingServer;
 import org.khelekore.rnio.impl.AcceptorListener;
-import org.khelekore.rnio.impl.BasicStatisticsHolder;
 import org.khelekore.rnio.impl.CachingBufferHandler;
 import org.khelekore.rnio.impl.Closer;
-import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 import org.khelekore.rnio.impl.UnlimitedSocketHandler;
 
 /** An echo server built using rnio. This echo server will handle
@@ -28,8 +21,7 @@ import org.khelekore.rnio.impl.UnlimitedSocketHandler;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class EchoServer {
-    private final NioHandler nioHandler;
-    private final ServerSocketChannel ssc;
+    private final AcceptingServer as;
     private final BufferHandler bufferHandler;
     private final AcceptListener acceptHandler;
     private final Logger logger =
@@ -39,7 +31,7 @@ public class EchoServer {
 	ByteBuffer.wrap ("quit\r\n".getBytes ("UTF-8"));
 
     public static void main (String[] args) {
-	int port = 9007;
+	int port = 9999;
 
 	if (args.length > 0)
 	    port = Integer.parseInt (args[0]);
@@ -53,22 +45,14 @@ public class EchoServer {
     }
 
     public EchoServer (int port) throws IOException {
-	ssc = ServerSocketChannel.open ();
-	ssc.configureBlocking (false);
-	ServerSocket ss = ssc.socket ();
-	ss.bind (new InetSocketAddress (port));
 	bufferHandler = new CachingBufferHandler ();
-
-	ExecutorService es = Executors.newCachedThreadPool ();
-	StatisticsHolder stats = new BasicStatisticsHolder ();
-	nioHandler = new MultiSelectorNioHandler (es, stats, 1);
 	acceptHandler = new AcceptListener ();
+	as = new AcceptingServer (null, port, acceptHandler, 
+				  Executors.newCachedThreadPool (), 1);
     }
 
     public void start () throws IOException {
-	nioHandler.start ();
-	Acceptor acceptor = new Acceptor (ssc, nioHandler, acceptHandler);
-	acceptor.register ();
+	as.start ();
     }
 
     public ByteBuffer getBuffer () {
@@ -80,12 +64,12 @@ public class EchoServer {
     }
 
     private void quit () {
-	nioHandler.shutdown ();
+	as.shutdown ();
     }
 
     private class AcceptListener implements AcceptorListener {
 	public void connectionAccepted (SocketChannel sc) throws IOException {
-	    Reader rh = new Reader (sc, nioHandler);
+	    Reader rh = new Reader (sc, as.getNioHandler ());
 	    rh.register ();
 	}
     }
