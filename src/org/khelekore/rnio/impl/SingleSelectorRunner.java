@@ -71,6 +71,8 @@ class SingleSelectorRunner implements Runnable {
 		    selectorThread.join (10000);
 		}
 	    }
+	    for (SelectionKey sk : selector.keys ())
+		close (sk.channel ());
 	    selector.close ();
 	} catch (InterruptedException e) {
 	    logger.log (Level.WARNING,

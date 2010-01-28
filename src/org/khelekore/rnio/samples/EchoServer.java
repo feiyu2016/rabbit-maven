@@ -30,7 +30,11 @@ public class EchoServer {
     private final ServerSocketChannel ssc;
     private final BufferHandler bufferHandler;
     private final AcceptListener acceptHandler;
-    private final Logger logger = Logger.getLogger ("org.khelekore.rnio.echoserver");
+    private final Logger logger =
+	Logger.getLogger ("org.khelekore.rnio.echoserver");
+
+    private final ByteBuffer QUIT =
+	ByteBuffer.wrap ("quit\r\n".getBytes ("UTF-8"));
 
     public static void main (String[] args) {
 	int port = 9007;
@@ -72,7 +76,7 @@ public class EchoServer {
     public void returnBuffer (ByteBuffer buf) {
 	bufferHandler.putBuffer (buf);
     }
-    
+
     private class AcceptListener implements AcceptorListener {
 	public void connectionAccepted (SocketChannel sc) throws IOException {
 	    Reader rh = new Reader (sc);
@@ -86,7 +90,7 @@ public class EchoServer {
 	public SockHandler (SocketChannel sc) {
 	    this.sc = sc;
 	}
-	
+
 	public Long getTimeout () {
 	    return null;
 	}
@@ -104,7 +108,6 @@ public class EchoServer {
 	}
 
 	public void closed () {
-	    System.out.println ("sc: " + sc + " has been closed");
 	    Closer.close (sc, logger);
 	}
     }
@@ -127,13 +130,25 @@ public class EchoServer {
 		    register ();
 		} else {
 		    buf.flip ();
-		    Writer writer = new Writer (sc, buf, this);
-		    writer.write ();
+		    if (quitMessage (buf)) {
+			quit ();
+		    } else {
+			Writer writer = new Writer (sc, buf, this);
+			writer.write ();
+		    }
 		}
 	    } catch (IOException e) {
 		e.printStackTrace ();
 		Closer.close (sc, logger);
 	    }
+	}
+
+	private boolean quitMessage (ByteBuffer buf) {
+	    return buf.compareTo (QUIT) == 0;
+	}
+
+	private void quit () {
+	    nioHandler.shutdown ();
 	}
 
 	public void register () {
