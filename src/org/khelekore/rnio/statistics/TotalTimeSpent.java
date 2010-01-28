@@ -1,7 +1,7 @@
 package org.khelekore.rnio.statistics;
 
 /** Information about total time spent on a group of tasks.
- *  This class is not thread safe.
+ *  <p>This class is not thread safe.
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */

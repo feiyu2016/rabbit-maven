@@ -21,7 +21,7 @@ public class AcceptingServer {
     private final AcceptorListener listener;
     private final NioHandler nioHandler;
 
-    /** 
+    /** Create a new server using the parameters given.
      * @param addr the InetAddress to bind to, may be null for wildcard address
      * @param port the port number to bind to
      * @param listener the client that will handle the accepted sockets
@@ -56,6 +56,8 @@ public class AcceptingServer {
 	nioHandler.shutdown ();	
     }
 
+    /** Get the NioHandler in use by this server.
+     */
     public NioHandler getNioHandler () {
 	return nioHandler;
     }
