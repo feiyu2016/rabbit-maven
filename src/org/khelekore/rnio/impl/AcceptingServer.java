@@ -14,6 +14,12 @@ import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 
 /** A basic server for rnio.
  *
+ * <p>This server will create a {@link MultiSelectorNioHandler} using a 
+ * {@link BasicStatisticsHolder} and the ExecutorService you pass.
+ * <br>When you start this server it will begin to listen for socket connections
+ * on the specified InetAddress and port and hand off new socket connections
+ * to the {@link AcceptorListener}
+ *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class AcceptingServer {

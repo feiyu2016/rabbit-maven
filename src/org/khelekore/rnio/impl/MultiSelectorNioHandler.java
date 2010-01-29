@@ -17,8 +17,12 @@ import org.khelekore.rnio.StatisticsHolder;
 import org.khelekore.rnio.TaskIdentifier;
 import org.khelekore.rnio.WriteHandler;
 
-/** An implementation of NioHandler that runs several
- *  selector threads.
+/** An implementation of NioHandler that runs several selector threads.
+ *
+ * <p>Any tasks that should run on a background thread are passed to the
+ * {@link ExecutorService} that was given in the constructor.
+ *
+ * <p>This class will log using the "org.khelekore.rnio" {@link Logger}.
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
