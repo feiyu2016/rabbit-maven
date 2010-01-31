@@ -59,13 +59,14 @@
 	</copy>
 	<copy file="build.xml" toDir="${dist}"/>
 	<copy file="ChangeLog" toDir="${dist}"/>
+	<copy file="LICENSE" toDir="${dist}"/>
     </target>
 
     <target name="tgz" description="build the tar.gz files" 
 	    depends="dist.bin">
       <tar destfile="dist/${full_name}-src.tar.gz" compression="gzip"
 	   basedir="dist" 
-	   includes="${full_name}/src/** ${full_name}/build.xml ${full_name}/ChangeLog">
+	   includes="${full_name}/src/** ${full_name}/build.xml ${full_name}/ChangeLog ${full_name}/LICENSE">
       </tar>
     </target>
 </project>
