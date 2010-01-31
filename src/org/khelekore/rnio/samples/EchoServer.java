@@ -76,12 +76,11 @@ public class EchoServer {
 	    bufferHandler.putBuffer (buf);
 	}
 
-	@Override public void channelClosed (SocketChannel sc) {
+	@Override public void channelClosed () {
 	    closed ();
 	}
 
-	@Override public void handleBufferRead (SocketChannel sc,
-						ByteBuffer buf) {
+	@Override public void handleBufferRead (ByteBuffer buf) {
 	    if (quitMessage (buf)) {
 		quit ();
 	    } else {

@@ -12,14 +12,12 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.ReadHandler;
 import org.khelekore.rnio.StatisticsHolder;
 import org.khelekore.rnio.impl.BasicStatisticsHolder;
 import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 import org.khelekore.rnio.impl.SimpleBlockReader;
 import org.khelekore.rnio.impl.SimpleBlockSender;
-import org.khelekore.rnio.impl.UnlimitedSocketHandler;
 
 /** An echo client built using rnio. 
  *
@@ -72,13 +70,13 @@ public class EchoClient {
 	    super (sc, nioHandler);
 	}
 	
-	@Override public void channelClosed (SocketChannel sc) {
+	@Override public void channelClosed () {
 	    logger.info ("Server shut down");
 	    shutdown ();	    
 	}
 
 	@Override
-	public void handleBufferRead (SocketChannel sc, ByteBuffer buf) 
+	public void handleBufferRead (ByteBuffer buf) 
 	    throws IOException {
 	    String s = new String (buf.array (), buf.position (), 
 				   buf.remaining (), "UTF-8");

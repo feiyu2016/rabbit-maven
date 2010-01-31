@@ -35,7 +35,7 @@ public abstract class SimpleBlockReader
 	    ByteBuffer buf = getByteBuffer ();
 	    int read = sc.read (buf);
 	    if (read == -1) {
-		channelClosed (sc);
+		channelClosed ();
 		putByteBuffer (buf);
 		return;
 	    }
@@ -44,7 +44,7 @@ public abstract class SimpleBlockReader
 		register ();
 	    } else {
 		buf.flip ();
-		handleBufferRead (sc, buf);
+		handleBufferRead (buf);
 	    }
 	} catch (IOException e) {
 	    handleIOException (e);
@@ -75,10 +75,10 @@ public abstract class SimpleBlockReader
     /** Do any cleanup that needs to be done when the channel we tried
      *  to read from was closed.
      */
-    public abstract void channelClosed (SocketChannel sc);
+    public abstract void channelClosed ();
 
     /** Handle the buffer content. */
-    public abstract void handleBufferRead (SocketChannel sc, ByteBuffer buf)
+    public abstract void handleBufferRead (ByteBuffer buf)
 	throws IOException;
 
     /** Wait for the channel to become read ready.*/
