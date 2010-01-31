@@ -61,7 +61,9 @@ public class EchoClient {
     public void shutdown () {
 	nioHandler.shutdown ();
 	Closer.close (serverChannel, logger);
-	inputReaderThread.interrupt ();
+	// would want to shutdown inputReaderThread but it will be
+	// blocked in BufferedReader.readLine and that one is not
+	// inerruptible.
     }
 
     private class ServerReader extends UnlimitedSocketHandler<SocketChannel>
