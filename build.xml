@@ -24,16 +24,20 @@
 	<mkdir dir="${build}"/>
     </target>
 
+    <target name="clean" description="clean up build and dist">
+	<delete dir="${build}"/>
+	<delete dir="${dist}"/>
+	<delete file="dist/${full_name}-src.tar.gz"/>
+    </target>
+
     <target name="compile" depends="init" description="compile the source">
 	<!-- Compile the java code from ${src} into ${build} -->
-	<javac
-		srcdir="${src}"
-		destdir="${build}"
-		debug="${debug_symbols}"
-		classpathref="project.classpath"
-		deprecation="on"
-		target="1.6"
-		encoding="ISO-8859-1"
+	<javac srcdir="${src}" destdir="${build}"
+	       debug="${debug_symbols}"
+	       classpathref="project.classpath"
+	       deprecation="on"
+	       target="1.6"
+	       encoding="ISO-8859-1"
 	/>
     </target>
 
@@ -45,24 +49,16 @@
 
     <target name="dist.bin" depends="clean, make_jars"
 	    description="generate the binary distribution">
-	<javadoc
-	   sourcepath="${src}"
-	   destdir="${dist}/javadoc"
-	   classpathref="project.classpath"
-	   link="http://java.sun.com/javase/6/docs/api/"
-	   overview="src/org/khelekore/rnio/overview.html"
+	<javadoc sourcepath="${src}" destdir="${dist}/javadoc"
+		 classpathref="project.classpath"
+		 link="http://java.sun.com/javase/6/docs/api/"
+		 overview="src/org/khelekore/rnio/overview.html"
 	   />
 	<copy todir="${dist}/src">
 	  <fileset dir="src"/>
 	</copy>
 	<copy file="build.xml" toDir="${dist}"/>
 	<copy file="ChangeLog" toDir="${dist}"/>
-    </target>
-
-    <target name="clean" description="clean up build and dist">
-	<delete dir="${build}"/>
-	<delete dir="${dist}"/>
-	<delete file="dist/${full_name}-src.tar.gz"/>
     </target>
 
     <target name="tgz" description="build the tar.gz files" 
