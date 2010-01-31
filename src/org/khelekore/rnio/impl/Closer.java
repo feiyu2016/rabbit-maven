@@ -11,6 +11,10 @@ import java.util.logging.Logger;
  */
 public class Closer {
 
+    /** Try to close the Closeable.
+     *  If an exception is thrown when calling close() it will be logged 
+     *  to the logger.
+     */
     public static void close (Closeable c, Logger logger) {
 	if (c == null)
 	    return;

@@ -29,6 +29,7 @@ public abstract class SimpleBlockSender
 	this.buf = buf;
     }
 
+    /** Get the buffer we are sending data from. */
     public ByteBuffer getBuffer () {
 	return buf;
     }
