@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 import org.khelekore.rnio.BufferHandler;
 import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.ReadHandler;
 import org.khelekore.rnio.impl.AcceptingServer;
 import org.khelekore.rnio.impl.AcceptorListener;
 import org.khelekore.rnio.impl.CachingBufferHandler;
-import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.SimpleBlockSender;
-import org.khelekore.rnio.impl.UnlimitedSocketHandler;
+import org.khelekore.rnio.impl.SimpleBlockReader;
 
 /** An echo server built using rnio. This echo server will handle
  *  many concurrent clients without any problems.
@@ -24,8 +21,6 @@ public class EchoServer {
     private final AcceptingServer as;
     private final BufferHandler bufferHandler;
     private final AcceptListener acceptHandler;
-    private final Logger logger =
-	Logger.getLogger ("org.khelekore.rnio.echoserver");
 
     private final ByteBuffer QUIT =
 	ByteBuffer.wrap ("quit\r\n".getBytes ("UTF-8"));
@@ -47,7 +42,7 @@ public class EchoServer {
     public EchoServer (int port) throws IOException {
 	bufferHandler = new CachingBufferHandler ();
 	acceptHandler = new AcceptListener ();
-	as = new AcceptingServer (null, port, acceptHandler, 
+	as = new AcceptingServer (null, port, acceptHandler,
 				  Executors.newCachedThreadPool (), 1);
     }
 
@@ -66,44 +61,37 @@ public class EchoServer {
 	}
     }
 
-    private class Reader extends UnlimitedSocketHandler<SocketChannel>
-	implements ReadHandler {
+    private class Reader extends SimpleBlockReader {
 	public Reader (SocketChannel sc, NioHandler nioHandler) {
 	    super (sc, nioHandler);
 	}
 
-	public void read () {
-	    try {
-		ByteBuffer buf = bufferHandler.getBuffer ();
-		int read = sc.read (buf);
-		if (read == -1) {
-		    bufferHandler.putBuffer (buf);
-		    closed ();
-		    return;
-		}
-		if (read == 0) {
-		    register ();
-		} else {
-		    buf.flip ();
-		    if (quitMessage (buf)) {
-			quit ();
-		    } else {
-			Writer writer = new Writer (sc, nioHandler, buf, this);
-			writer.write ();
-		    }
-		}
-	    } catch (IOException e) {
-		e.printStackTrace ();
-		Closer.close (sc, logger);
+	/** Use the direct byte buffers from the bufferHandler */
+	@Override public ByteBuffer getByteBuffer () {
+	    return bufferHandler.getBuffer ();
+	}
+
+	/** Cache the ByteBuffer again */
+	@Override public void putByteBuffer (ByteBuffer buf) {
+	    bufferHandler.putBuffer (buf);
+	}
+
+	@Override public void channelClosed (SocketChannel sc) {
+	    closed ();
+	}
+
+	@Override public void handleBufferRead (SocketChannel sc,
+						ByteBuffer buf) {
+	    if (quitMessage (buf)) {
+		quit ();
+	    } else {
+		Writer writer = new Writer (sc, nioHandler, buf, this);
+		writer.write ();
 	    }
 	}
 
 	private boolean quitMessage (ByteBuffer buf) {
 	    return buf.compareTo (QUIT) == 0;
-	}
-
-	public void register () {
-	    nioHandler.waitForRead (sc, this);
 	}
     }
 
@@ -115,7 +103,7 @@ public class EchoServer {
 	    super (sc, nioHandler, buf);
 	    this.reader = reader;
 	}
-	
+
 	@Override public void done () {
 	    bufferHandler.putBuffer (getBuffer ());
 	    reader.register ();

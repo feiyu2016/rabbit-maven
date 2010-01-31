@@ -17,6 +17,7 @@ import org.khelekore.rnio.StatisticsHolder;
 import org.khelekore.rnio.impl.BasicStatisticsHolder;
 import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.MultiSelectorNioHandler;
+import org.khelekore.rnio.impl.SimpleBlockReader;
 import org.khelekore.rnio.impl.SimpleBlockSender;
 import org.khelekore.rnio.impl.UnlimitedSocketHandler;
 
@@ -53,7 +54,7 @@ public class EchoClient {
 
     public void start () throws IOException {
 	nioHandler.start ();
-	ServerReader sr = new ServerReader (nioHandler);
+	ServerReader sr = new ServerReader (serverChannel, nioHandler);
 	nioHandler.waitForRead (serverChannel, sr);
 	inputReaderThread.start ();
     }
@@ -66,31 +67,24 @@ public class EchoClient {
 	// inerruptible.
     }
 
-    private class ServerReader extends UnlimitedSocketHandler<SocketChannel>
-	implements ReadHandler {
-	public ServerReader (NioHandler nioHandler) {
-	    super (serverChannel, nioHandler);
+    private class ServerReader extends SimpleBlockReader {
+	public ServerReader (SocketChannel sc, NioHandler nioHandler) {
+	    super (sc, nioHandler);
 	}
-	public void read () {
-	    ByteBuffer buf = ByteBuffer.allocate (1024);
-	    try {
-		int read = sc.read (buf);
-		if (read == -1) {
-		    logger.info ("Server shut down");
-		    shutdown ();
-		    return;
-		}
-		buf.flip ();
-		String s = new String (buf.array (), 
-				       buf.position (), 
-				       buf.remaining (), 
-				       "UTF-8");
-		output.println ("Server sent: " + s);
-		output.flush ();
-		nioHandler.waitForRead (serverChannel, this);
-	    } catch (IOException e) {
-		logger.log (Level.WARNING, "Failed to read", e);
-	    }
+	
+	@Override public void channelClosed (SocketChannel sc) {
+	    logger.info ("Server shut down");
+	    shutdown ();	    
+	}
+
+	@Override
+	public void handleBufferRead (SocketChannel sc, ByteBuffer buf) 
+	    throws IOException {
+	    String s = new String (buf.array (), buf.position (), 
+				   buf.remaining (), "UTF-8");
+	    output.println ("Server sent: " + s);
+	    output.flush ();
+	    nioHandler.waitForRead (sc, this);
 	}
     }
 
