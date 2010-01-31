@@ -57,16 +57,17 @@
 	<copy todir="${dist}/src">
 	  <fileset dir="src"/>
 	</copy>
-	<copy file="build.xml" toDir="${dist}"/>
-	<copy file="ChangeLog" toDir="${dist}"/>
-	<copy file="LICENSE" toDir="${dist}"/>
+	<copy toDir="${dist}">
+	  <fileset dir="." includes="build.xml ChangeLog LICENSE"/>
+	</copy>
     </target>
 
     <target name="tgz" description="build the tar.gz files" 
 	    depends="dist.bin">
       <tar destfile="dist/${full_name}-src.tar.gz" compression="gzip"
 	   basedir="dist" 
-	   includes="${full_name}/src/** ${full_name}/build.xml ${full_name}/ChangeLog ${full_name}/LICENSE">
+	   includes="${full_name}/src/** ${full_name}/build.xml
+		     ${full_name}/ChangeLog ${full_name}/LICENSE">
       </tar>
     </target>
 </project>
