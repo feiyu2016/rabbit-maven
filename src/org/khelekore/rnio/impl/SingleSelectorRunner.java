@@ -63,6 +63,8 @@ class SingleSelectorRunner implements Runnable {
     }
 
     public void shutdown () {
+	if (!running.get ())
+	    return;
 	running.set (false);
 	try {
 	    selector.wakeup ();
