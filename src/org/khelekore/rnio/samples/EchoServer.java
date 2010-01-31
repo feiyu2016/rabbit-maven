@@ -8,11 +8,11 @@ import java.util.logging.Logger;
 import org.khelekore.rnio.BufferHandler;
 import org.khelekore.rnio.NioHandler;
 import org.khelekore.rnio.ReadHandler;
-import org.khelekore.rnio.WriteHandler;
 import org.khelekore.rnio.impl.AcceptingServer;
 import org.khelekore.rnio.impl.AcceptorListener;
 import org.khelekore.rnio.impl.CachingBufferHandler;
 import org.khelekore.rnio.impl.Closer;
+import org.khelekore.rnio.impl.SimpleBlockSender;
 import org.khelekore.rnio.impl.UnlimitedSocketHandler;
 
 /** An echo server built using rnio. This echo server will handle
@@ -107,38 +107,18 @@ public class EchoServer {
 	}
     }
 
-    private class Writer extends UnlimitedSocketHandler<SocketChannel>
-	implements WriteHandler {
-	private final ByteBuffer buf;
-	private final Reader reader;
+    private class Writer extends SimpleBlockSender {
+	private Reader reader;
 
 	public Writer (SocketChannel sc, NioHandler nioHandler,
 		       ByteBuffer buf, Reader reader) {
-	    super (sc, nioHandler);
-	    this.buf = buf;
+	    super (sc, nioHandler, buf);
 	    this.reader = reader;
 	}
-
-	public void write () {
-	    try {
-		int written = 0;
-		do {
-		    written = sc.write (buf);
-		} while (buf.hasRemaining () && written > 0);
-		if (buf.hasRemaining ()) {
-		    register ();
-		} else {
-		    bufferHandler.putBuffer (buf);
-		    reader.register ();
-		}
-	    } catch (IOException e) {
-		e.printStackTrace ();
-		Closer.close (sc, logger);
-	    }
-	}
-
-	public void register () {
-	    nioHandler.waitForWrite (sc, this);
+	
+	@Override public void done () {
+	    bufferHandler.putBuffer (getBuffer ());
+	    reader.register ();
 	}
     }
 }

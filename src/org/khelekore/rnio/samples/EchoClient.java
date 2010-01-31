@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 import org.khelekore.rnio.NioHandler;
 import org.khelekore.rnio.ReadHandler;
 import org.khelekore.rnio.StatisticsHolder;
-import org.khelekore.rnio.WriteHandler;
 import org.khelekore.rnio.impl.BasicStatisticsHolder;
 import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.MultiSelectorNioHandler;
+import org.khelekore.rnio.impl.SimpleBlockSender;
 import org.khelekore.rnio.impl.UnlimitedSocketHandler;
 
 /** An echo client built using rnio. 
@@ -94,27 +94,9 @@ public class EchoClient {
 	}
     }
 
-    private class Sender extends UnlimitedSocketHandler<SocketChannel>
-	implements WriteHandler {
-	private ByteBuffer buf;
+    private class Sender extends SimpleBlockSender {
 	public Sender (NioHandler nioHandler, ByteBuffer buf) {
-	    super (serverChannel, nioHandler);
-	    this.buf = buf;
-	}
-
-	public void write () {
-	    try {
-		int written = 0;
-		do {
-		    written = sc.write (buf);
-		} while (buf.hasRemaining () && written > 0);
-		if (buf.hasRemaining ()) {
-		    nioHandler.waitForWrite (sc, this);
-		}
-	    } catch (IOException e) {
-		logger.log (Level.WARNING, "Failed to write", e);
-		shutdown ();
-	    }	    
+	    super (serverChannel, nioHandler, buf);
 	}
     }
 
@@ -128,6 +110,9 @@ public class EchoClient {
 		    byte[] bytes = line.getBytes ("UTF-8");
 		    ByteBuffer buf = ByteBuffer.wrap (bytes);
 		    Sender s = new Sender (nioHandler, buf);
+		    // if we fail to send everything before we read the next
+		    // line we may end up with several writers, but this is
+		    // an example, handle concurrency in real apps.
 		    s.write ();
 		}
 	    } catch (IOException e) {
