@@ -64,7 +64,7 @@
 
     <target name="tgz" description="build the tar.gz files" 
 	    depends="dist.bin">
-      <tar destfile="dist/${full_name}-src.tar.gz" compression="gzip"
+      <tar destfile="dist/${full_name}.tar.gz" compression="gzip"
 	   basedir="dist" 
 	   includes="${full_name}/src/** ${full_name}/build.xml
 		     ${full_name}/ChangeLog ${full_name}/LICENSE">
