@@ -61,6 +61,7 @@ public class EchoServer {
 	}
     }
 
+    // TODO: ought to set a timeout on the reads
     private class Reader extends SimpleBlockReader {
 	public Reader (SocketChannel sc, NioHandler nioHandler) {
 	    super (sc, nioHandler);

@@ -39,6 +39,7 @@ public class EchoClient {
 	this.input = input;
 	this.output = output;
 
+	// TODO: could use nioHandler to wait for connect.
 	serverChannel = 
 	    SocketChannel.open (new InetSocketAddress (host, port));
 	serverChannel.configureBlocking (false);
