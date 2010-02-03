@@ -1,4 +1,4 @@
-version 1.0 (201x-yy-zz)
+version 1.0 (2010-02-02)
 	Created rnio from the nio handling code found in rabbit/4.4.
 	Added EchoClient and EchoServer as examples.
 	Fixed a problem with calling NioHandler.shutdown() multiple times.
