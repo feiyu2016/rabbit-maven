@@ -22,10 +22,18 @@ public abstract class SimpleBlockSender
     private final Logger logger =
 	Logger.getLogger ("org.khelekore.rnio");
 
+    /**
+     * @param sc the channel to handle
+     * @param nioHandler the NioHandler
+     * @param buf the ByteBuffer to send
+     * @param timeout the timeout in millis, may be null if no timeout
+     *        is wanted.
+     */
     public SimpleBlockSender (SocketChannel sc, 
 			      NioHandler nioHandler, 
-			      ByteBuffer buf) {
-	super (sc, nioHandler, null);
+			      ByteBuffer buf, 
+			      Long timeout) {
+	super (sc, nioHandler, timeout);
 	this.buf = buf;
     }
 

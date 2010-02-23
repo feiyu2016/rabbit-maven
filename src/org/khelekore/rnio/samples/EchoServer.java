@@ -66,7 +66,6 @@ public class EchoServer {
 	}
     }
 
-    // TODO: ought to set a timeout on the reads
     private class Reader extends SimpleBlockReader {
 	public Reader (SocketChannel sc, NioHandler nioHandler, Long timeout) {
 	    super (sc, nioHandler, timeout);
@@ -90,7 +89,8 @@ public class EchoServer {
 	    if (quitMessage (buf)) {
 		quit ();
 	    } else {
-		Writer writer = new Writer (sc, nioHandler, buf, this);
+		Writer writer = 
+		    new Writer (sc, nioHandler, buf, this, getTimeout ());
 		writer.write ();
 	    }
 	}
@@ -104,14 +104,19 @@ public class EchoServer {
 	private Reader reader;
 
 	public Writer (SocketChannel sc, NioHandler nioHandler,
-		       ByteBuffer buf, Reader reader) {
-	    super (sc, nioHandler, buf);
+		       ByteBuffer buf, Reader reader, Long timeout) {
+	    super (sc, nioHandler, buf, timeout);
 	    this.reader = reader;
 	}
 
 	@Override public void done () {
 	    bufferHandler.putBuffer (getBuffer ());
 	    reader.register ();
+	}
+
+	@Override public void closed () {
+	    bufferHandler.putBuffer (getBuffer ());
+	    super.closed ();
 	}
     }
 }

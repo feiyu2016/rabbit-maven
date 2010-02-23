@@ -89,7 +89,7 @@ public class EchoClient {
 
     private class Sender extends SimpleBlockSender {
 	public Sender (NioHandler nioHandler, ByteBuffer buf) {
-	    super (serverChannel, nioHandler, buf);
+	    super (serverChannel, nioHandler, buf, null);
 	}
     }
 

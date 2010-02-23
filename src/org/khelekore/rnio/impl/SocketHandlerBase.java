@@ -49,10 +49,10 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
 	return false;
     }
 
-    /** Handle timeouts. Default implementation just calls
-     *  closed().
+    /** Handle timeouts. Default implementation just calls closed().
      */
     public void timeout () {
+	closed ();
     }
 
     public void closed () {
