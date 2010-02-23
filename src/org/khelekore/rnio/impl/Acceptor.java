@@ -12,7 +12,7 @@ import org.khelekore.rnio.NioHandler;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class Acceptor extends UnlimitedSocketHandler<ServerSocketChannel>
+public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
     implements AcceptHandler {
     private AcceptorListener listener;
 
@@ -24,7 +24,7 @@ public class Acceptor extends UnlimitedSocketHandler<ServerSocketChannel>
     public Acceptor (ServerSocketChannel ssc, 
 		     NioHandler nioHandler,
 		     AcceptorListener listener) {
-	super (ssc, nioHandler);
+	super (ssc, nioHandler, null);
 	this.listener = listener;
     }
 

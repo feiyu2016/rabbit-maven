@@ -14,7 +14,7 @@ import org.khelekore.rnio.ReadHandler;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public abstract class SimpleBlockReader
-    extends UnlimitedSocketHandler<SocketChannel>
+    extends SocketHandlerBase<SocketChannel>
     implements ReadHandler {
 
     private final Logger logger =
@@ -23,9 +23,12 @@ public abstract class SimpleBlockReader
     /** Create a new block reader.
      * @param sc the channel to read from
      * @param nioHandler the NioHandler to use for waiting on data
+     * @param timeout the timeout time, may be null if not timeout is set
      */
-    public SimpleBlockReader (SocketChannel sc, NioHandler nioHandler) {
-	super (sc, nioHandler);
+    public SimpleBlockReader (SocketChannel sc, 
+			      NioHandler nioHandler,
+			      Long timeout) {
+	super (sc, nioHandler, timeout);
     }
 
     /** Try to read data from the channel.

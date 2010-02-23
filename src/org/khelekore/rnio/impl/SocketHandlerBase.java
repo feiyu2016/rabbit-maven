@@ -10,22 +10,30 @@ import org.khelekore.rnio.SocketChannelHandler;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public abstract class UnlimitedSocketHandler<T extends SelectableChannel>
+public abstract class SocketHandlerBase<T extends SelectableChannel>
     implements SocketChannelHandler {
     public final T sc;
     public final NioHandler nioHandler;
+    public final Long timeout;
 
     private final Logger logger = Logger.getLogger ("org.khelekore.rnio");
 
-    public UnlimitedSocketHandler (T sc, NioHandler nioHandler) {
+    /**
+     * @param sc the channel to handle
+     * @param nioHandler the NioHandler
+     * @param timeout the timeout in millis, may be null if no timeout
+     *        is wanted.
+     */
+    public SocketHandlerBase (T sc, NioHandler nioHandler, Long timeout) {
 	this.sc = sc;
 	this.nioHandler = nioHandler;
+	this.timeout = timeout;
     }
     
     /** Will return null to indicate no timeout on accepts.
      */
     public Long getTimeout () {
-	return null;
+	return timeout;
     }
     
     /** Returns the class name.
@@ -41,10 +49,10 @@ public abstract class UnlimitedSocketHandler<T extends SelectableChannel>
 	return false;
     }
 
-    /** Handle timeouts. We should not get any timeout.
+    /** Handle timeouts. Default implementation just calls
+     *  closed().
      */
     public void timeout () {
-	throw new IllegalStateException ("Should not get timeout");
     }
 
     public void closed () {

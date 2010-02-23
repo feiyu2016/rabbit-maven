@@ -68,7 +68,7 @@ public class EchoClient {
 
     private class ServerReader extends SimpleBlockReader {
 	public ServerReader (SocketChannel sc, NioHandler nioHandler) {
-	    super (sc, nioHandler);
+	    super (sc, nioHandler, null);
 	}
 	
 	@Override public void channelClosed () {

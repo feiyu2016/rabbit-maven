@@ -54,17 +54,22 @@ public class EchoServer {
 	as.shutdown ();
     }
 
+    private Long getTimeout () {
+	long now = System.currentTimeMillis ();
+	return now + 60 * 1000;
+    }
+
     private class AcceptListener implements AcceptorListener {
 	public void connectionAccepted (SocketChannel sc) throws IOException {
-	    Reader rh = new Reader (sc, as.getNioHandler ());
+	    Reader rh = new Reader (sc, as.getNioHandler (), getTimeout ());
 	    rh.register ();
 	}
     }
 
     // TODO: ought to set a timeout on the reads
     private class Reader extends SimpleBlockReader {
-	public Reader (SocketChannel sc, NioHandler nioHandler) {
-	    super (sc, nioHandler);
+	public Reader (SocketChannel sc, NioHandler nioHandler, Long timeout) {
+	    super (sc, nioHandler, timeout);
 	}
 
 	/** Use the direct byte buffers from the bufferHandler */

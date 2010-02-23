@@ -16,7 +16,7 @@ import org.khelekore.rnio.WriteHandler;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public abstract class SimpleBlockSender 
-    extends UnlimitedSocketHandler<SocketChannel>
+    extends SocketHandlerBase<SocketChannel>
     implements WriteHandler {
     private final ByteBuffer buf;
     private final Logger logger =
@@ -25,7 +25,7 @@ public abstract class SimpleBlockSender
     public SimpleBlockSender (SocketChannel sc, 
 			      NioHandler nioHandler, 
 			      ByteBuffer buf) {
-	super (sc, nioHandler);
+	super (sc, nioHandler, null);
 	this.buf = buf;
     }
 
