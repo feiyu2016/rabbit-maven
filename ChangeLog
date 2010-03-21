@@ -1,7 +1,9 @@
 version 1.1 (201x-yy-zz)
-	Renamed UnlimitedSocketHandler to SocketHandlerBase and made
-	it possible to set the timeout values for it. Added timeouts to
-	the EchoServer sample.
+	Renamed UnlimitedSocketHandler to SocketHandlerBase and made it
+	possible to set the timeout values for it. Added timeouts to the
+	EchoServer sample. The default timeout value for
+	MultiSelectorNioHandler may now be passed as an argument to the
+	constructor.
 
 version 1.0 (2010-02-02)
 	Created rnio from the nio handling code found in rabbit/4.4.

@@ -33,11 +33,13 @@ public class AcceptingServer {
      * @param listener the client that will handle the accepted sockets
      * @param es the ExecutorService to use for the NioHandler
      * @param selectorThreads the number of threads that the NioHandler will use
+     * @param defaultTimeout the default timeout value for the NioHandler
      */
     public AcceptingServer (InetAddress addr, int port, 
 			    AcceptorListener listener, 
 			    ExecutorService es, 
-			    int selectorThreads) 
+			    int selectorThreads, 
+			    Long defaultTimeout) 
 	throws IOException {
 	ssc = ServerSocketChannel.open ();
 	ssc.configureBlocking (false);
@@ -45,7 +47,9 @@ public class AcceptingServer {
 	ss.bind (new InetSocketAddress (addr, port));
 	this.listener = listener;
 	StatisticsHolder stats = new BasicStatisticsHolder ();
-	nioHandler = new MultiSelectorNioHandler (es, stats, selectorThreads);
+	nioHandler = 
+	    new MultiSelectorNioHandler (es, stats, selectorThreads, 
+					 defaultTimeout);
     }
 
     /** Start the NioHandler and register to accept new socket connections.

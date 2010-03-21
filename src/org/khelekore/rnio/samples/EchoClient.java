@@ -19,7 +19,7 @@ import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 import org.khelekore.rnio.impl.SimpleBlockReader;
 import org.khelekore.rnio.impl.SimpleBlockSender;
 
-/** An echo client built using rnio. 
+/** An echo client built using rnio.
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
@@ -32,23 +32,24 @@ public class EchoClient {
     private final Logger logger =
 	Logger.getLogger ("org.khelekore.rnio.echoserver");
 
-    public EchoClient (String host, int port, 
-		       BufferedReader input, 
-		       PrintWriter output) 
+    public EchoClient (String host, int port,
+		       BufferedReader input,
+		       PrintWriter output)
 	throws IOException {
 	this.input = input;
 	this.output = output;
 
 	// TODO: could use nioHandler to wait for connect.
-	serverChannel = 
+	serverChannel =
 	    SocketChannel.open (new InetSocketAddress (host, port));
 	serverChannel.configureBlocking (false);
 
 	inputReaderThread = new Thread (new InputReader ());
 
 	ExecutorService es = Executors.newCachedThreadPool ();
-	StatisticsHolder stats = new BasicStatisticsHolder ();	
-	nioHandler = new MultiSelectorNioHandler (es, stats, 1);
+	StatisticsHolder stats = new BasicStatisticsHolder ();
+	Long timeout = Long.valueOf (15000);
+	nioHandler = new MultiSelectorNioHandler (es, stats, 1, timeout);
     }
 
     public void start () throws IOException {
@@ -70,16 +71,16 @@ public class EchoClient {
 	public ServerReader (SocketChannel sc, NioHandler nioHandler) {
 	    super (sc, nioHandler, null);
 	}
-	
+
 	@Override public void channelClosed () {
 	    logger.info ("Server shut down");
-	    shutdown ();	    
+	    shutdown ();
 	}
 
 	@Override
-	public void handleBufferRead (ByteBuffer buf) 
+	public void handleBufferRead (ByteBuffer buf)
 	    throws IOException {
-	    String s = new String (buf.array (), buf.position (), 
+	    String s = new String (buf.array (), buf.position (),
 				   buf.remaining (), "UTF-8");
 	    output.println ("Server sent: " + s);
 	    output.flush ();

@@ -43,7 +43,8 @@ public class EchoServer {
 	bufferHandler = new CachingBufferHandler ();
 	acceptHandler = new AcceptListener ();
 	as = new AcceptingServer (null, port, acceptHandler,
-				  Executors.newCachedThreadPool (), 1);
+				  Executors.newCachedThreadPool (), 1,
+				  Long.valueOf (15000));
     }
 
     public void start () throws IOException {

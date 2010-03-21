@@ -32,14 +32,21 @@ public class MultiSelectorNioHandler implements NioHandler {
     private final List<SingleSelectorRunner> selectorRunners;
     private final Logger logger = Logger.getLogger ("org.khelekore.rnio");
     private final StatisticsHolder stats;
+    private final Long defaultTimeout;
     private int nextIndex = 0;
 
     /** Create a new MultiSelectorNioHandler that runs background tasks on
      *  the given executor and has a specified number of selectors.
+     *
+     * @param executorService the ExecutorService to use for this NioHandler
+     * @param stats the StatisticsHolder to use for this NioHandler
+     * @param numSelectors the number of threads that this NioHandler will use
+     * @param defaultTimeout the default timeout value for this NioHandler
      */
     public MultiSelectorNioHandler (ExecutorService executorService,
 				    StatisticsHolder stats,
-				    int numSelectors)
+				    int numSelectors, 
+				    Long defaultTimeout)
 	throws IOException {
 	this.executorService = executorService;
 	this.stats = stats;
@@ -51,6 +58,11 @@ public class MultiSelectorNioHandler implements NioHandler {
 	selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
 	for (int i = 0; i < numSelectors; i++)
 	    selectorRunners.add (new SingleSelectorRunner (executorService));
+	if (defaultTimeout != null && defaultTimeout <= 0) {
+	    String err = "Default timeout may not be zero or negative";
+	    throw new IllegalArgumentException (err);
+	}
+	this.defaultTimeout = defaultTimeout;
     }
 
     public void start () {
@@ -70,7 +82,9 @@ public class MultiSelectorNioHandler implements NioHandler {
     }
 
     public Long getDefaultTimeout () {
-	return Long.valueOf (System.currentTimeMillis () + 15000);
+	if (defaultTimeout == null)
+	    return null;
+	return Long.valueOf (System.currentTimeMillis () + defaultTimeout);
     }
 
     public void runThreadTask (Runnable r, TaskIdentifier ti) {
