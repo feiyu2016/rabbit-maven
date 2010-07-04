@@ -14,6 +14,11 @@ public final class CompletionEntry {
     /** The number of millis spent on the task. */
     public final long timeSpent;
 
+    /** Create a new CompletionEntry
+     * @param ti the identifier of the task that completed
+     * @param wasOk true if the task completed without errors, false otherwise
+     * @param timeSpent the wall clock time for the task
+     */
     public CompletionEntry (TaskIdentifier ti, 
 			    boolean wasOk, 
 			    long timeSpent) {

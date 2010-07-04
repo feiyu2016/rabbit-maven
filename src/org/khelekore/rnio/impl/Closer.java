@@ -14,6 +14,8 @@ public class Closer {
     /** Try to close the Closeable.
      *  If an exception is thrown when calling close() it will be logged 
      *  to the logger.
+     * @param c the object to close
+     * @param logger the Logger to use if the close fails
      */
     public static void close (Closeable c, Logger logger) {
 	if (c == null)

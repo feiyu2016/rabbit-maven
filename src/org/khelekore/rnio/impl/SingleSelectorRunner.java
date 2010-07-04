@@ -209,7 +209,7 @@ class SingleSelectorRunner implements Runnable {
 
 		Long nextTimeout = findNextTimeout ();
 		if (nextTimeout != null)
-		    sleepTime = nextTimeout - now;
+		    sleepTime = nextTimeout.longValue () - now;
 		else
 		    sleepTime = 100 * 1000;
 
@@ -302,7 +302,7 @@ class SingleSelectorRunner implements Runnable {
 		     "hopefully system is ok again.");
     }
 
-    private void cancelTimeouts (long now) throws IOException {
+    private void cancelTimeouts (long now) {
 	for (SelectionKey sk : selector.keys ()) {
 	    ChannelOpsHandler coh = (ChannelOpsHandler)sk.attachment ();
 	    if (coh == null)
@@ -315,6 +315,7 @@ class SingleSelectorRunner implements Runnable {
     }
 
     /** Close down a client that has timed out.
+     * @param sk SelectionKey to cancel
      */
     private void cancelKeyAndCloseChannel (SelectionKey sk) {
 	sk.cancel ();
@@ -328,7 +329,7 @@ class SingleSelectorRunner implements Runnable {
 	}
     }
 
-    private int handleSelects () throws IOException {
+    private int handleSelects () {
 	Set<SelectionKey> selected = selector.selectedKeys ();
 	int ret = selected.size ();
 	if (logger.isLoggable (Level.FINEST))

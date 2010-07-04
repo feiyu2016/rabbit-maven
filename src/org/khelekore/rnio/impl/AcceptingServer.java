@@ -34,6 +34,7 @@ public class AcceptingServer {
      * @param es the ExecutorService to use for the NioHandler
      * @param selectorThreads the number of threads that the NioHandler will use
      * @param defaultTimeout the default timeout value for the NioHandler
+     * @throws IOException if network setup fails
      */
     public AcceptingServer (InetAddress addr, int port, 
 			    AcceptorListener listener, 
@@ -54,7 +55,7 @@ public class AcceptingServer {
 
     /** Start the NioHandler and register to accept new socket connections.
      */
-    public void start () throws IOException {
+    public void start () {
 	nioHandler.start ();
 	Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
 	acceptor.register ();
@@ -67,6 +68,7 @@ public class AcceptingServer {
     }
 
     /** Get the NioHandler in use by this server.
+     * @return the NioHandler used by this server
      */
     public NioHandler getNioHandler () {
 	return nioHandler;

@@ -9,10 +9,15 @@ public interface SocketChannelHandler {
     /** Signal that the select operation timed out. */
     void timeout ();
 
-    /** Check if this handler needs to run in a separate thread. */
+    /** Check if this handler needs to run in a separate thread.
+     * @return true if this task want to run in a worker thread, 
+     *         false otherwise
+     */
     boolean useSeparateThread ();
 
-    /** Get a string description. */
+    /** Get a string description.
+     * @return a description of this task
+     */
     String getDescription ();
 
     /** Get the timeout time in millis. 

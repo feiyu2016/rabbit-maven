@@ -8,6 +8,7 @@ import java.nio.channels.Selector;
  */
 public interface SelectorVisitor {
     /** Visit one selector.
+     * @param selector one of the Selector:s handled by the NioHandler
      */
     void selector (Selector selector);
 

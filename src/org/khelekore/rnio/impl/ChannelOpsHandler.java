@@ -13,15 +13,15 @@ import org.khelekore.rnio.WriteHandler;
 class ChannelOpsHandler {
     private static class NullHandler 
 	implements ReadHandler, WriteHandler, AcceptHandler, ConnectHandler {
-	public void closed () {}
-	public void timeout () {}
+	public void closed () { /* empty */ }
+	public void timeout () { /* empty */ }
 	public boolean useSeparateThread () { return false; }
 	public String getDescription () { return "NullHandler"; }
 	public Long getTimeout () { return null; }
-	public void read () {}
-	public void write () {}
-	public void accept () {}
-	public void connect () {}
+	public void read () { /* empty */ }
+	public void write () { /* empty */ }
+	public void accept () { /* empty */ }
+	public void connect () { /* empty */ }
 	@Override public String toString () { return "NullHandler"; }
     }
 
@@ -58,7 +58,7 @@ class ChannelOpsHandler {
 				   String type) {
 	if (handler != NULL_HANDLER) {
 	    String msg = "Trying to overwrite the existing " + type + ": " +
-		handler + ", new " + type + ": " + readHandler +
+		handler + ", new " + type + ": " + newHandler +
 		", coh: " + this;
 	    throw new IllegalStateException (msg);
 	}

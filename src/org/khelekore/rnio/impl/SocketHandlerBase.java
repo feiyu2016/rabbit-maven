@@ -8,12 +8,17 @@ import org.khelekore.rnio.SocketChannelHandler;
 /** A socket handler that never times out and always runs on the 
  *  selector thread.
  *
+ * @param <T> the type of chanel that is handled
+ *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public abstract class SocketHandlerBase<T extends SelectableChannel>
     implements SocketChannelHandler {
+    /** The actual channel */
     public final T sc;
+    /** The NioHandler used to wait for opeations. */
     public final NioHandler nioHandler;
+    /** The timeout for the current operation */
     public final Long timeout;
 
     private final Logger logger = Logger.getLogger ("org.khelekore.rnio");

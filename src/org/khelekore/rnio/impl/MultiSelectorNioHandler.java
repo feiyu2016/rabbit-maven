@@ -42,6 +42,7 @@ public class MultiSelectorNioHandler implements NioHandler {
      * @param stats the StatisticsHolder to use for this NioHandler
      * @param numSelectors the number of threads that this NioHandler will use
      * @param defaultTimeout the default timeout value for this NioHandler
+     * @throws IOException if the selectors can not be started
      */
     public MultiSelectorNioHandler (ExecutorService executorService,
 				    StatisticsHolder stats,
@@ -58,7 +59,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 	selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
 	for (int i = 0; i < numSelectors; i++)
 	    selectorRunners.add (new SingleSelectorRunner (executorService));
-	if (defaultTimeout != null && defaultTimeout <= 0) {
+	if (defaultTimeout != null && defaultTimeout.longValue () <= 0) {
 	    String err = "Default timeout may not be zero or negative";
 	    throw new IllegalArgumentException (err);
 	}
@@ -84,7 +85,8 @@ public class MultiSelectorNioHandler implements NioHandler {
     public Long getDefaultTimeout () {
 	if (defaultTimeout == null)
 	    return null;
-	return Long.valueOf (System.currentTimeMillis () + defaultTimeout);
+	return Long.valueOf (System.currentTimeMillis () + 
+			     defaultTimeout.longValue ());
     }
 
     public void runThreadTask (Runnable r, TaskIdentifier ti) {
@@ -103,6 +105,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 
     /** Run a task on one of the selector threads.
      *  The task will be run sometime in the future.
+     * @param channel the channel to run the task on
      * @param sr the task to run on the main thread.
      */
     private void runSelectorTask (SelectableChannel channel,

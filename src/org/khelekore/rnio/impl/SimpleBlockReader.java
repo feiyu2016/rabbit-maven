@@ -56,6 +56,7 @@ public abstract class SimpleBlockReader
 
     /** Called before a read attempt is made.
      *	The default is to create a new 1kB big ByteBuffer and return it.
+     * @return the ByteBuffer to read data into
      */
     public ByteBuffer getByteBuffer () {
 	return ByteBuffer.allocate (1024);
@@ -63,12 +64,14 @@ public abstract class SimpleBlockReader
 
     /** Return the ByteBuffer, this method will be called when read gets EOF
      *  or no data. The default is to do nothing.
+     * @param buf the ByteBuffer that is returned
      */
     public void putByteBuffer (ByteBuffer buf) {
 	// nothing.
     }
 
     /** Handle the exception, default is to log it and to close the channel.
+     * @param e the IOException that was the cause of a read failure
      */
     public void handleIOException (IOException e) {
 	logger.log (Level.WARNING, "Failed to read data", e);
@@ -80,7 +83,10 @@ public abstract class SimpleBlockReader
      */
     public abstract void channelClosed ();
 
-    /** Handle the buffer content. */
+    /** Handle the buffer content.
+     * @param buf the ByteBuffer with the newly read data
+     * @throws IOException if data handling fails
+     */
     public abstract void handleBufferRead (ByteBuffer buf)
 	throws IOException;
 

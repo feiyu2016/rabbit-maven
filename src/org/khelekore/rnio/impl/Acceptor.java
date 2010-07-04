@@ -49,7 +49,7 @@ public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
 
     /** Register OP_ACCEPT with the selector. 
      */ 
-    public void register () throws IOException {
+    public void register () {
 	nioHandler.waitForAccept (sc, this);
     }
 }

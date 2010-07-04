@@ -37,7 +37,9 @@ public abstract class SimpleBlockSender
 	this.buf = buf;
     }
 
-    /** Get the buffer we are sending data from. */
+    /** Get the buffer we are sending data from.
+     * @return the ByteBuffer with the data that is being sent
+     */
     public ByteBuffer getBuffer () {
 	return buf;
     }
@@ -58,6 +60,7 @@ public abstract class SimpleBlockSender
     }
 
     /** Handle the exception, default is to log it and to close the channel. 
+     * @param e the IOException that is the cause of data write failure
      */
     public void handleIOException (IOException e) {
 	logger.log (Level.WARNING, "Failed to send data", e);
@@ -67,6 +70,7 @@ public abstract class SimpleBlockSender
     /** The default is to do nothing, override in subclasses if needed.
      */
     public void done () {
+	// empty
     }
 
     /** Register writeWait on the nioHandler 

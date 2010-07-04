@@ -32,6 +32,13 @@ public class EchoClient {
     private final Logger logger =
 	Logger.getLogger ("org.khelekore.rnio.echoserver");
 
+    /** Create a new EchoClient.
+     * @param host the server to connect to
+     * @param port the port number the server is listening on
+     * @param input the reader used to read data from
+     * @param output the writer to write the result to
+     * @throws IOException if network setup fails
+     */
     public EchoClient (String host, int port,
 		       BufferedReader input,
 		       PrintWriter output)
@@ -52,13 +59,17 @@ public class EchoClient {
 	nioHandler = new MultiSelectorNioHandler (es, stats, 1, timeout);
     }
 
-    public void start () throws IOException {
+    /** Start the client.
+     */
+    public void start () {
 	nioHandler.start ();
 	ServerReader sr = new ServerReader (serverChannel, nioHandler);
 	nioHandler.waitForRead (serverChannel, sr);
 	inputReaderThread.start ();
     }
 
+    /** Try to shutdown the client in a nice way
+     */
     public void shutdown () {
 	nioHandler.shutdown ();
 	Closer.close (serverChannel, logger);
@@ -117,6 +128,9 @@ public class EchoClient {
 	}
     }
 
+    /** The entry point for the EchoClient
+     * @param args the command line arguments
+     */
     public static void main (String[] args) {
 	if (args.length < 2) {
 	    usage ();
