@@ -215,7 +215,7 @@ class SingleSelectorRunner implements Runnable {
 
 		lastRun = now;
 	    } catch (IOException e) {
-		logger.warning (id + ": Failed to accept, " +
+		logger.warning (id + ": Failed to select, " +
 				"shutting down selector: " + e +
 				"\n" + getStackTrace (e));
 		shutdown ();
