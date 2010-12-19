@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,12 +53,13 @@ class SingleSelectorRunner implements Runnable {
 	return getClass ().getSimpleName () + "{id: " + id + "}";
     }
 
-    public void start () {
+    public void start (ThreadFactory tf) {
 	if (running.get ())
 	    throw new IllegalStateException ("Already started");
 	running.set (true);
 	synchronized (this) {
-	    selectorThread = new Thread (this, getClass ().getName () + " " + id);
+	    selectorThread = tf.newThread (this);
+	    selectorThread.setName (getClass ().getName () + " " + id);
 	    selectorThread.start ();
 	}
     }

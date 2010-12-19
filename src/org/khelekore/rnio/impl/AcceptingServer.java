@@ -56,7 +56,7 @@ public class AcceptingServer {
     /** Start the NioHandler and register to accept new socket connections.
      */
     public void start () {
-	nioHandler.start ();
+	nioHandler.start (new SimpleThreadPool ());
 	Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
 	acceptor.register ();
     }

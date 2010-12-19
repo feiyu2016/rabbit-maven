@@ -25,6 +25,9 @@ public class EchoServer {
     private final ByteBuffer QUIT =
 	ByteBuffer.wrap ("quit\r\n".getBytes ("UTF-8"));
 
+    /** Start a new EchoServer
+     * @param args the command line arguments
+     */
     public static void main (String[] args) {
 	int port = 9999;
 
@@ -39,6 +42,10 @@ public class EchoServer {
 	}
     }
 
+    /** Create a new EchoServer listening on the given port
+     * @param port the port lnumber to listen on
+     * @throws IOException if creating the server fails
+     */
     public EchoServer (int port) throws IOException {
 	bufferHandler = new CachingBufferHandler ();
 	acceptHandler = new AcceptListener ();
@@ -47,7 +54,9 @@ public class EchoServer {
 				  Long.valueOf (15000));
     }
 
-    public void start () throws IOException {
+    /** Start listening for connections
+     */
+    public void start () {
 	as.start ();
     }
 

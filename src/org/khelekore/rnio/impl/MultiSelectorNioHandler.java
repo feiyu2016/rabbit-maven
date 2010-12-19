@@ -5,6 +5,7 @@ import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.khelekore.rnio.AcceptHandler;
@@ -66,9 +67,9 @@ public class MultiSelectorNioHandler implements NioHandler {
 	this.defaultTimeout = defaultTimeout;
     }
 
-    public void start () {
+    public void start (ThreadFactory tf) {
 	for (SingleSelectorRunner ssr : selectorRunners)
-	    ssr.start ();
+	    ssr.start (tf);
     }
 
     public void shutdown () {

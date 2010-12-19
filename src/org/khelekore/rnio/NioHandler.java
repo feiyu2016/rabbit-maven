@@ -1,14 +1,16 @@
 package org.khelekore.rnio;
 
 import java.nio.channels.SelectableChannel;
+import java.util.concurrent.ThreadFactory;
 
 /** A handler of nio based events.
  */
 public interface NioHandler {
 
     /** Start handling operations.
+     * @param tf the thread factory to use when creating the selctor threads
      */
-    void start ();
+    void start (ThreadFactory tf);
 
     /** Shutdown this task runner.
      *  This will make the NioHandler stop accepting new thread tasks and it

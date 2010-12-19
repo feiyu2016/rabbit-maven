@@ -18,6 +18,7 @@ import org.khelekore.rnio.impl.Closer;
 import org.khelekore.rnio.impl.MultiSelectorNioHandler;
 import org.khelekore.rnio.impl.SimpleBlockReader;
 import org.khelekore.rnio.impl.SimpleBlockSender;
+import org.khelekore.rnio.impl.SimpleThreadPool;
 
 /** An echo client built using rnio.
  *
@@ -62,7 +63,7 @@ public class EchoClient {
     /** Start the client.
      */
     public void start () {
-	nioHandler.start ();
+	nioHandler.start (new SimpleThreadPool ());
 	ServerReader sr = new ServerReader (serverChannel, nioHandler);
 	nioHandler.waitForRead (serverChannel, sr);
 	inputReaderThread.start ();
