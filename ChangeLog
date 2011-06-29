@@ -1,5 +1,6 @@
-version 1.2 (2010-xx-yy)
-	Major updates of the javadocs.
+version 1.2 (2011-06-29)
+	Major updates of the javadocs. Made it possible to specify a
+	thread factory for the selector thread creation.
 
 version 1.1 (2010-03-23)
 	Renamed UnlimitedSocketHandler to SocketHandlerBase and made it
