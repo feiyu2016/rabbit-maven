@@ -89,6 +89,12 @@ class SingleSelectorRunner implements Runnable {
 	}
     }
 
+    public boolean isSelectorThread () {
+	synchronized (this) {
+	    return selectorThread == Thread.currentThread ();
+	}
+    }
+
     private interface ChannelOpsUpdater {
 	// Add the new handler
 	void addHandler (ChannelOpsHandler coh);

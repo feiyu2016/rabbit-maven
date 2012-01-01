@@ -4,7 +4,7 @@
     </description>
 
     <property name="major_version" value="1"/>
-    <property name="minor_version" value="2"/>
+    <property name="minor_version" value="3"/>
     <property name="version" value="${major_version}.${minor_version}"/>
     <property name="full_name" value="rnio-${major_version}.${minor_version}"/>
 
@@ -36,7 +36,6 @@
 	       debug="${debug_symbols}"
 	       classpathref="project.classpath"
 	       deprecation="on"
-	       target="1.6"
 	       encoding="ISO-8859-1"
 	/>
     </target>

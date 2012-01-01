@@ -90,6 +90,13 @@ public class MultiSelectorNioHandler implements NioHandler {
 			     defaultTimeout.longValue ());
     }
 
+    public boolean isSelectorThread () {
+	for (SingleSelectorRunner ssr : selectorRunners)
+	    if (ssr.isSelectorThread ())
+		return true;
+	return false;
+    }
+
     public void runThreadTask (Runnable r, TaskIdentifier ti) {
 	stats.addPendingTask (ti);
 	executorService.execute (new StatisticsCollector (stats, r, ti));

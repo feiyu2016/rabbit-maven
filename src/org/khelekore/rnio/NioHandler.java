@@ -25,6 +25,12 @@ public interface NioHandler {
      */
     Long getDefaultTimeout ();
 
+    /** Check if the current thread is one of the selector threads. 
+     * @return true if the the current thread is a thread used for the selctor.
+     *         false if the current thread is any other thread
+     */
+    boolean isSelectorThread ();
+
     /** Run a task in a background thread.
      *  The task will be run sometime in the future.
      * @param r the task to run.
