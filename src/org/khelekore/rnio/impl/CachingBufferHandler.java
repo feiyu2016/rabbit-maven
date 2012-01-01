@@ -19,7 +19,10 @@ public class CachingBufferHandler implements BufferHandler {
     private Queue<BufferHolder> largeCache = 
 	new ConcurrentLinkedQueue<BufferHolder> ();
     private int count = 0;
-    
+
+    private static final int SMALL_BUFFER_SIZE = 4096;
+    private static final int LARGE_BUFFER_SIZE = 128 * 1024;
+
     private ByteBuffer getBuffer (Queue<BufferHolder> bufs, int size) {
 	count++;
 	BufferHolder r = bufs.poll ();
@@ -33,7 +36,7 @@ public class CachingBufferHandler implements BufferHandler {
     }
 
     public ByteBuffer getBuffer () {
-	return getBuffer (cache, 4096);
+	return getBuffer (cache, SMALL_BUFFER_SIZE);
     }
     
     private void addCache (Queue<BufferHolder> bufs, BufferHolder bh) {
@@ -45,19 +48,23 @@ public class CachingBufferHandler implements BufferHandler {
 	    throw new IllegalArgumentException ("null buffer not allowed");
 	count--;	
 	BufferHolder bh = new BufferHolder (buffer);
-	if (buffer.capacity () == 4096)
+	if (buffer.capacity () == SMALL_BUFFER_SIZE)
 	    addCache (cache, bh);
 	else 
 	    addCache (largeCache, bh);
     }
     
     public ByteBuffer growBuffer (ByteBuffer buffer) {
-	ByteBuffer lb = getBuffer (largeCache, 128 * 1024);
+	ByteBuffer lb = getBuffer (largeCache, LARGE_BUFFER_SIZE);
 	if (buffer != null) {
 	    lb.put (buffer);
 	    putBuffer (buffer);
 	}
 	return lb;
+    }
+
+    public boolean isLarge (ByteBuffer buffer) {
+	return buffer.capacity () > SMALL_BUFFER_SIZE;
     }
 
     private static final class BufferHolder {

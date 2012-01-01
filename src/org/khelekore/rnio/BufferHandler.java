@@ -24,4 +24,10 @@ public interface BufferHandler {
      * @return the new bigger buffer
      */
     ByteBuffer growBuffer (ByteBuffer buffer);
+
+    /** Check if the given buffer is a large buffer 
+     * @param buffer the ByteBuffer to check
+     * @return true if the given buffer is large
+     */
+    boolean isLarge (ByteBuffer buffer);
 }
