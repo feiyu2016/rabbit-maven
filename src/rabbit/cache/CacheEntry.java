@@ -40,7 +40,6 @@ public interface CacheEntry<K, V> {
     void setExpires (long d);	
 
     /** Get the hooked data.
-     * @param cache the Cache this entry lives in. 
      * @return the the hooked data.
      */
     V getDataHook ();
