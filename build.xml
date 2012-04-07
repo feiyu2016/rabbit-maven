@@ -76,24 +76,17 @@
 	  <link href="http://www.khelekore.org/rnio/javadoc"/>
 	  </javadoc>
 
-        <copy todir="${dist}/conf">
-            <fileset dir="conf"/>
-        </copy>
-
-        <copy todir="${dist}/libs">
-            <fileset dir="libs"/>
-        </copy>
-
         <mkdir dir="${dist}/logs" />
 
-        <copy todir="${dist}/htdocs">
-            <fileset dir="htdocs"/>
-        </copy>
-
-        <copy todir="${dist}">
-            <fileset file="ChangeLog"/>
-            <fileset file="LICENSE"/>
-            <fileset file="README"/>
+        <copy todir="${dist}/">
+            <fileset dir=".">
+		<include name="ChangeLog" />
+		<include name="LICENSE" />
+		<include name="README" />
+	        <include name="conf/**" />
+	        <include name="htdocs/**" />
+	        <include name="libs/**" />
+	    </fileset>
         </copy>
     </target>
 
