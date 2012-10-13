@@ -387,8 +387,9 @@ public class HttpBaseFilter implements HttpFilter {
 	    String auth = resolver.getProxyAuthString ();
 	    // it should look like this (using RabbIT:RabbIT):
 	    // Proxy-authorization: Basic UmFiYklUOlJhYmJJVA==
-	    header.setHeader ("Proxy-authorization",
-			      "Basic " + Base64.encode (auth));
+	    if (auth != null && !auth.isEmpty ())
+		header.setHeader ("Proxy-authorization",
+				  "Basic " + Base64.encode (auth));
 	}
 
 	// try to use keepalive backwards.
