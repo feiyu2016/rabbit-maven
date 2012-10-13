@@ -388,7 +388,7 @@ public class HttpBaseFilter implements HttpFilter {
 	    // it should look like this (using RabbIT:RabbIT):
 	    // Proxy-authorization: Basic UmFiYklUOlJhYmJJVA==
 	    if (auth != null && !auth.isEmpty ())
-		header.setHeader ("Proxy-authorization",
+		header.setHeader ("Proxy-Authorization",
 				  "Basic " + Base64.encode (auth));
 	}
 
