@@ -145,6 +145,8 @@ public class FilterHandler extends GZipHandler {
 		charSet = charSet.replace ("_", "").replace ("-", "");
 		if (charSet.equalsIgnoreCase("iso88591"))
 		    cs = "ISO8859_1";
+		else
+		    cs = charSet;
 	    }
 	}
 	return cs;
