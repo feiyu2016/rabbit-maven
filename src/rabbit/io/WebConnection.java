@@ -75,9 +75,12 @@ public class WebConnection implements Closeable {
      * @param nioHandler the NioHandler to use for network tasks
      * @param wcl the listener that will be notified when the connection
      *        has been extablished.
+     * @param setTcpNoDelay pass true if you want to enable tcp no delay,
+     *        false to leave it at default.
      * @throws IOException if the network operations fail
      */
-    public void connect (NioHandler nioHandler, WebConnectionListener wcl)
+    public void connect (NioHandler nioHandler, WebConnectionListener wcl,
+			 boolean setTcpNoDelay)
 	throws IOException {
 	// if we are a keepalive connection then just say so..
 	if (channel != null && channel.isConnected ()) {
@@ -88,6 +91,8 @@ public class WebConnection implements Closeable {
 	    channel.socket ().bind (new InetSocketAddress (binder.getInetAddress (),
 							   binder.getPort ()));
 	    channel.configureBlocking (false);
+	    if (setTcpNoDelay)
+		channel.socket ().setTcpNoDelay (true);
 	    SocketAddress addr =
 		new InetSocketAddress (address.getInetAddress (),
 				       address.getPort ());

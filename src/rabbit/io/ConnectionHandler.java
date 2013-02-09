@@ -51,6 +51,9 @@ public class ConnectionHandler {
     // the socket binder
     private SocketBinder socketBinder = new DefaultBinder ();
 
+    // The tcp no delay flag
+    private boolean setTcpNoDelay;
+
     /** Create a new ConnectionHandler.
      * @param counter the Counter to update with statistics
      * @param proxyChain the ProxyChain to use when doing dns lookups
@@ -150,7 +153,7 @@ public class ConnectionHandler {
 		    wc = new WebConnection (a, getSocketBinder (), counter);
 	    }
 	    try {
-		wc.connect (nioHandler, wcl);
+		wc.connect (nioHandler, wcl, setTcpNoDelay);
 	    } catch (IOException e) {
 		wcl.failed (e);
 	    }
@@ -327,6 +330,8 @@ public class ConnectionHandler {
 		"Bad number for ConnectionHandler keepalivetime: '" + kat + "'";
 	    logger.warning (err);
 	}
+	String tcpNoDelay = config.getProperty ("use_tcp_no_delay", "false");
+	setTcpNoDelay = "true".equalsIgnoreCase (tcpNoDelay);
 	String up = config.get ("usepipelining");
 	if (up == null)
 	    up = "true";

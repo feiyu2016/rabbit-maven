@@ -72,7 +72,9 @@ http_generator_factory=rabbit.proxy.StandardHttpGeneratorFactory
 # but then you have to see the configuration for the factory below as well
 #http_generator_factory=rabbit.proxy.FileTemplateHttpGeneratorFactory
 
-# Set this to true if you want to enable TCP_NODELAY
+# Set this to true if you want to enable TCP_NODELAY for all client connections
+# (web browsers), see the same setting for the ConnectionHandler for
+# out going connections.
 #use_tcp_no_delay=true
 
 
@@ -146,6 +148,10 @@ usepipelining=false
 # Here you can specify an ip that will be used for outgoing 
 # connections.
 #bind_ip=192.168.0.123
+
+# Set this to true if you want all out going connections to use
+# TCP_NODELAY.
+use_tcp_no_delay=true
 
 
 [rabbit.proxy.StandardHttpGeneratorFactory]
