@@ -1,5 +1,6 @@
 version 4.12 (20xx-yy-zz) Only pass a proxy-authentication token if it is
-	actually set to something.
+	actually set to something. Made it possible to configure
+	tcp_no_delay on or off.
 
 version 4.11 (2012-02-16) Cleanup of the request logging. Make sure that
 	logging is done off the selector threads so that we can call
