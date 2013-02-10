@@ -255,8 +255,9 @@ public class Connection {
 	HttpHeader badresponse = filterer.filterHttpIn (this, channel, request);
 	if (badresponse != null) {
 	    statusCode = badresponse.getStatusCode ();
-	    // Send response and close
-	    sendAndClose (badresponse);
+	    // Try to keep the connection open (authorization may need it).
+	    // A filter that want to close can set keep alive to false
+	    sendAndTryRestart (badresponse);
 	} else {
 	    if (getMeta ())
 		handleMeta ();
@@ -472,8 +473,8 @@ public class Connection {
 		if (bad != null) {
 		    // Bad cache entry or this request is blocked
 		    rh.getContent ().release ();
-		    // Send error response and close
-		    sendAndClose (bad);
+		    // Send error response, keep connection open
+		    sendAndTryRestart (bad);
 		    return;
 		}
 
@@ -651,7 +652,7 @@ public class Connection {
     HttpHeader setupCachedEntry (RequestHandler rh) throws IOException {
 	SCC swc = new SCC (this, request, rh);
 	return swc.establish ();
-	}
+    }
 
     private void setupChunkedContent () {
 	status = "Request read, reading chunked data";
