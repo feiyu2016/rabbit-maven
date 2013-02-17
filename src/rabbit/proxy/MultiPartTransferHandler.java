@@ -39,15 +39,19 @@ class MultiPartTransferHandler extends ResourceHandlerBase
 	BufferHandle sbh = new SimpleBufferHandle (sendBuffer);
 	mpp.parseBuffer (sendBuffer);
 	fireResouceDataRead (sbh);
-	BlockSender bs = 
-	    new BlockSender (wc.getChannel (), con.getNioHandler (), 
-			     tlh.getNetwork (), sbh, false, this);
-	bs.write ();
+	if (wc != null) {
+	    BlockSender bs =
+		new BlockSender (wc.getChannel (), con.getNioHandler (),
+				 tlh.getNetwork (), sbh, false, this);
+	    bs.write ();
+	} else {
+	    blockSent ();
+	}
     }
     public void blockSent () {
 	if (!mpp.isFinished ())
 	    doTransfer ();
-	else 
+	else
 	    listener.clientResourceTransferred ();
     }
 }

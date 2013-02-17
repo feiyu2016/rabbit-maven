@@ -255,15 +255,38 @@ public class Connection {
 	HttpHeader badresponse = filterer.filterHttpIn (this, channel, request);
 	if (badresponse != null) {
 	    statusCode = badresponse.getStatusCode ();
-	    // Try to keep the connection open (authorization may need it).
-	    // A filter that want to close can set keep alive to false
-	    sendAndTryRestart (badresponse);
+	    if (clientResourceHandler != null)
+		readOffClientResource (badresponse);
+	    else
+		// Try to keep the connection open (authorization may need it).
+		// A filter that want to close can set keep alive to false
+		sendAndTryRestart (badresponse);
 	} else {
 	    if (getMeta ())
 		handleMeta ();
 	    else
 		handleRequest ();
 	}
+    }
+
+    private void readOffClientResource (final HttpHeader badresponse) {
+	clientResourceHandler.transfer (null, new ClientResourceTransferredListener () {
+	    public void clientResourceTransferred () {
+		sendAndTryRestart (badresponse);
+	    }
+
+	    public void clientResourceAborted (HttpHeader error) {
+		closeDown ();
+	    }
+
+	    public void failed (Exception cause) {
+		closeDown ();
+	    }
+
+	    public void timeout () {
+		closeDown ();
+	    }
+	});
     }
 
     /** Handle a meta page.

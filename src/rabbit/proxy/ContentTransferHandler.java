@@ -47,14 +47,24 @@ class ContentTransferHandler extends ResourceHandlerBase
 	    // int cast is safe since buffer.remaining returns an int
 	    buffer.limit (buffer.position () + (int)toTransfer);
 	    ByteBuffer sendBuffer = buffer.slice ();
+	    // update buffer position with what we have read
+	    buffer.position (buffer.limit ());
+	    // restore original limit so that we can read next request
 	    buffer.limit (limit);
 	    sbufHandle = new SimpleBufferHandle (sendBuffer);
+	} else {
+	    // update buffer position with what we have read
+	    buffer.position (buffer.limit ());
 	}
 	fireResouceDataRead (sbufHandle);
-	BlockSender bs =
-	    new BlockSender (wc.getChannel (), con.getNioHandler (),
-			     tlh.getNetwork (), sbufHandle, false, this);
-	bs.write ();
+	if (wc != null) {
+	    BlockSender bs =
+		new BlockSender (wc.getChannel (), con.getNioHandler (),
+				 tlh.getNetwork (), sbufHandle, false, this);
+	    bs.write ();
+	} else {
+	    blockSent ();
+	}
     }
 
     public void blockSent () {

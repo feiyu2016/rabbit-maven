@@ -43,17 +43,25 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
 
     public void bufferRead (BufferHandle bufHandle) {
 	fireResouceDataRead (bufHandle);
-	BlockSender bs =
-	    new BlockSender (wc.getChannel (), con.getNioHandler (),
-			     tlh.getNetwork (), bufHandle, true, this);
-	bs.write ();
+	if (wc != null) {
+	    BlockSender bs =
+		new BlockSender (wc.getChannel (), con.getNioHandler (),
+				 tlh.getNetwork (), bufHandle, true, this);
+	    bs.write ();
+	} else {
+	    blockSent ();
+	}
     }
 
     public void finishedRead () {
-	ChunkEnder ce = new ChunkEnder ();
-	sentEndChunk = true;
-	ce.sendChunkEnding (wc.getChannel (), con.getNioHandler (),
-			    tlh.getNetwork (), this);
+	if (wc != null) {
+	    ChunkEnder ce = new ChunkEnder ();
+	    sentEndChunk = true;
+	    ce.sendChunkEnding (wc.getChannel (), con.getNioHandler (),
+				tlh.getNetwork (), this);
+	} else {
+	    blockSent ();
+	}
     }
 
     public void register () {
