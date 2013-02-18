@@ -53,8 +53,10 @@ class ContentTransferHandler extends ResourceHandlerBase
 	    buffer.limit (limit);
 	    sbufHandle = new SimpleBufferHandle (sendBuffer);
 	} else {
+	    ByteBuffer sendBuffer = buffer.slice ();
 	    // update buffer position with what we have read
 	    buffer.position (buffer.limit ());
+	    sbufHandle = new SimpleBufferHandle (sendBuffer);
 	}
 	fireResourceDataRead (sbufHandle);
 	if (wc != null) {
