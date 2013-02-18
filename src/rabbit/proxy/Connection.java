@@ -773,8 +773,9 @@ public class Connection {
 	    HttpHeader badresponse = filterer.filterConnect (this, channel, request);
 	    if (badresponse != null) {
 		statusCode = badresponse.getStatusCode ();
-		// Send response and close
-		sendAndClose (badresponse);
+		// Try to keep the connection open (authorization may need it).
+		// A filter that want to close can set keep alive to false
+		sendAndTryRestart (badresponse);
 	    } else {
 		sslh.handle (channel, bh);
 	    }
