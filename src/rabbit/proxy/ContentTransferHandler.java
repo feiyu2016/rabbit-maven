@@ -56,7 +56,7 @@ class ContentTransferHandler extends ResourceHandlerBase
 	    // update buffer position with what we have read
 	    buffer.position (buffer.limit ());
 	}
-	fireResouceDataRead (sbufHandle);
+	fireResourceDataRead (sbufHandle);
 	if (wc != null) {
 	    BlockSender bs =
 		new BlockSender (wc.getChannel (), con.getNioHandler (),

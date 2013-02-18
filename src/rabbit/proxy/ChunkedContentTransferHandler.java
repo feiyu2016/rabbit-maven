@@ -42,7 +42,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
     }
 
     public void bufferRead (BufferHandle bufHandle) {
-	fireResouceDataRead (bufHandle);
+	fireResourceDataRead (bufHandle);
 	if (wc != null) {
 	    BlockSender bs =
 		new BlockSender (wc.getChannel (), con.getNioHandler (),
