@@ -60,7 +60,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
 	    ce.sendChunkEnding (wc.getChannel (), con.getNioHandler (),
 				tlh.getNetwork (), this);
 	} else {
-	    blockSent ();
+	    listener.clientResourceTransferred ();
 	}
     }
 
