@@ -47,6 +47,10 @@ public class ProxyAuth implements HttpFilter {
 	    return null;
 	if (noAuthRequired (header))
 	    return null;
+	return handleAuthentication (header, con);
+    }
+
+    private HttpHeader handleAuthentication (HttpHeader header, Connection con) {
 	String username = con.getUserName ();
 	String token = authenticator.getToken (header, con);
 	if (username == null || token == null)
@@ -92,6 +96,9 @@ public class ProxyAuth implements HttpFilter {
     private HttpHeader getError (HttpHeader header, Connection con) {
 	HttpGenerator hg = con.getHttpGenerator ();
 	String url = header.getRequestURI ();
+	// connect is just "foo.bar.com:443"
+	if (header.getMethod ().equals ("CONNECT"))
+	    url = "https://" + url;
 	try {
 	    return hg.get407 (new URL (url), "internet");
 	} catch (MalformedURLException e) {
@@ -107,7 +114,7 @@ public class ProxyAuth implements HttpFilter {
 
     public HttpHeader doConnectFiltering (SocketChannel socket,
 					  HttpHeader header, Connection con) {
-	return null;
+	return handleAuthentication (header, con);
     }
 
     /** Setup this class with the given properties.

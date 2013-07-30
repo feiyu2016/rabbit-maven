@@ -294,7 +294,7 @@ httpoutfilters=rabbit.filter.HttpBaseFilter
 
 # The filters to run on CONNECT requests.
 # Typically not used, but can be nice for snooping or authentication controls.
-#conectfilters=
+#conectfilters=rabbit.filter.HttpBaseFilter,rabbit.filter.ProxyAuth
 
 
 [sslhandler]

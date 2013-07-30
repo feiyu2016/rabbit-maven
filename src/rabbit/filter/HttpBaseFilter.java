@@ -476,10 +476,13 @@ public class HttpBaseFilter implements HttpFilter {
 	return null;
     }
 
-    public HttpHeader doConnectFiltering (SocketChannel socket, 
+    public HttpHeader doConnectFiltering (SocketChannel socket,
 					  HttpHeader header, Connection con) {
+	String uap = header.getHeader ("Proxy-Authorization");
+	if (uap != null)
+	    handleProxyAuthentication (uap, con);
 	return null;
-    }    
+    }
 
     public void setup (SProperties properties, HttpProxy proxy) {
 	removes.clear ();
