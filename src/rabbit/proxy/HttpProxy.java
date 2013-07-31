@@ -490,7 +490,7 @@ public class HttpProxy {
 
 	String in = config.getProperty ("Filters", "httpinfilters","");
 	String out = config.getProperty ("Filters", "httpoutfilters","");
-	String connect = config.getProperty ("Filters", "conectfilters","");
+	String connect = config.getProperty ("Filters", "connectfilters","");
 	httpHeaderFilterer =
 	    new HttpHeaderFilterer (in, out, connect, config, this);
 
