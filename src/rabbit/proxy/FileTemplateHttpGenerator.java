@@ -244,10 +244,11 @@ class FileTemplateHttpGenerator extends StandardResponseHeaders {
 	return super.get404 (file);
     }
 
-    @Override public HttpHeader get407 (URL url, String realm) {
-	if (hasFile (_407))
+    @Override public HttpHeader get407 (URL url, String realm,
+					boolean withBody) {
+	if (hasFile (_407) && withBody)
 	    return getTemplated (_407, getURLRealmData (url, realm, "Proxy"));
-	return super.get407 (url, realm);
+	return super.get407 (url, realm, withBody);
     }
 
     @Override public HttpHeader get412 () {

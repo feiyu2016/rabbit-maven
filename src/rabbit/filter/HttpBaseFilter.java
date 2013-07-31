@@ -164,7 +164,7 @@ public class HttpBaseFilter implements HttpFilter {
 		    HttpHeader err;
 		    String realm = uhost + ":" + urlport;
 		    if (proxyRequest)
-			err = con.getHttpGenerator ().get407 (url, realm);
+			err = con.getHttpGenerator ().get407 (url, realm, true);
 
 		    else
 			err = con.getHttpGenerator ().get401 (url, realm);

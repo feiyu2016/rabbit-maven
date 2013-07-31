@@ -60,9 +60,11 @@ public interface HttpGenerator {
     /** Get a 407 Proxy Authentication Required for the given realm and url.
      * @param realm the realm that requires auth.
      * @param url the URL of the request made.
+     * @param withBody true if the 407 should have a resoponse body, 
+     *        false otherwise
      * @return a suitable HttpHeader.
      */
-    HttpHeader get407 (URL url, String realm);
+    HttpHeader get407 (URL url, String realm, boolean withBody);
 
     /** Get a 412 Precondition Failed header.
      * @return a suitable HttpHeader.

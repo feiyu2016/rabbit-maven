@@ -149,18 +149,22 @@ class StandardResponseHeaders implements HttpGenerator {
      * @return a suitable HttpHeader.
      */
     public HttpHeader get401 (URL url, String realm) {
-	return getAuthorizationHeader (realm, url, _401, "WWW");
+	return getAuthorizationHeader (realm, url, _401, "WWW", true);
     }
 
     private HttpHeader getAuthorizationHeader (String realm, URL url,
-					       StatusCode sc, String type) {
+					       StatusCode sc, String type,
+					       boolean withBody) {
 	HttpHeaderWithContent header = getHeader (sc);
 	header.setHeader (type + "-Authenticate",
 			  "Basic realm=\"" + realm + "\"");
-	String page = HtmlPage.getPageHeader (con, sc) +
-	    "Access to: <b>" + HtmlEscapeUtils.escapeHtml (url.toString ()) +
-	    "</b><br>requires some authentication\n</body></html>\n";
-	header.setContent (page, "UTF-8");
+	if (withBody) {
+	    String page = HtmlPage.getPageHeader (con, sc) +
+		"Access to: <b>" +
+		HtmlEscapeUtils.escapeHtml (url.toString ()) +
+		"</b><br>requires some authentication\n</body></html>\n";
+	    header.setContent (page, "UTF-8");
+	}
 	return header;
     }
 
@@ -194,8 +198,8 @@ class StandardResponseHeaders implements HttpGenerator {
      * @param url the URL of the request made.
      * @return a suitable HttpHeader.
      */
-    public HttpHeader get407 (URL url, String realm) {
-	return getAuthorizationHeader (realm, url, _407, "Proxy");
+    public HttpHeader get407 (URL url, String realm, boolean withBody) {
+	return getAuthorizationHeader (realm, url, _407, "Proxy", withBody);
     }
 
     /** Get a 412 Precondition Failed header.
