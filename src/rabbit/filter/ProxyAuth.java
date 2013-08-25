@@ -100,7 +100,7 @@ public class ProxyAuth implements HttpFilter {
 	if (header.getMethod ().equals ("CONNECT"))
 	    url = "https://" + url;
 	try {
-	    return hg.get407 (new URL (url), "internet", false);
+	    return hg.get407 (new URL (url), "internet");
 	} catch (MalformedURLException e) {
 	    logger.log (Level.WARNING, "Bad url: " + header.getRequestURI (), e);
 	    return hg.get400 (e);
