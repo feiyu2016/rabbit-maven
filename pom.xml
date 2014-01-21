@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>RabbIT proxy for a faster web</name>
+    <groupId>com.toonetown.maven</groupId>
+    <artifactId>rabbit</artifactId>
+    <version>4.12-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+
+    <properties>
+        <sourceEncoding>UTF-8</sourceEncoding>
+        <sourceLevel>1.7</sourceLevel>
+        <project.build.sourceEncoding>${sourceEncoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${sourceEncoding}</project.reporting.outputEncoding>
+
+        <!-- Versions of jars and plugins -->
+        <version.rnio>1.3-SNAPSHOT</version.rnio>
+        <version.dnsjava>2.1.0</version.dnsjava>
+        <version.commons-lang>2.5</version.commons-lang>
+        <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
+        <version.maven-assembly-plugin>2.4</version.maven-assembly-plugin>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.toonetown.maven</groupId>
+            <artifactId>rnio</artifactId>
+            <version>${version.rnio}</version>
+        </dependency>
+        <dependency>
+            <groupId>dnsjava</groupId>
+            <artifactId>dnsjava</artifactId>
+            <version>${version.dnsjava}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${version.commons-lang}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${version.maven-compiler-plugin}</version>
+                <configuration>
+                    <source>${sourceLevel}</source>
+                    <target>${sourceLevel}</target>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${version.maven-assembly-plugin}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>rabbit.proxy.ProxyStarter</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
