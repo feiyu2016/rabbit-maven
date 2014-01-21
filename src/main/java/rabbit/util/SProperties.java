@@ -28,4 +28,18 @@ public class SProperties extends HashMap<String, String> {
 	    return defaultValue;
 	return val;
     }
+	
+	/** Overridden so if we add a null value, it actually removes it
+	 *  from the hashmap
+	 *  @param key the property to get
+	 *  @param value the value to set, or null to remove a value
+	 *  @return the previous value, if any
+	 */
+	public String put (String key, String value) {
+		if(value == null){
+			return remove(key);
+		}else{
+			return super.put(key, value);
+		}
+	}
 }
