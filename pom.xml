@@ -35,6 +35,10 @@
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
             <version>${version.dnsjava}</version>
+            <!-- But not junit -->
+            <exclusions>
+                <exclusion><groupId>junit</groupId><artifactId>junit</artifactId></exclusion>
+            </exclusions> 
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
