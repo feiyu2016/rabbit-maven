@@ -37,8 +37,8 @@ public class HttpHeaderWithContent extends HttpHeader {
      * @param content the binary content.
      */
     public void setContent (byte[] content) {
-	this.content = content;
-	setHeader ("Content-Length", "" + content.length);
+	this.content = (content == null ? new byte[0] : content);
+	setHeader ("Content-Length", "" + this.content.length);
     }
 
     /** Set the Content for the request/response
