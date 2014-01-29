@@ -18,7 +18,6 @@
         <project.reporting.outputEncoding>${sourceEncoding}</project.reporting.outputEncoding>
 
         <!-- Versions of jars and plugins -->
-        <version.rnio>1.3-SNAPSHOT</version.rnio>
         <version.dnsjava>2.1.0</version.dnsjava>
         <version.commons-lang>2.5</version.commons-lang>
         <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
@@ -26,11 +25,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.toonetown.maven</groupId>
-            <artifactId>rnio</artifactId>
-            <version>${version.rnio}</version>
-        </dependency>
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>

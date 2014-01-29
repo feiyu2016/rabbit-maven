@@ -3,7 +3,7 @@ package rabbit.httpio;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
-import org.khelekore.rnio.NioHandler;
+import rabbit.rnio.NioHandler;
 import rabbit.dns.DNSHandler;
 import rabbit.io.ProxyChain;
 import rabbit.io.ProxyChainFactory;

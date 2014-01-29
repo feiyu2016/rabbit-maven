@@ -96,7 +96,7 @@ public class ProxyLogger implements ConnectionLogger {
 	    System.out.println ("Logging configure by system property");
 	} else {
 	    Logger eh = getLogger (config, "error", null, "rabbit",
-				   "org.khelekore.rnio");
+				   "rabbit.rnio");
 	    eh.info ("Log level set to: " + eh.getLevel ());
 	}
 	accessLog = getLogger (config, "access", new AccessFormatter (),

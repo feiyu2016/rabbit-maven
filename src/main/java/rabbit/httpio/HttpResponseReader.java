@@ -2,8 +2,8 @@ package rabbit.httpio;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import org.khelekore.rnio.BufferHandler;
-import org.khelekore.rnio.NioHandler;
+import rabbit.rnio.BufferHandler;
+import rabbit.rnio.NioHandler;
 import rabbit.http.HttpHeader;
 import rabbit.io.BufferHandle;
 import rabbit.io.CacheBufferHandle;

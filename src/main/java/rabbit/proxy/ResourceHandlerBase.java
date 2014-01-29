@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import org.khelekore.rnio.ReadHandler;
+import rabbit.rnio.ReadHandler;
 import rabbit.io.BufferHandle;
 import rabbit.io.WebConnection;
 

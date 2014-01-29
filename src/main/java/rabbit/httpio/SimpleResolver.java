@@ -1,8 +1,8 @@
 package rabbit.httpio;
 
 import java.net.URL;
-import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.impl.DefaultTaskIdentifier;
+import rabbit.rnio.NioHandler;
+import rabbit.rnio.impl.DefaultTaskIdentifier;
 import rabbit.dns.DNSHandler;
 import rabbit.io.InetAddressListener;
 import rabbit.io.Resolver;

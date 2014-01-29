@@ -1,7 +1,7 @@
 package rabbit.io;
 
 import java.util.logging.Logger;
-import org.khelekore.rnio.NioHandler;
+import rabbit.rnio.NioHandler;
 import rabbit.dns.DNSHandler;
 import rabbit.util.SProperties;
 

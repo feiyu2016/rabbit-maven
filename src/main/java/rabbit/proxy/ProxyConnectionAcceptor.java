@@ -5,7 +5,7 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.khelekore.rnio.impl.AcceptorListener;
+import rabbit.rnio.impl.AcceptorListener;
 import rabbit.util.Config;
 
 /** An acceptor handler that creates proxy client connection

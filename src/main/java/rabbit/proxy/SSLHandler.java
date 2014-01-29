@@ -16,7 +16,7 @@ import rabbit.io.Resolver;
 import rabbit.io.WebConnection;
 import rabbit.io.WebConnectionListener;
 import rabbit.util.Base64;
-import org.khelekore.rnio.impl.Closer;
+import rabbit.rnio.impl.Closer;
 
 /** A handler that shuttles ssl traffic
  *

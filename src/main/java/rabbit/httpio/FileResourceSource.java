@@ -8,11 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.logging.Logger;
-import org.khelekore.rnio.BufferHandler;
-import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.TaskIdentifier;
-import org.khelekore.rnio.impl.Closer;
-import org.khelekore.rnio.impl.DefaultTaskIdentifier;
+import rabbit.rnio.BufferHandler;
+import rabbit.rnio.NioHandler;
+import rabbit.rnio.TaskIdentifier;
+import rabbit.rnio.impl.Closer;
+import rabbit.rnio.impl.DefaultTaskIdentifier;
 import rabbit.io.BufferHandle;
 import rabbit.io.CacheBufferHandle;
 

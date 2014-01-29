@@ -4,7 +4,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Date;
 import java.util.Set;
-import org.khelekore.rnio.SelectorVisitor;
+import rabbit.rnio.SelectorVisitor;
 import rabbit.proxy.HtmlPage;
 
 /** A status page for the proxy.

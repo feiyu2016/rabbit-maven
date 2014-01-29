@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import org.khelekore.rnio.impl.Closer;
+import rabbit.rnio.impl.Closer;
 
 /** A class to store cache data to a file.
  *

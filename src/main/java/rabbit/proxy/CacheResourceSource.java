@@ -1,8 +1,8 @@
 package rabbit.proxy;
 
 import java.io.IOException;
-import org.khelekore.rnio.BufferHandler;
-import org.khelekore.rnio.NioHandler;
+import rabbit.rnio.BufferHandler;
+import rabbit.rnio.NioHandler;
 import rabbit.cache.Cache;
 import rabbit.cache.CacheEntry;
 import rabbit.http.HttpHeader;

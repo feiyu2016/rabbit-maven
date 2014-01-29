@@ -3,9 +3,9 @@ package rabbit.httpio;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.channels.SocketChannel;
-import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.WriteHandler;
-import org.khelekore.rnio.impl.DefaultTaskIdentifier;
+import rabbit.rnio.NioHandler;
+import rabbit.rnio.WriteHandler;
+import rabbit.rnio.impl.DefaultTaskIdentifier;
 import rabbit.io.Address;
 import rabbit.util.TrafficLogger;
 

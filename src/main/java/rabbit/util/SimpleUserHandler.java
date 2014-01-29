@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.khelekore.rnio.impl.Closer;
+import rabbit.rnio.impl.Closer;
 
 /** This is a class that handles users authentication using a simple text file.
  *

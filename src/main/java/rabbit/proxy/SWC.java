@@ -3,7 +3,7 @@ package rabbit.proxy;
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Logger;
-import org.khelekore.rnio.impl.Closer;
+import rabbit.rnio.impl.Closer;
 import rabbit.http.HttpDateParser;
 import rabbit.http.HttpHeader;
 import rabbit.httpio.HttpHeaderListener;

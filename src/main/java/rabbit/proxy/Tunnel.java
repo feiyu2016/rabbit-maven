@@ -5,10 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.ReadHandler;
-import org.khelekore.rnio.WriteHandler;
-import org.khelekore.rnio.impl.Closer;
+import rabbit.rnio.NioHandler;
+import rabbit.rnio.ReadHandler;
+import rabbit.rnio.WriteHandler;
+import rabbit.rnio.impl.Closer;
 import rabbit.io.BufferHandle;
 import rabbit.util.TrafficLogger;
 

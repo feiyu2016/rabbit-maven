@@ -2,11 +2,11 @@ package rabbit.meta;
 
 import java.util.List;
 import java.util.Map;
-import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.StatisticsHolder;
-import org.khelekore.rnio.TaskIdentifier;
-import org.khelekore.rnio.statistics.CompletionEntry;
-import org.khelekore.rnio.statistics.TotalTimeSpent;
+import rabbit.rnio.NioHandler;
+import rabbit.rnio.StatisticsHolder;
+import rabbit.rnio.TaskIdentifier;
+import rabbit.rnio.statistics.CompletionEntry;
+import rabbit.rnio.statistics.TotalTimeSpent;
 import rabbit.proxy.HtmlPage;
 
 /** A page that shows the currently open web connections.

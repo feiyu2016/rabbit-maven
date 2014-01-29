@@ -3,10 +3,10 @@ package rabbit.httpio;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Logger;
-import org.khelekore.rnio.NioHandler;
-import org.khelekore.rnio.ReadHandler;
-import org.khelekore.rnio.SocketChannelHandler;
-import org.khelekore.rnio.WriteHandler;
+import rabbit.rnio.NioHandler;
+import rabbit.rnio.ReadHandler;
+import rabbit.rnio.SocketChannelHandler;
+import rabbit.rnio.WriteHandler;
 import rabbit.io.BufferHandle;
 
 /** A base class for socket handlers.

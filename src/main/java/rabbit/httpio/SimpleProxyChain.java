@@ -1,6 +1,6 @@
 package rabbit.httpio;
 
-import org.khelekore.rnio.NioHandler;
+import rabbit.rnio.NioHandler;
 import rabbit.dns.DNSHandler;
 import rabbit.io.ProxyChain;
 import rabbit.io.Resolver;

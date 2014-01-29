@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import org.khelekore.rnio.NioHandler;
+import rabbit.rnio.NioHandler;
 import rabbit.http.HttpHeader;
 import rabbit.io.BufferHandle;
 import rabbit.io.SimpleBufferHandle;

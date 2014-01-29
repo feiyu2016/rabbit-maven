@@ -8,7 +8,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.khelekore.rnio.impl.Closer;
+import rabbit.rnio.impl.Closer;
 import rabbit.html.HtmlBlock;
 import rabbit.html.HtmlEscapeUtils;
 import rabbit.html.HtmlParseException;
