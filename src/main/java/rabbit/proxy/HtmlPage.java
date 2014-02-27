@@ -11,9 +11,6 @@ import rabbit.util.SProperties;
  */
 public class HtmlPage {
 
-    private static final String BASICLOGO =
-	"http://www.khelekore.org/rabbit/images/smallRabbIT4.png";
-
     private static SProperties config = setup ();
 
     // No dont instanciate this.
@@ -38,7 +35,7 @@ public class HtmlPage {
      * @param type the StatusCode of the request
      * @return a HTMLHeader.
      */
-    public static String getPageHeader (Connection con, StatusCode type) {
+    public static String getPageHeader (final Connection con, final StatusCode type) {
 	return getPageHeader (con, type.getDescription ());
     }
 
@@ -47,28 +44,13 @@ public class HtmlPage {
      * @param title the title of this page.
      * @return a HTMLHeader.
      */
-    public static String getPageHeader (Connection con, String title) {
-	int idx;
-	HttpProxy proxy = con.getProxy ();
-	String basiclogo =
-	    proxy.getConfig ().getProperty (proxy.getClass ().getName (),
-							   "logo",
-							   BASICLOGO);
-	while ((idx = basiclogo.indexOf ("$proxy")) > -1) {
-	    basiclogo = basiclogo.substring(0,idx) +
-		proxy.getHost ().getHostName () + ":" + proxy.getPort () +
-		basiclogo.substring (idx + "$proxy".length ());
-	}
-
-
+    public static String getPageHeader (final Connection con, final String title) {
 	return ("<html><head><title>" + title + "</title></head>\n" +
 		"<body bgcolor=\"" + config.getProperty ("bodybgcolor") +
 		"\" text=\"" + config.getProperty ("bodytext") +
 		"\" link=\"" + config.getProperty ("bodylink") +
 		"\" alink=\"" + config.getProperty ("bodyalink") +
 		"\" vlink=\"" + config.getProperty ("bodyvlink") + "\">\n" +
-		"<img src=\"" + basiclogo +
-		"\" alt=\"RabbIT logo\" align=\"right\">\n" +
 		"<h1>" + title + "</h1>\n");
     }
 
@@ -78,7 +60,7 @@ public class HtmlPage {
      * @param border the width of the border in pixels
      * @return a html table header
      */
-    public static String getTableHeader (int width, int border) {
+    public static String getTableHeader (final int width, final int border) {
 	return ("<table border=\"" + border + "\" " +
 		"width=\"" + width + "%\" " +
 		"bgcolor=\"" + config.getProperty ("tablebgcolor") + "\">\n");

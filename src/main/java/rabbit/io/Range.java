@@ -12,7 +12,7 @@ public class Range {
      * @param start the lower value of the range
      * @param end the upper value of the range 
      */
-    public Range (long start, long end) {
+    public Range (final long start, final long end) {
 	this.start = start; 
 	this.end = end;
     }

@@ -17,17 +17,16 @@ public abstract class SimpleBlockReader
     extends SocketHandlerBase<SocketChannel>
     implements ReadHandler {
 
-    private final Logger logger =
-	Logger.getLogger ("rabbit.rnio");
+    private static final Logger logger = Logger.getLogger ("rabbit.rnio");
 
     /** Create a new block reader.
      * @param sc the channel to read from
      * @param nioHandler the NioHandler to use for waiting on data
      * @param timeout the timeout time, may be null if not timeout is set
      */
-    public SimpleBlockReader (SocketChannel sc, 
-			      NioHandler nioHandler,
-			      Long timeout) {
+    public SimpleBlockReader (final SocketChannel sc, 
+			      final NioHandler nioHandler,
+			      final Long timeout) {
 	super (sc, nioHandler, timeout);
     }
 
@@ -35,8 +34,8 @@ public abstract class SimpleBlockReader
      */
     public void read () {
 	try {
-	    ByteBuffer buf = getByteBuffer ();
-	    int read = sc.read (buf);
+	    final ByteBuffer buf = getByteBuffer ();
+	    final int read = sc.read (buf);
 	    if (read == -1) {
 		channelClosed ();
 		putByteBuffer (buf);
@@ -66,14 +65,14 @@ public abstract class SimpleBlockReader
      *  or no data. The default is to do nothing.
      * @param buf the ByteBuffer that is returned
      */
-    public void putByteBuffer (ByteBuffer buf) {
+    public void putByteBuffer (final ByteBuffer buf) {
 	// nothing.
     }
 
     /** Handle the exception, default is to log it and to close the channel.
      * @param e the IOException that was the cause of a read failure
      */
-    public void handleIOException (IOException e) {
+    public void handleIOException (final IOException e) {
 	logger.log (Level.WARNING, "Failed to read data", e);
 	Closer.close (sc, logger);
     }

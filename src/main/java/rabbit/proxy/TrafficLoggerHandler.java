@@ -61,7 +61,7 @@ public class TrafficLoggerHandler {
     /** Add our statistics to the given other TrafficLoggerHandler.
      * @param other the TrafficLoggerHandler to update
      */
-    public void addTo (TrafficLoggerHandler other) {
+    public void addTo (final TrafficLoggerHandler other) {
 	client.addTo (other.client);
 	network.addTo (other.network);
 	cache.addTo (other.cache);

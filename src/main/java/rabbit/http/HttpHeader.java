@@ -1,5 +1,6 @@
 package rabbit.http;
 
+import java.util.Locale;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -17,6 +18,8 @@ public class HttpHeader extends GeneralHeader {
     private String httpVersion = null;
     private int hashCodeValue;
 
+    private transient byte[] content;
+
     /** Create a new HTTPHeader from scratch
      */
     public HttpHeader () {
@@ -27,14 +30,16 @@ public class HttpHeader extends GeneralHeader {
     private static final StringCache stringCache =
 	StringCache.getSharedInstance ();
 
-    private static String getCachedString (String s) {
+    private static String getCachedString (final String s) {
 	return stringCache.getCachedString (s);
     }
 
-    @Override protected void fillBuffer (StringBuilder sb) {
+    @Override protected void fillBuffer (final StringBuilder sb) {
 	sb.append (getRequestLine ());
 	sb.append (Header.CRLF);
 	super.fillBuffer (sb);
+	if (content != null)
+	    sb.append (new String(content));
     }
 
     /** Convert this header to a byte[].
@@ -43,12 +48,18 @@ public class HttpHeader extends GeneralHeader {
      * @return the content of this header
      */
     public byte[] getBytes () {
-	StringBuilder sb = new StringBuilder ();
+	final StringBuilder sb = new StringBuilder ();
 	sb.append (getRequestLine ());
 	sb.append (Header.CRLF);
 	super.fillBuffer (sb);
 	try {
-	    return sb.toString ().getBytes ("US-ASCII");
+	    final byte[] header = sb.toString ().getBytes ("US-ASCII");
+	    if (content == null)
+		return header;
+	    final byte[] res = new byte[header.length + content.length];
+	    System.arraycopy (header, 0, res, 0, header.length);
+	    System.arraycopy (content, 0, res, header.length, content.length);
+	    return res;
 	} catch (UnsupportedEncodingException e) {
 	    throw new RuntimeException ("Failed to find ascii", e);
 	}
@@ -64,7 +75,7 @@ public class HttpHeader extends GeneralHeader {
     /** Set the statusline of this header.
      * @param line a Status-Line )RFC 2068: 6.1)
      */
-    public void setStatusLine (String line) {
+    public void setStatusLine (final String line) {
 	setRequestLine (line);
     }
 
@@ -72,7 +83,7 @@ public class HttpHeader extends GeneralHeader {
      * @return the request.
      */
     public String getRequestLine () {
-	StringBuilder sb = new StringBuilder (method.length () + requestURI.length () + 10);
+	final StringBuilder sb = new StringBuilder (method.length () + requestURI.length () + 10);
 	sb.append (method).append (' ').append (requestURI);
 	if (httpVersion != null) {
 	    sb.append (' ').append (httpVersion);
@@ -83,13 +94,13 @@ public class HttpHeader extends GeneralHeader {
     /** Set the requestline of this header
      * @param line a Request-Line (RFC 2068: 5.1)
      */
-    public void setRequestLine (String line) {
-	int s1 = line.indexOf (' ');
+    public void setRequestLine (final String line) {
+	final int s1 = line.indexOf (' ');
 	if (s1 < 0) {
 	    method = getCachedString (line);
 	    return;
 	}
-	int s2 = line.indexOf (' ', s1+1);
+	final int s2 = line.indexOf (' ', s1+1);
 	method = getCachedString (line.substring(0,s1));
 	if (s2 > 0) {
 	    requestURI = getCachedString (line.substring (s1+1,s2));
@@ -98,7 +109,7 @@ public class HttpHeader extends GeneralHeader {
 	    requestURI = getCachedString (line.substring (s1+1));
 	    httpVersion = null;
 	}
-	hashCodeValue = getRequestURI ().toLowerCase ().hashCode ();
+	hashCodeValue = requestURI.toLowerCase (Locale.US).hashCode ();
     }
 
     /** Is this request for the head only?
@@ -118,7 +129,7 @@ public class HttpHeader extends GeneralHeader {
     /** Sets the request method of this header
      * @param method the new requestmethod
      */
-    public void setMehtod (String method) {
+    public void setMehtod (final String method) {
 	this.method = method;
     }
 
@@ -126,7 +137,7 @@ public class HttpHeader extends GeneralHeader {
      * @return true if this header is an CONNECT request.
      */
     public boolean isSSLRequest () {
-	return getMethod ().equals ("CONNECT");
+	return method.equals ("CONNECT");
     }
 
     /** Get the requestURI of this request (only valid for requests).
@@ -139,9 +150,9 @@ public class HttpHeader extends GeneralHeader {
     /** Sets the request URI of this header
      * @param requestURI the new URI
      */
-    public void setRequestURI (String requestURI) {
+    public void setRequestURI (final String requestURI) {
 	this.requestURI = requestURI;
-	hashCodeValue = getRequestURI ().toLowerCase ().hashCode ();
+	hashCodeValue = requestURI.toLowerCase (Locale.US).hashCode ();
     }
 
     /** Get the HTTP Version of this request (only valid for requests).
@@ -154,7 +165,7 @@ public class HttpHeader extends GeneralHeader {
     /** Set the HTTP Version to use for request.
      * @param version the version to use.
      */
-    public void setHTTPVersion (String version) {
+    public void setHTTPVersion (final String version) {
 	httpVersion = version;
     }
 
@@ -168,7 +179,7 @@ public class HttpHeader extends GeneralHeader {
     /** Set the HTTP version for this response.
      * @param httpVersion the version to use.
      */
-    public void setResponseHTTPVersion (String httpVersion) {
+    public void setResponseHTTPVersion (final String httpVersion) {
 	method = httpVersion;
     }
 
@@ -182,9 +193,9 @@ public class HttpHeader extends GeneralHeader {
     /** Set the Status code for this response.
      * @param status the new status code.
      */
-    public void setStatusCode (String status) {
+    public void setStatusCode (final String status) {
 	requestURI = status;
-	hashCodeValue = getRequestURI ().toLowerCase ().hashCode ();
+	hashCodeValue = requestURI.toLowerCase (Locale.US).hashCode ();
     }
 
     /** Get the Reason phrase of the response (only valid for responses).
@@ -197,7 +208,7 @@ public class HttpHeader extends GeneralHeader {
     /** Set the reason phrase for this reqponse.
      * @param reason the new reasonphrase
      */
-    public void setReasonPhrase (String reason) {
+    public void setReasonPhrase (final String reason) {
 	httpVersion = reason;
     }
 
@@ -222,10 +233,10 @@ public class HttpHeader extends GeneralHeader {
      * @param o the Object to compare to.
      * @return true if o and this object are equal, false otherwise.
      */
-    @Override public boolean equals (Object o) {
+    @Override public boolean equals (final Object o) {
 	if (o instanceof HttpHeader) {
-	    String lcuri = getRequestURI ().toLowerCase ();
-	    String olcuri = ((HttpHeader)o).getRequestURI ().toLowerCase ();
+	    final String lcuri = requestURI.toLowerCase (Locale.US);
+	    final String olcuri = ((HttpHeader)o).requestURI.toLowerCase (Locale.US);
 	    return lcuri.equals (olcuri);
 	}
 	return false;
@@ -242,36 +253,70 @@ public class HttpHeader extends GeneralHeader {
      * @return true if this (probably) is a response, false otherwise.
      */
     public boolean isResponse () {
-	return (getResponseHTTPVersion () != null &&
-		getResponseHTTPVersion ().toLowerCase ().startsWith ("http/"));
+	return (method != null &&
+		method.toLowerCase (Locale.US).startsWith ("http/"));
     }
 
     /** Try to guess if this header is a secure thing.
      * @return true if this (probably) is a secure connection.
      */
     public boolean isSecure () {
-	return (getMethod () != null &&
-		getMethod ().equals ("CONNECT"));
+	return (method != null &&
+		method.equals ("CONNECT"));
+    }
+
+    /** Set the Content for the request/response
+     *  Mostly not used for responses.
+     *  As a side effect the &quot;Content-Length&quot; header is also set.
+     * @param content the binary content.
+     */
+    public void setContent (byte[] content) {
+	if(content == null){
+		this.content = null;
+	}else{
+		this.content = (byte[])content.clone();
+		setHeader ("Content-Length", Integer.toString(content.length));
+	}
+    }
+
+    /** Set the Content for the request/response
+     *  Mostly not used for responses.
+     *  As a side effect the &quot;Content-Length&quot; header is also set.
+     * @param data the String to set
+     * @param charset the character encoding to use when converting the
+     *        string to bytes
+     * @throws IllegalArgumentException if the charset is unknown
+     */
+    public void setContent (final String data, final String charset) {
+	try {
+	    setContent (data.getBytes (charset));
+	} catch (UnsupportedEncodingException e) {
+	    throw new IllegalArgumentException ("Unknown encoding: " + charset,
+						e);
+	}
     }
 
     /** Get the current content for this request/response.
      * @return the resource associated with this header, may be null
      */
     public byte[] getContent () {
-	return null;
+	if(content == null){
+		return null;
+	}
+	return (byte[])content.clone();
     }
 
-    @Override public void read (DataInput in) throws IOException {
+    @Override public void read (final DataInput in) throws IOException {
 	method = in.readUTF ();
 	requestURI = in.readUTF ();
 	httpVersion = in.readUTF ();
 	if ("".equals (httpVersion))
 	    httpVersion = null;
-	hashCodeValue = getRequestURI ().toLowerCase ().hashCode ();
+	hashCodeValue = requestURI.toLowerCase (Locale.US).hashCode ();
 	super.read (in);
     }
 
-    @Override public void write (DataOutput out) throws IOException {
+    @Override public void write (final DataOutput out) throws IOException {
 	out.writeUTF (method);
 	out.writeUTF (requestURI);
 	out.writeUTF (httpVersion != null ? httpVersion : "");

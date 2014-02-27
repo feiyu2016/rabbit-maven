@@ -13,7 +13,7 @@ public class BoundBinder implements SocketBinder {
      *  InetAddress.
      * @param ia the InetAddress to use
      */
-    public BoundBinder (InetAddress ia) {
+    public BoundBinder (final InetAddress ia) {
 	this.ia = ia;
     }
     

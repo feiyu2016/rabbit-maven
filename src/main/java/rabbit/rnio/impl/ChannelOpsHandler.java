@@ -53,39 +53,39 @@ class ChannelOpsHandler {
 	return ret;
     }
 
-    private void checkNullHandler (SocketChannelHandler handler,
-				   SocketChannelHandler newHandler,
-				   String type) {
+    private void checkNullHandler (final SocketChannelHandler handler,
+				   final SocketChannelHandler newHandler,
+				   final String type) {
 	if (handler != NULL_HANDLER) {
-	    String msg = "Trying to overwrite the existing " + type + ": " +
+	    final String msg = "Trying to overwrite the existing " + type + ": " +
 		handler + ", new " + type + ": " + newHandler +
 		", coh: " + this;
 	    throw new IllegalStateException (msg);
 	}
     }
 
-    public void setReadHandler (ReadHandler rh) {
+    public void setReadHandler (final ReadHandler rh) {
 	if (rh == null)
 	    throw new IllegalArgumentException ("read handler may not be null");
 	checkNullHandler (this.readHandler, rh, "readHandler");
 	this.readHandler = rh;
     }
 
-    public void setWriteHandler (WriteHandler writeHandler) {
+    public void setWriteHandler (final WriteHandler writeHandler) {
 	if (writeHandler == null)
 	    throw new IllegalArgumentException ("write handler may not be null");
 	checkNullHandler (this.writeHandler, writeHandler, "writeHandler");
 	this.writeHandler = writeHandler;
     }
 
-    public void setAcceptHandler (AcceptHandler acceptHandler) {
+    public void setAcceptHandler (final AcceptHandler acceptHandler) {
 	if (acceptHandler == null)
 	    throw new IllegalArgumentException ("accept handler may not be null");
 	checkNullHandler (this.acceptHandler, acceptHandler, "acceptHandler");
 	this.acceptHandler = acceptHandler;
     }
 
-    public void setConnectHandler (ConnectHandler connectHandler) {
+    public void setConnectHandler (final ConnectHandler connectHandler) {
 	if (connectHandler == null)
 	    throw new IllegalArgumentException ("connect handler may not be null");
 	checkNullHandler (this.connectHandler, connectHandler,
@@ -93,7 +93,7 @@ class ChannelOpsHandler {
 	this.connectHandler = connectHandler;
     }
 
-    private void handleRead (ExecutorService executorService,
+    private void handleRead (final ExecutorService executorService,
 			     final ReadHandler rh) {
 	if (rh.useSeparateThread ()) {
 	    executorService.execute (new Runnable () {
@@ -106,7 +106,7 @@ class ChannelOpsHandler {
 	}
     }
 
-    private void handleWrite (ExecutorService executorService,
+    private void handleWrite (final ExecutorService executorService,
 			      final WriteHandler wh) {
 	if (wh.useSeparateThread ()) {
 	    executorService.execute (new Runnable () {
@@ -119,7 +119,7 @@ class ChannelOpsHandler {
 	}
     }
 
-    private void handleAccept (ExecutorService executorService,
+    private void handleAccept (final ExecutorService executorService,
 			       final AcceptHandler ah) {
 	if (ah.useSeparateThread ()) {
 	    executorService.execute (new Runnable () {
@@ -132,7 +132,7 @@ class ChannelOpsHandler {
 	}
     }
 
-    private void handleConnect (ExecutorService executorService,
+    private void handleConnect (final ExecutorService executorService,
 				final ConnectHandler ch) {
 	if (ch.useSeparateThread ()) {
 	    executorService.execute (new Runnable () {
@@ -145,12 +145,12 @@ class ChannelOpsHandler {
 	}
     }
 
-    public void handle (ExecutorService executorService, SelectionKey sk) {
+    public void handle (final ExecutorService executorService, final SelectionKey sk) {
 	sk.interestOps (0);
-	ReadHandler rh = readHandler;
-	WriteHandler wh = writeHandler;
-	AcceptHandler ah = acceptHandler;
-	ConnectHandler ch = connectHandler;
+	final ReadHandler rh = readHandler;
+	final WriteHandler wh = writeHandler;
+	final AcceptHandler ah = acceptHandler;
+	final ConnectHandler ch = connectHandler;
 	readHandler = NULL_HANDLER;
 	writeHandler = NULL_HANDLER;
 	acceptHandler = NULL_HANDLER;
@@ -177,19 +177,19 @@ class ChannelOpsHandler {
 	    setConnectHandler (ch);
     }
 
-    private boolean doTimeout (long now, SocketChannelHandler sch) {
+    private boolean doTimeout (final long now, final SocketChannelHandler sch) {
 	if (sch == null)
 	    return false;
-	Long t = sch.getTimeout ();
+	final Long t = sch.getTimeout ();
 	if (t == null)
 	    return false;
-	boolean ret = t.longValue () < now;
+	final boolean ret = t.longValue () < now;
 	if (ret)
 	    sch.timeout ();
 	return ret;
     }
 
-    public boolean doTimeouts (long now) {
+    public boolean doTimeouts (final long now) {
 	boolean ret = false;
 	if (ret |= doTimeout (now, readHandler))
 	    readHandler = NULL_HANDLER;
@@ -202,10 +202,10 @@ class ChannelOpsHandler {
 	return ret;
     }
 
-    private Long minTimeout (Long t, SocketChannelHandler sch) {
+    private Long minTimeout (final Long t, final SocketChannelHandler sch) {
 	if (sch == null)
 	    return t;
-	Long t2 = sch.getTimeout ();
+	final Long t2 = sch.getTimeout ();
 	if (t == null)
 	    return t2;
 	if (t2 == null)
@@ -221,7 +221,7 @@ class ChannelOpsHandler {
 	return t;
     }
 
-    public void cancel (SocketChannelHandler sch) {
+    public void cancel (final SocketChannelHandler sch) {
 	if (readHandler == sch)
 	    readHandler = NULL_HANDLER;
 	if (writeHandler == sch)
@@ -232,7 +232,7 @@ class ChannelOpsHandler {
 	    connectHandler = NULL_HANDLER;
     }
 
-    private void closedIfSet (SocketChannelHandler sch) {
+    private void closedIfSet (final SocketChannelHandler sch) {
 	if (sch != null)
 	    sch.closed ();
     }

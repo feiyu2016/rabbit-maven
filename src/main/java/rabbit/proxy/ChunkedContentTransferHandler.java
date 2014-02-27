@@ -25,15 +25,15 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
     private boolean sentEndChunk = false;
     private final ChunkHandler chunkHandler;
 
-    public ChunkedContentTransferHandler (Connection con,
-					  BufferHandle bufHandle,
-					  TrafficLoggerHandler tlh) {
+    public ChunkedContentTransferHandler (final Connection con,
+					  final BufferHandle bufHandle,
+					  final TrafficLoggerHandler tlh) {
 	super (con, bufHandle, tlh);
 	chunkHandler = new ChunkHandler (this, con.getProxy ().getStrictHttp ());
 	chunkHandler.setBlockListener (this);
     }
 
-    public void modifyRequest (HttpHeader header) {
+    public void modifyRequest (final HttpHeader header) {
 	header.setHeader ("Transfer-Encoding", "chunked");
     }
 
@@ -41,27 +41,19 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
 	chunkHandler.handleData (bufHandle);
     }
 
-    public void bufferRead (BufferHandle bufHandle) {
-	fireResourceDataRead (bufHandle);
-	if (wc != null) {
-	    BlockSender bs =
-		new BlockSender (wc.getChannel (), con.getNioHandler (),
-				 tlh.getNetwork (), bufHandle, true, this);
-	    bs.write ();
-	} else {
-	    blockSent ();
-	}
+    public void bufferRead (final BufferHandle bufHandle) {
+	fireResouceDataRead (bufHandle);
+	final BlockSender bs =
+	    new BlockSender (wc.getChannel (), con.getNioHandler (),
+			     tlh.getNetwork (), bufHandle, true, this);
+	bs.write ();
     }
 
     public void finishedRead () {
+	final ChunkEnder ce = new ChunkEnder ();
 	sentEndChunk = true;
-	if (wc != null) {
-	    ChunkEnder ce = new ChunkEnder ();
-	    ce.sendChunkEnding (wc.getChannel (), con.getNioHandler (),
-				tlh.getNetwork (), this);
-	} else {
-	    blockSent ();
-	}
+	ce.sendChunkEnding (wc.getChannel (), con.getNioHandler (),
+			    tlh.getNetwork (), this);
     }
 
     public void register () {

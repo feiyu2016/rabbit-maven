@@ -5,6 +5,7 @@ import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public class MultiSelectorNioHandler implements NioHandler {
     /** The executor service. */
     private final ExecutorService executorService;
     private final List<SingleSelectorRunner> selectorRunners;
-    private final Logger logger = Logger.getLogger ("rabbit.rnio");
+    private static final Logger logger = Logger.getLogger ("rabbit.rnio");
     private final StatisticsHolder stats;
     private final Long defaultTimeout;
     private int nextIndex = 0;
@@ -45,35 +46,35 @@ public class MultiSelectorNioHandler implements NioHandler {
      * @param defaultTimeout the default timeout value for this NioHandler
      * @throws IOException if the selectors can not be started
      */
-    public MultiSelectorNioHandler (ExecutorService executorService,
-				    StatisticsHolder stats,
-				    int numSelectors, 
-				    Long defaultTimeout)
+    public MultiSelectorNioHandler (final ExecutorService executorService,
+				    final StatisticsHolder stats,
+				    final int numSelectors, 
+				    final Long defaultTimeout)
 	throws IOException {
 	this.executorService = executorService;
 	this.stats = stats;
 
 	if (numSelectors < 1) {
-	    String err = "Must have at least one selector: " + numSelectors;
+	    final String err = "Must have at least one selector: " + numSelectors;
 	    throw new IllegalArgumentException (err);
 	}
 	selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
 	for (int i = 0; i < numSelectors; i++)
 	    selectorRunners.add (new SingleSelectorRunner (executorService));
 	if (defaultTimeout != null && defaultTimeout.longValue () <= 0) {
-	    String err = "Default timeout may not be zero or negative";
+	    final String err = "Default timeout may not be zero or negative";
 	    throw new IllegalArgumentException (err);
 	}
 	this.defaultTimeout = defaultTimeout;
     }
 
-    public void start (ThreadFactory tf) {
+    public void start (final ThreadFactory tf) {
 	for (SingleSelectorRunner ssr : selectorRunners)
 	    ssr.start (tf);
     }
 
     public void shutdown () {
-	Thread t = new Thread (new Runnable () {
+	final Thread t = new Thread (new Runnable () {
 		public void run () {
 		    executorService.shutdown ();
 		    for (SingleSelectorRunner ssr : selectorRunners)
@@ -90,16 +91,13 @@ public class MultiSelectorNioHandler implements NioHandler {
 			     defaultTimeout.longValue ());
     }
 
-    public boolean isSelectorThread () {
-	for (SingleSelectorRunner ssr : selectorRunners)
-	    if (ssr.isSelectorThread ())
-		return true;
-	return false;
-    }
-
-    public void runThreadTask (Runnable r, TaskIdentifier ti) {
+    public void runThreadTask (final Runnable r, final TaskIdentifier ti) {
 	stats.addPendingTask (ti);
-	executorService.execute (new StatisticsCollector (stats, r, ti));
+	try{
+		executorService.execute (new StatisticsCollector (stats, r, ti));
+	}catch(RejectedExecutionException e){
+		logger.log(Level.WARNING, "Could not launch exeuctor", e);
+	}
     }
 
     private SingleSelectorRunner getSelectorRunner () {
@@ -116,8 +114,8 @@ public class MultiSelectorNioHandler implements NioHandler {
      * @param channel the channel to run the task on
      * @param sr the task to run on the main thread.
      */
-    private void runSelectorTask (SelectableChannel channel,
-				  SelectorRunnable sr) {
+    private void runSelectorTask (final SelectableChannel channel,
+				  final SelectorRunnable sr) {
 	// If the channel is already being served by someone, favor that one.
 	for (SingleSelectorRunner ssr : selectorRunners) {
 	    if (ssr.handlesChannel (channel)) {
@@ -126,7 +124,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 	    }
 	}
 	// Put it on any selector
-	SingleSelectorRunner ssr = getSelectorRunner ();
+	final SingleSelectorRunner ssr = getSelectorRunner ();
 	ssr.runSelectorTask (sr);
     }
 
@@ -136,7 +134,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 	    logger.fine ("Waiting for read for: channel: " + channel +
 			 ", handler: " + handler);
 	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (SingleSelectorRunner ssr) throws IOException {
+		public void run (final SingleSelectorRunner ssr) throws IOException {
 		    ssr.waitForRead (channel, handler);
 		}
 	    });
@@ -148,7 +146,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 	    logger.fine ("Waiting for write for: channel: " + channel +
 			 ", handler: " + handler);
 	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (SingleSelectorRunner ssr) throws IOException {
+		public void run (final SingleSelectorRunner ssr) throws IOException {
 		    ssr.waitForWrite (channel, handler);
 		}
 	    });
@@ -160,7 +158,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 	    logger.fine ("Waiting for accept for: channel: " + channel +
 			 ", handler: " + handler);
 	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (SingleSelectorRunner ssr) throws IOException {
+		public void run (final SingleSelectorRunner ssr) throws IOException {
 		    ssr.waitForAccept (channel, handler);
 		}
 	    });
@@ -169,7 +167,7 @@ public class MultiSelectorNioHandler implements NioHandler {
     public void waitForConnect (final SelectableChannel channel,
 				final ConnectHandler handler) {
 	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (SingleSelectorRunner ssr) throws IOException {
+		public void run (final SingleSelectorRunner ssr) throws IOException {
 		    ssr.waitForConnect (channel, handler);
 		}
 	    });
@@ -179,7 +177,7 @@ public class MultiSelectorNioHandler implements NioHandler {
 			final SocketChannelHandler handler) {
 	for (SingleSelectorRunner sr : selectorRunners) {
 	    sr.runSelectorTask (new SelectorRunnable () {
-		    public void run (SingleSelectorRunner ssr) {
+		    public void run (final SingleSelectorRunner ssr) {
 			ssr.cancel (channel, handler);
 		    }
 		});
@@ -189,14 +187,14 @@ public class MultiSelectorNioHandler implements NioHandler {
     public void close (final SelectableChannel channel) {
 	for (SingleSelectorRunner sr : selectorRunners) {
 	    sr.runSelectorTask (new SelectorRunnable () {
-		    public void run (SingleSelectorRunner ssr) {
+		    public void run (final SingleSelectorRunner ssr) {
 			ssr.close (channel);
 		    }
 		});
 	}
     }
 
-    public void visitSelectors (SelectorVisitor visitor) {
+    public void visitSelectors (final SelectorVisitor visitor) {
 	// TODO: do we need to run on the respective threads?
 	for (SingleSelectorRunner sr : selectorRunners)
 	    sr.visit (visitor);

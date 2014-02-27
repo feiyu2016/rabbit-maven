@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import rabbit.rnio.NioHandler;
-import rabbit.dns.DNSHandler;
 import rabbit.io.ProxyChain;
 import rabbit.io.Resolver;
 
@@ -18,16 +17,16 @@ public class InOutProxyChain implements ProxyChain {
     private final Resolver directResolver;
     private final Resolver proxiedResolver;
 
-    public InOutProxyChain (String insideMatch,
-			    NioHandler nio, DNSHandler dnsHandler,
-			    InetAddress proxy, int port, String proxyAuth) {
+    public InOutProxyChain (final String insideMatch,
+			    final NioHandler nio,
+			    final InetAddress proxy, final int port, final String proxyAuth) {
 	insidePattern = Pattern.compile (insideMatch);
-	directResolver = new SimpleResolver (nio, dnsHandler);
+	directResolver = new SimpleResolver (nio);
 	proxiedResolver = new ProxyResolver (proxy, port, proxyAuth);
     }
 
-    public Resolver getResolver (String url) {
-	Matcher m = insidePattern.matcher (url);
+    public Resolver getResolver (final String url) {
+	final Matcher m = insidePattern.matcher (url);
 	if (m.find ())
 	    return directResolver;
 	return proxiedResolver;

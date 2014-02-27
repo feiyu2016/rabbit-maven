@@ -10,7 +10,7 @@ public class SimpleTrafficLogger implements TrafficLogger {
     private long transferFrom;
     private long transferTo;
 
-    public void read (long read) {
+    public void read (final long read) {
 	this.read += read;
     }
 
@@ -18,7 +18,7 @@ public class SimpleTrafficLogger implements TrafficLogger {
 	return read;
     }
     
-    public void write (long written) {
+    public void write (final long written) {
 	this.written += written;
     }
     
@@ -26,7 +26,7 @@ public class SimpleTrafficLogger implements TrafficLogger {
 	return written;
     }
     
-    public void transferFrom (long transferred) {
+    public void transferFrom (final long transferred) {
 	this.transferFrom += transferred;
     }   
 
@@ -34,7 +34,7 @@ public class SimpleTrafficLogger implements TrafficLogger {
 	return transferFrom;
     }
 
-    public void transferTo (long transferred) {
+    public void transferTo (final long transferred) {
 	this.transferTo += transferred;
     }   
 
@@ -49,7 +49,7 @@ public class SimpleTrafficLogger implements TrafficLogger {
 	transferTo = 0;
     }
 
-    public void addTo (TrafficLogger other) {
+    public void addTo (final TrafficLogger other) {
 	other.read (read);
 	other.write (written);
 	other.transferFrom (transferFrom);

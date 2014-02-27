@@ -18,14 +18,9 @@ public class CachingBufferHandler implements BufferHandler {
 	new ConcurrentLinkedQueue<BufferHolder> ();
     private Queue<BufferHolder> largeCache = 
 	new ConcurrentLinkedQueue<BufferHolder> ();
-    private int count = 0;
-
-    private static final int SMALL_BUFFER_SIZE = 4096;
-    private static final int LARGE_BUFFER_SIZE = 128 * 1024;
-
-    private ByteBuffer getBuffer (Queue<BufferHolder> bufs, int size) {
-	count++;
-	BufferHolder r = bufs.poll ();
+    
+    private ByteBuffer getBuffer (final Queue<BufferHolder> bufs, final int size) {
+	final BufferHolder r = bufs.poll ();
 	ByteBuffer b = null;
 	if (r != null)
 	    b = r.getBuffer ();
@@ -36,26 +31,25 @@ public class CachingBufferHandler implements BufferHandler {
     }
 
     public ByteBuffer getBuffer () {
-	return getBuffer (cache, SMALL_BUFFER_SIZE);
+	return getBuffer (cache, 4096);
     }
     
-    private void addCache (Queue<BufferHolder> bufs, BufferHolder bh) {
+    private void addCache (final Queue<BufferHolder> bufs, final BufferHolder bh) {
 	bufs.add (bh);
     }
 
-    public void putBuffer (ByteBuffer buffer) {
+    public void putBuffer (final ByteBuffer buffer) {
 	if (buffer == null) 
 	    throw new IllegalArgumentException ("null buffer not allowed");
-	count--;	
-	BufferHolder bh = new BufferHolder (buffer);
-	if (buffer.capacity () == SMALL_BUFFER_SIZE)
+	final BufferHolder bh = new BufferHolder (buffer);
+	if (buffer.capacity () == 4096)
 	    addCache (cache, bh);
 	else 
 	    addCache (largeCache, bh);
     }
     
-    public ByteBuffer growBuffer (ByteBuffer buffer) {
-	ByteBuffer lb = getBuffer (largeCache, LARGE_BUFFER_SIZE);
+    public ByteBuffer growBuffer (final ByteBuffer buffer) {
+	final ByteBuffer lb = getBuffer (largeCache, 128 * 1024);
 	if (buffer != null) {
 	    lb.put (buffer);
 	    putBuffer (buffer);
@@ -63,19 +57,15 @@ public class CachingBufferHandler implements BufferHandler {
 	return lb;
     }
 
-    public boolean isLarge (ByteBuffer buffer) {
-	return buffer.capacity () > SMALL_BUFFER_SIZE;
-    }
-
     private static final class BufferHolder {
 	private ByteBuffer buffer;
 	
-	public BufferHolder (ByteBuffer buffer) {
+	public BufferHolder (final ByteBuffer buffer) {
 	    this.buffer = buffer;
 	}
 
 	// Two holders are equal if they hold the same buffer
-	@Override public boolean equals (Object o) {
+	@Override public boolean equals (final Object o) {
 	    if (o == null)
 		return false;
 	    if (o == this)

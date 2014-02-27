@@ -10,7 +10,7 @@ public class DefaultTaskIdentifier implements TaskIdentifier {
     private final String groupId;
     private final String description;
     
-    public DefaultTaskIdentifier (String groupId, String description) {
+    public DefaultTaskIdentifier (final String groupId, final String description) {
 	this.groupId = groupId;
 	this.description = description;
     }

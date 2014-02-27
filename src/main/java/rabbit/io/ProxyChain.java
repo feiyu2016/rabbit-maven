@@ -1,7 +1,5 @@
 package rabbit.io;
 
-import rabbit.io.Resolver;
-
 /** Interface to be able to handle different connection strategies
  *  depending on where we want to connect. This makes it possible
  *  to setup a system where we connect directly to computers on the 

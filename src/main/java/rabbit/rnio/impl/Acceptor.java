@@ -21,9 +21,9 @@ public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
      * @param nioHandler the NioHandler to use for waiting
      * @param listener the listener waiting for connections
      */
-    public Acceptor (ServerSocketChannel ssc, 
-		     NioHandler nioHandler,
-		     AcceptorListener listener) {
+    public Acceptor (final ServerSocketChannel ssc, 
+		     final NioHandler nioHandler,
+		     final AcceptorListener listener) {
 	super (ssc, nioHandler, null);
 	this.listener = listener;
     }
@@ -38,7 +38,7 @@ public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
      */ 
     public void accept () {
 	try {
-	    SocketChannel s = sc.accept ();
+	    final SocketChannel s = sc.accept ();
 	    s.configureBlocking (false);
 	    listener.connectionAccepted (s);
 	    register ();

@@ -30,16 +30,16 @@ public class BlockSender extends BaseSocketHandler implements WriteHandler {
      * @param sender the listener that will be notified when the data has
      *        been handled.
      */
-    public BlockSender (SocketChannel channel, NioHandler nioHandler, 
-			TrafficLogger tl, 
-			BufferHandle bufHandle, boolean chunking, 
-			BlockSentListener sender) {
+    public BlockSender (final SocketChannel channel, final NioHandler nioHandler, 
+			final TrafficLogger tl, 
+			final BufferHandle bufHandle, final boolean chunking, 
+			final BlockSentListener sender) {
 	super (channel, bufHandle, nioHandler);
 	this.tl = tl;
-	ByteBuffer buffer = bufHandle.getBuffer ();
+	final ByteBuffer buffer = bufHandle.getBuffer ();
 	if (chunking) {
-	    int len = buffer.remaining ();
-	    String s = Long.toHexString (len) + "\r\n";
+	    final int len = buffer.remaining ();
+	    final String s = Long.toHexString (len) + "\r\n";
 	    try {
 		chunkBuffer = ByteBuffer.wrap (s.getBytes ("ASCII"));
 	    } catch (UnsupportedEncodingException e) {
@@ -57,7 +57,7 @@ public class BlockSender extends BaseSocketHandler implements WriteHandler {
     }
 
     @Override public String getDescription () {
-	StringBuilder sb = 
+	final StringBuilder sb = 
 	    new StringBuilder ("BlockSender: buffers: " + buffers.length);
 	for (int i = 0; i < buffers.length; i++) {
 	    if (i > 0)

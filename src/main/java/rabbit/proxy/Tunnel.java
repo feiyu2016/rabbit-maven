@@ -18,7 +18,7 @@ import rabbit.util.TrafficLogger;
  */
 public class Tunnel {
     private final NioHandler nioHandler;
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (Tunnel.class.getName ());
     private final OneWayTunnel fromToTo;
     private final OneWayTunnel toToFrom;
     private final TunnelDoneListener listener;
@@ -36,12 +36,12 @@ public class Tunnel {
      * @param listener the listener that will be notified when the tunnel
      *        is closed
      */
-    public Tunnel (NioHandler nioHandler, SocketChannel from, 
-		   BufferHandle fromHandle,
-		   TrafficLogger fromLogger, 
-		   SocketChannel to, BufferHandle toHandle, 
-		   TrafficLogger toLogger,
-		   TunnelDoneListener listener) {
+    public Tunnel (final NioHandler nioHandler, final SocketChannel from, 
+		   final BufferHandle fromHandle,
+		   final TrafficLogger fromLogger, 
+		   final SocketChannel to, final BufferHandle toHandle, 
+		   final TrafficLogger toLogger,
+		   final TunnelDoneListener listener) {
 	if (logger.isLoggable (Level.FINEST))
 	    logger.finest ("Tunnel created from: " + from + " to: " + to);
 	this.nioHandler = nioHandler;
@@ -65,8 +65,8 @@ public class Tunnel {
 	private final BufferHandle bh;
 	private final TrafficLogger tl;
 	
-	public OneWayTunnel (SocketChannel from, SocketChannel to, 
-			     BufferHandle bh, TrafficLogger tl) {
+	public OneWayTunnel (final SocketChannel from, final SocketChannel to, 
+			     final BufferHandle bh, final TrafficLogger tl) {
 	    this.from = from;
 	    this.to = to;
 	    this.bh = bh;
@@ -98,7 +98,7 @@ public class Tunnel {
 	    nioHandler.cancel (to, this);
 
 	    // clear buffer and return it.
-	    ByteBuffer buf = bh.getBuffer ();
+	    final ByteBuffer buf = bh.getBuffer ();
 	    buf.position (buf.limit ());
 	    bh.possiblyFlush ();
 	}
@@ -110,7 +110,7 @@ public class Tunnel {
 		    closeDown ();
 		    return;
 		}
-		ByteBuffer buf = bh.getBuffer ();
+		final ByteBuffer buf = bh.getBuffer ();
 		if (buf.hasRemaining ()) {
 		    int written;
 		    do {
@@ -159,9 +159,9 @@ public class Tunnel {
 		    logger.warning ("Tunnel to is closed, not reading data");
 		    return;
 		}
-		ByteBuffer buffer = bh.getBuffer ();
+		final ByteBuffer buffer = bh.getBuffer ();
 		buffer.clear ();
-		int read = from.read (buffer);
+		final int read = from.read (buffer);
 		if (logger.isLoggable (Level.FINEST))
 		    logger.finest ("OneWayTunnel read: " + read);
 		if (read == -1) {

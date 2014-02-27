@@ -12,7 +12,7 @@ public class SProperties extends HashMap<String, String> {
      * @return the property or null if the key does not exists in
      *         this properties.
      */
-    public String getProperty (String key) {
+    public String getProperty (final String key) {
 	return get (key);
     }
 
@@ -22,8 +22,8 @@ public class SProperties extends HashMap<String, String> {
      *        or if the value was null.
      * @return the property value
      */
-    public String getProperty (String key, String defaultValue) {
-	String val = get (key);
+    public String getProperty (final String key, final String defaultValue) {
+	final String val = get (key);
 	if (val == null)
 	    return defaultValue;
 	return val;
@@ -35,7 +35,7 @@ public class SProperties extends HashMap<String, String> {
 	 *  @param value the value to set, or null to remove a value
 	 *  @return the previous value, if any
 	 */
-	public String put (String key, String value) {
+	public String put (final String key, final String value) {
 		if(value == null){
 			return remove(key);
 		}else{

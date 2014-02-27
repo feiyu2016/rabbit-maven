@@ -21,37 +21,33 @@ class MultiPartTransferHandler extends ResourceHandlerBase
     implements BlockSentListener {
     private MultiPartPipe mpp = null;
 
-    public MultiPartTransferHandler (Connection con, 
-				     BufferHandle bufHandle,
-				     TrafficLoggerHandler tlh, 
-				     String ctHeader) {
+    public MultiPartTransferHandler (final Connection con, 
+				     final BufferHandle bufHandle,
+				     final TrafficLoggerHandler tlh, 
+				     final String ctHeader) {
 	super (con, bufHandle, tlh);
 	mpp = new MultiPartPipe (ctHeader);
     }
     
-    public void modifyRequest (HttpHeader header) {
+    public void modifyRequest (final HttpHeader header) {
 	// nothing.
     }
     
     @Override void sendBuffer () {
-	ByteBuffer buffer = bufHandle.getBuffer ();
-	ByteBuffer sendBuffer = buffer.slice ();
-	BufferHandle sbh = new SimpleBufferHandle (sendBuffer);
+	final ByteBuffer buffer = bufHandle.getBuffer ();
+	final ByteBuffer sendBuffer = buffer.slice ();
+	final BufferHandle sbh = new SimpleBufferHandle (sendBuffer);
 	mpp.parseBuffer (sendBuffer);
-	fireResourceDataRead (sbh);
-	if (wc != null) {
-	    BlockSender bs =
-		new BlockSender (wc.getChannel (), con.getNioHandler (),
-				 tlh.getNetwork (), sbh, false, this);
-	    bs.write ();
-	} else {
-	    blockSent ();
-	}
+	fireResouceDataRead (sbh);
+	final BlockSender bs = 
+	    new BlockSender (wc.getChannel (), con.getNioHandler (), 
+			     tlh.getNetwork (), sbh, false, this);
+	bs.write ();
     }
     public void blockSent () {
 	if (!mpp.isFinished ())
 	    doTransfer ();
-	else
+	else 
 	    listener.clientResourceTransferred ();
     }
 }

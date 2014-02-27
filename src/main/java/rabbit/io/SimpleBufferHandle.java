@@ -12,7 +12,7 @@ public class SimpleBufferHandle implements BufferHandle {
     /** Create a BufferHandle that wraps the given ByteBuffer.
      * @param buffer the ByteBuffer to wrap
      */
-    public SimpleBufferHandle (ByteBuffer buffer) {
+    public SimpleBufferHandle (final ByteBuffer buffer) {
 	this.buffer = buffer;
     }
 
@@ -28,7 +28,7 @@ public class SimpleBufferHandle implements BufferHandle {
 	throw new RuntimeException ("Not implemented");
     }
 
-    public boolean isLarge (ByteBuffer buffer) {
+    public boolean isLarge (final ByteBuffer buffer) {
 	return false; // we only give out small buffers
     }
 
@@ -37,7 +37,7 @@ public class SimpleBufferHandle implements BufferHandle {
 	    buffer = null;
     }
 
-    public void setMayBeFlushed (boolean mayBeFlushed) {
+    public void setMayBeFlushed (final boolean mayBeFlushed) {
 	// ignore
     }
 }

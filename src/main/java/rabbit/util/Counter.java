@@ -15,8 +15,8 @@ public class Counter {
     /** Increase a logentry.
      * @param log the event to increase 
      */
-    public void inc (String log) {
-	AtomicInteger l = counters.putIfAbsent (log, new AtomicInteger ());
+    public void inc (final String log) {
+	final AtomicInteger l = counters.putIfAbsent (log, new AtomicInteger ());
 	if (l != null)
 	    l.incrementAndGet ();
     }
@@ -32,8 +32,8 @@ public class Counter {
      * @param key the event were intrested in
      * @return the current count of event.
      */
-    public int get (String key) {
-	AtomicInteger l = counters.get (key);
+    public int get (final String key) {
+	final AtomicInteger l = counters.get (key);
 	if (l == null)
 	    return 0;
 	return l.get ();

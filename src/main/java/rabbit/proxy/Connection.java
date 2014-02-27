@@ -1,24 +1,21 @@
 package rabbit.proxy;
 
+import java.util.Locale;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import rabbit.rnio.BufferHandler;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.TaskIdentifier;
 import rabbit.rnio.impl.Closer;
 import rabbit.rnio.impl.DefaultTaskIdentifier;
-import rabbit.cache.Cache;
-import rabbit.cache.CacheEntry;
-import rabbit.cache.CacheException;
 import rabbit.handler.BaseHandler;
 import rabbit.handler.Handler;
 import rabbit.handler.MultiPartHandler;
-import rabbit.http.HttpDateParser;
 import rabbit.http.HttpHeader;
 import rabbit.httpio.HttpHeaderListener;
 import rabbit.httpio.HttpHeaderReader;
@@ -53,6 +50,9 @@ public class Connection {
     /** The current request buffer handle */
     private BufferHandle requestHandle;
 
+    /** The buffer handler. */
+    private final BufferHandler bufHandler;
+
     /** The proxy we are serving */
     private final HttpProxy proxy;
 
@@ -63,14 +63,7 @@ public class Connection {
     private long started;
 
     private boolean  keepalive      = true;
-    private boolean  meta           = false;
     private boolean  chunk          = true;
-    private boolean  mayUseCache    = true;
-    private boolean  mayCache       = true;
-    private boolean  mayFilter      = true;
-    private boolean  mustRevalidate = false;
-    private boolean  addedINM       = false;
-    private boolean  addedIMS       = false;
 
     /** If the user has authenticated himself */
     private String userName = null;
@@ -89,20 +82,23 @@ public class Connection {
 
     private final TrafficLoggerHandler tlh = new TrafficLoggerHandler ();
 
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (Connection.class.getName ());
 
     /** Create a new Connection
      * @param id the ConnectionId of this connection.
      * @param channel the SocketChannel to the client.
      * @param proxy the HttpProxy that this connection belongs to.
+     * @param bufHandler the BufferHandler to use for getting ByteBuffers.
      */
-    public Connection (ConnectionId id, SocketChannel channel, HttpProxy proxy) {
+    public Connection (final ConnectionId id,	final SocketChannel channel,
+		      final  HttpProxy proxy, final BufferHandler bufHandler) {
 	this.id = id;
 	this.channel = channel;
 	this.proxy = proxy;
-	this.requestHandle = new CacheBufferHandle (proxy.getBufferHandler ());
+	this.requestHandle = new CacheBufferHandle (bufHandler);
+	this.bufHandler = bufHandler;
 	proxy.addCurrentConnection (this);
-	HttpGeneratorFactory hgf = proxy.getHttpGeneratorFactory ();
+	final HttpGeneratorFactory hgf = proxy.getHttpGeneratorFactory ();
 	responseHandler = hgf.create (proxy.getServerIdentity (), this);
     }
 
@@ -118,8 +114,8 @@ public class Connection {
     public void readRequest () {
 	clearStatuses ();
 	try {
-	    HttpHeaderListener clientListener = new RequestListener ();
-	    HttpHeaderReader hr =
+	    final HttpHeaderListener clientListener = new RequestListener ();
+	    final HttpHeaderReader hr =
 		new HttpHeaderReader (channel, requestHandle, getNioHandler (),
 				      tlh.getClient (), true,
 				      proxy.getStrictHttp (), clientListener);
@@ -129,15 +125,15 @@ public class Connection {
 	}
     }
 
-    private boolean connectionReset (Throwable t) {
+    private boolean connectionReset (final Throwable t) {
 	if (t instanceof IOException)
 	    return "Connection reset by peer".equals (t.getMessage ());
 	return false;
     }
 
-    private void handleFailedRequestRead (Throwable t) {
+    private void handleFailedRequestRead (final Throwable t) {
 	if (t instanceof RequestLineTooLongException) {
-	    HttpHeader err = getHttpGenerator ().get414 ();
+	    final HttpHeader err = responseHandler.get414 ();
 	    // Send response and close
 	    sendAndClose (err);
 	} else if (connectionReset (t)) {
@@ -150,9 +146,9 @@ public class Connection {
     }
 
     private class RequestListener implements HttpHeaderListener {
-	public void httpHeaderRead (HttpHeader header, BufferHandle bh,
-				    boolean keepalive, boolean isChunked,
-				    long dataSize) {
+	public void httpHeaderRead (final HttpHeader header, final BufferHandle bh,
+				    final boolean keepalive, final boolean isChunked,
+				    final long dataSize) {
 	    setKeepalive (keepalive);
 	    requestRead (header, bh, isChunked, dataSize);
 	}
@@ -165,23 +161,23 @@ public class Connection {
 	    closeDown ();
 	}
 
-	public void failed (Exception e) {
+	public void failed (final Exception e) {
 	    handleFailedRequestRead (e);
 	}
     }
 
-    private void handleInternalError (Throwable t) {
+    private void handleInternalError (final Throwable t) {
 	extraInfo =
 	    extraInfo != null ? extraInfo + t.toString () : t.toString ();
 	logger.log (Level.WARNING, "Internal Error", t);
-	HttpHeader internalError =
-	    getHttpGenerator ().get500 (request.getRequestURI (), t);
+	final HttpHeader internalError =
+	    responseHandler.get500 (request.getRequestURI (), t);
 	// Send response and close
 	sendAndClose (internalError);
     }
 
-    private void requestRead (HttpHeader request, BufferHandle bh,
-			      boolean isChunked, long dataSize) {
+    private void requestRead (final HttpHeader request, final BufferHandle bh,
+			      final boolean isChunked, final long dataSize) {
 	if (request == null) {
 	    logger.warning ("Got a null request");
 	    closeDown ();
@@ -193,8 +189,7 @@ public class Connection {
 	requestVersion = request.getHTTPVersion ();
 	if (request.isDot9Request ())
 	    requestVersion = "HTTP/0.9";
-	requestVersion = requestVersion.toUpperCase ();
-	request.addHeader ("Via", requestVersion + " RabbIT");
+	requestVersion = requestVersion.toUpperCase (Locale.US);
 
 	requestLine = request.getRequestLine ();
 	getCounter ().inc ("Requests");
@@ -213,7 +208,7 @@ public class Connection {
 		setupChunkedContent ();
 	    } else {
 		// no? then try regular data
-		String ct = request.getHeader ("Content-Type");
+		final String ct = request.getHeader ("Content-Type");
 		if (hasRegularContent (request, ct, dataSize))
 		    setupClientResourceHandler (dataSize);
 		else
@@ -222,7 +217,7 @@ public class Connection {
 			readMultiPart (ct);
 	    }
 
-	    TaskIdentifier ti =
+	    final TaskIdentifier ti =
 		new DefaultTaskIdentifier (getClass ().getSimpleName () +
 					   ".filterAndHandleRequest: ",
 					   request.getRequestURI ());
@@ -236,8 +231,8 @@ public class Connection {
 	}
     }
 
-    private boolean hasRegularContent (HttpHeader request, String ct,
-				       long dataSize) {
+    private boolean hasRegularContent (final HttpHeader request, final String ct,
+				       final long dataSize) {
 	if (request.getContent () != null)
 	    return true;
 	if (ct != null && ct.startsWith ("multipart/byteranges"))
@@ -251,74 +246,15 @@ public class Connection {
 	// Filter the request based on the header.
 	// A response means that the request is blocked.
 	// For ad blocking, bad header configuration (http/1.1 correctness) ...
-	HttpHeaderFilterer filterer = proxy.getHttpHeaderFilterer ();
-	HttpHeader badresponse = filterer.filterHttpIn (this, channel, request);
+	final HttpHeaderFilterer filterer = proxy.getHttpHeaderFilterer ();
+	final HttpHeader badresponse = filterer.filterHttpIn (this, channel, request);
 	if (badresponse != null) {
 	    statusCode = badresponse.getStatusCode ();
-	    if (clientResourceHandler != null)
-		readOffClientResource (badresponse);
-	    else
-		// Try to keep the connection open (authorization may need it).
-		// A filter that want to close can set keep alive to false
-		sendAndTryRestart (badresponse);
+	    // Send response and close
+	    sendAndClose (badresponse);
 	} else {
-	    if (getMeta ())
-		handleMeta ();
-	    else
 		handleRequest ();
 	}
-    }
-
-    private void readOffClientResource (final HttpHeader badresponse) {
-	clientResourceHandler.transfer (null, new ClientResourceTransferredListener () {
-	    public void clientResourceTransferred () {
-		sendAndTryRestart (badresponse);
-	    }
-
-	    public void clientResourceAborted (HttpHeader error) {
-		closeDown ();
-	    }
-
-	    public void failed (Exception cause) {
-		closeDown ();
-	    }
-
-	    public void timeout () {
-		closeDown ();
-	    }
-	});
-    }
-
-    /** Handle a meta page.
-     */
-    private void handleMeta () {
-	status = "Handling meta page";
-	MetaHandlerHandler mhh = new MetaHandlerHandler ();
-	try {
-	    mhh.handleMeta (this, request, tlh.getProxy (), tlh.getClient ());
-	} catch (IOException ex) {
-	    logAndClose ();
-	}
-    }
-
-    private void checkNoStore (CacheEntry<HttpHeader, HttpHeader> entry) {
-	if (entry == null)
-	    return;
-	List<String> ccs = request.getHeaders ("Cache-Control");
-	int ccl = ccs.size ();
-	try {
-	    for (int i = 0; i < ccl; i++) {
-		if (ccs.get (i).equals ("no-store")) {
-		    proxy.getCache ().remove (entry.getKey ());
-		}
-	    }
-	} catch (CacheException e) {
-	    logger.log (Level.WARNING, "Failed to remove entry from cache", e);
-	}
-    }
-
-    private boolean checkMaxAge (RequestHandler rh) {
-	return rh.getCond ().checkMaxAge (this, rh.getDataHook (), rh);
     }
 
     /** Handle a request by getting the datastream (from the cache or the web).
@@ -327,53 +263,6 @@ public class Connection {
     private void handleRequest () {
 	status = "Handling request";
 	final RequestHandler rh = new RequestHandler (this);
-	if (proxy.getCache ().getCacheConfiguration ().getMaxSize () > 0) {
-	    fillInCacheEntries (rh);
-	} else {
-	    handleRequestBottom (rh);
-	}
-    }
-
-    private void fillInCacheEntries (final RequestHandler rh) {
-	status = "Handling request - checking cache";
-	Cache<HttpHeader, HttpHeader> cache = proxy.getCache ();
-	String method = request.getMethod ();
-	try {
-	    if (!method.equals ("GET") && !method.equals ("HEAD"))
-		cache.remove (request);
-
-	    rh.setEntry (cache.getEntry (request));
-	    if (rh.getEntry () != null)
-		rh.setDataHook (rh.getEntry ().getDataHook ());
-	    checkNoStore (rh.getEntry ());
-	    // Check if cached item is too old
-	    if (!rh.getCond ().checkMaxStale (request, rh) && checkMaxAge (rh))
-		setMayUseCache (false);
-
-	    // Add headers to send If-None-Match, or If-Modified-Since
-	    rh.setConditional (rh.getCond ().checkConditional (this, request,
-							       rh,
-							       mustRevalidate));
-	    if (partialContent (rh))
-		fillupContent ();
-	    checkIfRange (rh);
-	} catch (CacheException e) {
-	    logger.log (Level.WARNING, "Failed cache operation", e);
-	}
-
-	boolean mc = getMayCache ();
-	// in cache?
-	if (getMayUseCache () && rh.getEntry () != null) {
-	    CacheChecker cc = new CacheChecker ();
-	    if (cc.checkCachedEntry (this, request, rh))
-		return;
-	}
-	if (rh.getContent () == null) {
-	    // Ok cache did not have a usable resource,
-	    // reset value to one before we thought we could use cache...
-	    mayCache = mc;
-	}
-
 	handleRequestBottom (rh);
     }
 
@@ -381,9 +270,9 @@ public class Connection {
 	if (rh.getContent () == null) {
 	    status = "Handling request - setting up web connection";
 	    // no usable cache entry so get the resource from the net.
-	    ProxyChain pc = proxy.getProxyChain ();
-	    Resolver r = pc.getResolver (request.getRequestURI ());
-	    SWC swc =
+	    final ProxyChain pc = proxy.getProxyChain ();
+	    final Resolver r = pc.getResolver (request.getRequestURI ());
+	    final SWC swc =
 		new SWC (this, r, request, tlh, clientResourceHandler, rh);
 	    swc.establish ();
 	} else {
@@ -395,7 +284,7 @@ public class Connection {
      * @param rh the RequestHandler
      * @param cause the Exception that signaled the problem
      */
-    public void webConnectionSetupFailed (RequestHandler rh, Exception cause) {
+    public void webConnectionSetupFailed (final RequestHandler rh, final Exception cause) {
 	if (cause instanceof UnknownHostException)
 	    // do we really want this in the log?
 	    logger.warning (cause.toString () + ": " +
@@ -403,23 +292,7 @@ public class Connection {
 	else
 	    logger.warning ("Failed to set up web connection to: " +
 			    request.getRequestURI () + ", cause: " + cause);
-	tryStaleEntry (rh, cause);
-    }
-
-    private void setMayCacheFromCC (RequestHandler rh) {
-	HttpHeader resp = rh.getWebHeader ();
-	for (String val : resp.getHeaders ("Cache-Control")) {
-	    if ("public".equals (val)
-		|| "must-revalidate".equals (val)
-		|| val.startsWith ("s-maxage=")) {
-		String auth = request.getHeader ("Authorization");
-		if (auth != null) {
-		    // TODO this ignores no-store and a few other things...
-		    mayCache = true;
-		    break;
-		}
-	    }
-	}
+	doGateWayTimeout (cause);
     }
 
     /** Check if we must tunnel a request.
@@ -427,34 +300,31 @@ public class Connection {
      * @return true if the current request needs to be handled by a tunnel
      */
     protected boolean mustTunnel () {
-	String auth = request.getHeader ("Authorization");
+	final String auth = request.getHeader ("Authorization");
 	return auth != null &&
 	    (auth.startsWith ("NTLM") || auth.startsWith ("Negotiate"));
     }
 
     /** Fired when a web connection has been established.
      *  The web connection may be to the origin server or to an upstream proxy.
-     * @param rh the RequestHandler for the current request
+     * @param rh the RequestHandler for the current request 
      */
-    public void webConnectionEstablished (RequestHandler rh) {
-	getProxy ().markForPipelining (rh.getWebConnection ());
-	if (!request.isDot9Request ())
-	    setMayCacheFromCC (rh);
+    public void webConnectionEstablished (final RequestHandler rh) {
 	resourceEstablished (rh);
     }
 
-    private void tunnel (RequestHandler rh) {
+    private void tunnel (final RequestHandler rh) {
 	status = "Handling request - tunneling";
-	TunnelDoneListener tdl = new TDL (rh);
-	SocketChannel webChannel = rh.getWebConnection ().getChannel ();
-	Tunnel tunnel =
+	final TunnelDoneListener tdl = new TDL (rh);
+	final SocketChannel webChannel = rh.getWebConnection ().getChannel ();
+	final Tunnel tunnel =
 	    new Tunnel (getNioHandler (), channel, requestHandle,
 			tlh.getClient (), webChannel,
 			rh.getWebHandle (), tlh.getNetwork (), tdl);
 	tunnel.start ();
     }
 
-    private void resourceEstablished (RequestHandler rh) {
+    private void resourceEstablished (final RequestHandler rh) {
 	status = "Handling request - got resource";
 	try {
 	    // and now we filter the response header if any.
@@ -464,70 +334,49 @@ public class Connection {
 		    return;
 		}
 
-		String status = rh.getWebHeader ().getStatusCode ().trim ();
+		final String status = rh.getWebHeader ().getStatusCode ().trim ();
 
-		// Check if the cached Date header is newer,
-		// indicating that we should not cache.
-		if (!rh.getCond ().checkStaleCache (request, this, rh))
-		    setMayCache (false);
-
-		CacheChecker cc = new CacheChecker ();
-		cc.removeOtherStaleCaches (request, rh.getWebHeader (),
-					   proxy.getCache ());
-		if (status.equals ("304")) {
-		    NotModifiedHandler nmh = new NotModifiedHandler ();
-		    nmh.updateHeader (rh);
-		    if (rh.getEntry () != null) {
-			proxy.getCache ().entryChanged (rh.getEntry (),
-							request, rh.getDataHook ());
-		    }
-		}
-
-		// Check that the cache entry has expected header
-		// returns null for a good cache entry
-		HttpHeader bad =
-		    cc.checkExpectations (this, request, rh.getWebHeader ());
-		if (bad == null) {
-		    HttpHeaderFilterer filterer =
-			proxy.getHttpHeaderFilterer ();
-		    // Run output filters on the header
-		    bad = filterer.filterHttpOut (this, channel, rh.getWebHeader ());
-		}
+		final HttpHeaderFilterer filterer =
+		proxy.getHttpHeaderFilterer ();
+		// Run output filters on the header
+		final HttpHeader bad = filterer.filterHttpOut (this, channel, rh.getWebHeader ());
 		if (bad != null) {
 		    // Bad cache entry or this request is blocked
 		    rh.getContent ().release ();
-		    // Send error response, keep connection open
-		    sendAndTryRestart (bad);
+		    // Send error response and close
+		    sendAndClose (bad);
 		    return;
 		}
 
-		if (rh.isConditional () && rh.getEntry () != null
-		    && status.equals ("304")) {
-		    // Try to setup a resource from the cache
-		    if (handleConditional (rh)) {
-			return;
-		    }
-		} else if (status.length () > 0) {
-		    if (status.equals ("304") || status.equals ("204")
-			|| status.charAt (0) == '1') {
+		if (status.length () > 0 && (status.equals ("304") || status.equals ("204")
+									 || status.charAt (0) == '1')) {
 			rh.getContent ().release ();
 			// Send success response and close
 			sendAndClose (rh.getWebHeader ());
 			return;
-		    }
 		}
 	    }
 
-	    setHandlerFactory (rh);
+	    if (rh.getWebHeader () != null) {
+			String ct = rh.getWebHeader ().getHeader ("Content-Type");
+			if (ct != null) {
+				ct = ct.toLowerCase (Locale.US);
+				// remove some white spaces for easier configuration.
+				// "text/html; charset=iso-8859-1"
+				// "text/html;charset=iso-8859-1"
+				ct = ct.replace ("; ", ";");
+				if (ct.startsWith ("multipart/byteranges"))
+					rh.setHandlerFactory (new MultiPartHandler ());
+			}
+		}
+	    rh.setHandlerFactory (new BaseHandler ()); 
 	    status = "Handling request - " +
 		rh.getHandlerFactory ().getClass ().getName ();
-	    Handler handler =
+	    final Handler handler =
 		rh.getHandlerFactory ().getNewInstance (this, tlh,
 							request,
 							rh.getWebHeader (),
 							rh.getContent (),
-							getMayCache (),
-							getMayFilter (),
 							rh.getSize ());
 	    if (handler == null) {
 		doError (500, "Failed to find handler");
@@ -536,7 +385,7 @@ public class Connection {
 		// HTTP/0.9 does not support HEAD, so webheader should be valid.
 		if (request.isHeadOnlyRequest ()) {
 		    rh.getContent ().release ();
-		    sendAndTryRestart (rh.getWebHeader ());
+		    sendAndRestart (rh.getWebHeader ());
 		} else {
 		    handler.handle ();
 		}
@@ -546,7 +395,7 @@ public class Connection {
 	}
     }
 
-    private void finalFixesOnWebHeader (RequestHandler rh, Handler handler) {
+    private void finalFixesOnWebHeader (final RequestHandler rh, final Handler handler) {
 	if (rh.getWebHeader () == null)
 	    return;
 	if (chunk) {
@@ -557,7 +406,7 @@ public class Connection {
 		setChunking (false);
 	    }
 	} else {
-	    if (getKeepalive ()) {
+	    if (keepalive) {
 		rh.getWebHeader ().setHeader ("Proxy-Connection", "Keep-Alive");
 		rh.getWebHeader ().setHeader ("Connection", "Keep-Alive");
 	    } else {
@@ -567,177 +416,36 @@ public class Connection {
 	}
     }
 
-    private void setHandlerFactory (RequestHandler rh) {
-	if (rh.getHandlerFactory () == null) {
-	    String ct = null;
-	    if (rh.getWebHeader () != null) {
-		ct = rh.getWebHeader ().getHeader ("Content-Type");
-		if (ct != null) {
-		    ct = ct.toLowerCase ();
-		    // remove some white spaces for easier configuration.
-		    // "text/html; charset=iso-8859-1"
-		    // "text/html;charset=iso-8859-1"
-		    ct = ct.replace ("; ", ";");
-		    if (getMayFilter ())
-			rh.setHandlerFactory (proxy.getHandlerFactory (ct));
-		    if (rh.getHandlerFactory () == null
-			&& ct.startsWith ("multipart/byteranges"))
-			rh.setHandlerFactory (new MultiPartHandler ());
-		}
-	    }
-	    if (rh.getHandlerFactory () == null) {              // still null
-		logger.fine ("Using BaseHandler for " + ct);
-		rh.setHandlerFactory (new BaseHandler ());   // fallback...
-	    }
-	}
-    }
-
-    private boolean handleConditional (RequestHandler rh) {
-	HttpHeader cachedHeader = rh.getDataHook ();
-	rh.getContent ().release ();
-
-	if (addedINM)
-	    request.removeHeader ("If-None-Match");
-	if (addedIMS)
-	    request.removeHeader ("If-Modified-Since");
-
-	if (ETagUtils.checkWeakEtag (cachedHeader, rh.getWebHeader ())) {
-	    NotModifiedHandler nmh = new NotModifiedHandler ();
-	    nmh.updateHeader (rh);
-	    setMayCache (false);
-	    try {
-		HttpHeader res304 =
-		    nmh.is304 (request, getHttpGenerator (), rh);
-		if (res304 != null) {
-		    sendAndClose (res304);
-		    return true;
-		}
-		// Try to setup a resource from the cache
-		setupCachedEntry (rh);
-	    } catch (IOException e) {
-		logger.log (Level.WARNING,
-			    "Conditional request: IOException (" +
-			    request.getRequestURI (),
-			    e);
-	    }
-	} else {
-	    // retry...
-	    request.removeHeader ("If-None-Match");
-	    try {
-		proxy.getCache ().remove (request);
-	    } catch (CacheException e) {
-		logger.log (Level.WARNING, "Failed to remove entry", e);
-	    }
-	    handleRequest ();
-	    return true;
-	}
-
-	// send the cached entry.
-	return false;
-    }
-
     private class TDL implements TunnelDoneListener {
 	private final RequestHandler rh;
 
-	public TDL (RequestHandler rh) {
+	public TDL (final RequestHandler rh) {
 	    this.rh = rh;
 	}
 
 	public void tunnelClosed () {
-	    if (rh != null && rh.getWebConnection () != null) {
-		proxy.releaseWebConnection (rh.getWebConnection ());
-	    }
-	    logAndClose ();
+	    logAndClose (rh);
 	}
-    }
-
-    private void tryStaleEntry (RequestHandler rh, Exception e) {
-	// do we have a stale entry?
-	if (rh.getEntry () != null && rh.isConditional () && !mustRevalidate)
-	    handleStaleEntry (rh);
-	else
-	    doGateWayTimeout (e);
-    }
-
-    private void handleStaleEntry (RequestHandler rh) {
-	setMayCache (false);
-	try {
-	    setupCachedEntry (rh);
-	    HttpHeader wh = rh.getWebHeader ();
-	    wh.addHeader ("Warning", "110 RabbIT \"Response is stale\"");
-	    resourceEstablished (rh);
-	} catch (IOException ex) {
-	    doGateWayTimeout (ex);
-	}
-    }
-
-    // Setup a resource from the cache
-    HttpHeader setupCachedEntry (RequestHandler rh) throws IOException {
-	SCC swc = new SCC (this, request, rh);
-	return swc.establish ();
     }
 
     private void setupChunkedContent () {
 	status = "Request read, reading chunked data";
-	setMayUseCache (false);
-	setMayCache (false);
 	clientResourceHandler =
 	    new ChunkedContentTransferHandler (this, requestHandle, tlh);
     }
 
-    private void setupClientResourceHandler (long dataSize) {
+    private void setupClientResourceHandler (final long dataSize) {
 	status = "Request read, reading client resource data";
-	setMayUseCache (false);
-	setMayCache (false);
 	clientResourceHandler =
 	    new ContentTransferHandler (this, requestHandle, dataSize, tlh);
     }
 
-    private void readMultiPart (String ct) {
+    private void readMultiPart (final String ct) {
 	status = "Request read, reading multipart data";
 	// Content-Type: multipart/byteranges; boundary=B-qpuvxclkeavxeywbqupw
 	if (ct.startsWith ("multipart/byteranges")) {
-	    setMayUseCache (false);
-	    setMayCache (false);
-
 	    clientResourceHandler =
 		new MultiPartTransferHandler (this, requestHandle, tlh, ct);
-	}
-    }
-
-    private boolean partialContent (RequestHandler rh) {
-	if (rh.getEntry () == null)
-	    return false;
-	String method = request.getMethod ();
-	if (!method.equals ("GET"))
-	    return false;
-	HttpHeader resp = rh.getDataHook ();
-	String realLength = resp.getHeader ("RabbIT-Partial");
-	return (realLength != null);
-    }
-
-    private void fillupContent () {
-	setMayUseCache (false);
-	setMayCache (true);
-	// TODO: if the need arise, think about implementing smart partial updates.
-    }
-
-    private void checkIfRange (RequestHandler rh) {
-	if (rh.getEntry () == null)
-	    return;
-	String ifRange = request.getHeader ("If-Range");
-	if (ifRange == null)
-	    return;
-	String range = request.getHeader ("Range");
-	if (range == null)
-	    return;
-	Date d = HttpDateParser.getDate (ifRange);
-	HttpHeader oldresp = rh.getDataHook ();
-	if (d == null) {
-	    // we have an etag...
-	    String etag = oldresp.getHeader ("Etag");
-	    if (etag == null || !ETagUtils.checkWeakEtag (etag, ifRange))
-		setMayUseCache (false);
 	}
     }
 
@@ -745,42 +453,41 @@ public class Connection {
      * @param status the status code of the error.
      * @param message the error message to tell the client.
      */
-    public void doError (int status, String message) {
+    public void doError (final int status, final String message) {
 	this.statusCode = Integer.toString (status);
-	HttpHeader header =
-	    getHttpGenerator ().get400 (new IOException (message));
+	final HttpHeader header =
+	    responseHandler.get400 (new IOException (message));
 	sendAndClose (header);
     }
 
     /** Send an error (400 Bad Request or 504) to the client.
      * @param e the exception to tell the client.
      */
-    private void doGateWayTimeout (Exception e) {
+    private void doGateWayTimeout (final Exception e) {
 	this.statusCode = "504";
 	extraInfo = (extraInfo != null ?
 		     extraInfo + e.toString () :
 		     e.toString ());
-	HttpHeader header =
-	    getHttpGenerator ().get504 (request.getRequestURI (), e);
+	final HttpHeader header =
+	    responseHandler.get504 (request.getRequestURI (), e);
 	sendAndClose (header);
     }
 
-    private void checkAndHandleSSL (BufferHandle bh) {
+    private void checkAndHandleSSL (final BufferHandle bh) {
 	status = "Handling ssl request";
-	SSLHandler sslh = new SSLHandler (proxy, this, request, tlh);
+	final SSLHandler sslh = new SSLHandler (proxy, this, request, tlh);
 	if (sslh.isAllowed ()) {
-	    HttpHeaderFilterer filterer = proxy.getHttpHeaderFilterer ();
-	    HttpHeader badresponse = filterer.filterConnect (this, channel, request);
+	    final HttpHeaderFilterer filterer = proxy.getHttpHeaderFilterer ();
+	    final HttpHeader badresponse = filterer.filterConnect (this, channel, request);
 	    if (badresponse != null) {
 		statusCode = badresponse.getStatusCode ();
-		// Try to keep the connection open (authorization may need it).
-		// A filter that want to close can set keep alive to false
-		sendAndTryRestart (badresponse);
+		// Send response and close
+		sendAndClose (badresponse);
 	    } else {
 		sslh.handle (channel, bh);
 	    }
 	} else {
-	    HttpHeader badresponse = responseHandler.get403 ();
+	    final HttpHeader badresponse = responseHandler.get403 ();
 	    sendAndClose (badresponse);
 	}
     }
@@ -806,19 +513,22 @@ public class Connection {
 	return proxy;
     }
 
+    /**
+     * @return the BufferHandler that this connection is using
+     */
+    public BufferHandler getBufferHandler () {
+	return bufHandler;
+    }
+
     private void closeDown () {
 	Closer.close (channel, logger);
 	if (!requestHandle.isEmpty ()) {
 	    // empty the buffer...
-	    ByteBuffer buf = requestHandle.getBuffer ();
+	    final ByteBuffer buf = requestHandle.getBuffer ();
 	    buf.position (buf.limit ());
 	}
 	requestHandle.possiblyFlush ();
 	proxy.removeCurrentConnection (this);
-    }
-
-    private ConnectionLogger getConnectionLogger () {
-	return proxy.getConnectionLogger ();
     }
 
     /**
@@ -835,14 +545,7 @@ public class Connection {
 	started        = System.currentTimeMillis ();
 	request        = null;
 	keepalive      = true;
-	meta           = false;
 	chunk          = true;
-	mayUseCache    = true;
-	mayCache       = true;
-	mayFilter      = true;
-	mustRevalidate = false;
-	addedINM       = false;
-	addedIMS       = false;
 	userName       = null;
 	password       = null;
 	requestLine    = "?";
@@ -856,15 +559,8 @@ public class Connection {
      *	promoted down.
      * @param keepalive the new keepalive value.
      */
-    public void setKeepalive (boolean keepalive) {
+    public void setKeepalive (final boolean keepalive) {
 	this.keepalive = (this.keepalive && keepalive);
-    }
-
-    /** Get the keepalive value.
-     * @return true if keepalive should be done, false otherwise.
-     */
-    private boolean getKeepalive () {
-	return keepalive;
     }
 
     /** Get the name of the user that is currently authorized.
@@ -877,7 +573,7 @@ public class Connection {
     /** Set the name of the currently authenticated user (for basic proxy auth)
      * @param userName the name of the current user
      */
-    public void setUserName (String userName) {
+    public void setUserName (final String userName) {
 	this.userName = userName;
     }
 
@@ -891,7 +587,7 @@ public class Connection {
     /** Set the password of the currently authenticated user (for basic proxy auth)
      * @param password the password that was used for authentication
      */
-    public void setPassword (String password) {
+    public void setPassword (final String password) {
 	this.password = password;
     }
 
@@ -910,24 +606,6 @@ public class Connection {
 	return request.getRequestURI();
     }
 
-    /** Get debug info for use in 500 error response
-     * @return a string with internal state of this connection
-     */
-    public String getDebugInfo () {
-	return
-	    "status: " + getStatus ()  + "\n" +
-	    "started: " + new Date (getStarted ()) + "\n" +
-	    "keepalive: " + getKeepalive () + "\n" +
-	    "meta: " + getMeta () + "\n" +
-	    "mayusecache: " + getMayUseCache () + "\n" +
-	    "maycache: " + getMayCache () + "\n" +
-	    "mayfilter: " + getMayFilter () + "\n"+
-	    "requestline: " + getRequestLine () + "\n" +
-	    "statuscode: " + getStatusCode () + "\n" +
-	    "extrainfo: " + getExtraInfo () + "\n" +
-	    "contentlength: " + getContentLength () + "\n";
-    }
-
     /** Get the http version that the client used.
      *  We modify the request header to hold HTTP/1.1 since that is
      *  what rabbit uses, but the real client may have sent a 1.0 header.
@@ -937,7 +615,7 @@ public class Connection {
 	return requestVersion;
     }
 
-    /** Get the current status of this request
+    /** Get the current status of this request 
      * @return the current status
      */
     public String getStatus () {
@@ -974,11 +652,11 @@ public class Connection {
     /** Set the extra info.
      * @param info the new info.
      */
-    public void setExtraInfo (String info) {
+    public void setExtraInfo (final String info) {
 	this.extraInfo = info;
     }
 
-    /** Get the time the current request was started.
+    /** Get the time the current request was started. 
      * @return the start time for the current request
      */
     public long getStarted () {
@@ -988,7 +666,7 @@ public class Connection {
     /** Set the chunking option.
      * @param b if true this connection should use chunking.
      */
-    public void setChunking (boolean b) {
+    public void setChunking (final boolean b) {
 	chunk = b;
     }
 
@@ -999,176 +677,114 @@ public class Connection {
 	return chunk;
     }
 
-    /** Get the state of this request.
-     * @return true if this is a metapage request, false otherwise.
-     */
-    public boolean getMeta () {
-	return meta;
-    }
-
-    /** Flag this request as a meta-request, that is a request that the
-     *  proxy should to handle.
-     */
-    public void setMeta () {
-	this.meta = true;
-    }
-
-    /** Specify if the current resource may be served from our cache.
-     *  This can only be promoted down..
-     * @param useCache true if we may use the cache for serving this request,
-     *        false otherwise.
-     */
-    public void setMayUseCache (boolean useCache) {
-	mayUseCache = mayUseCache && useCache;
-    }
-
-    /** Get the state of this request.
-     * @return true if we may use the cache for this request, false otherwise.
-     */
-    private boolean getMayUseCache () {
-	return mayUseCache;
-    }
-
-    /** Specify if we may cache the response resource.
-     *  This can only be promoted down.
-     * @param cacheAllowed true if we may cache the response, false otherwise.
-     */
-    public void setMayCache (boolean cacheAllowed) {
-	mayCache = cacheAllowed && mayCache;
-    }
-
-    /** Get the state of this request.
-     * @return true if we may cache the response, false otherwise.
-     */
-    private boolean getMayCache () {
-	return mayCache;
-    }
-
-    /** Get the state of this request. This can only be promoted down.
-     */
-    public void setFilteringNotAllowed () {
-	mayFilter = false;
-    }
-
-    /** Get the state of the request.
-     * @return true if we may filter the response, false otherwise.
-     */
-    public boolean getMayFilter () {
-	return mayFilter;
-    }
-
-    void setAddedINM () {
-	addedINM = true;
-    }
-
-    void setAddedIMS () {
-	addedIMS = true;
-    }
-
-    /** Tell this connection that the current request must be revalidated.
-     */
-    public void setMustRevalidate () {
-	mustRevalidate = true;
-    }
-
     /** Set the content length of the response.
      * @param contentLength the new content length.
      */
-    public void setContentLength (String contentLength) {
+    public void setContentLength (final String contentLength) {
 	this.contentLength = contentLength;
     }
 
     /** Set the status code for the current request
      * @param statusCode the new status code
      */
-    public void setStatusCode (String statusCode) {
+    public void setStatusCode (final String statusCode) {
 	this.statusCode = statusCode;
     }
 
     // Set status and content length
-    private void setStatusesFromHeader (HttpHeader header) {
+    private void setStatusesFromHeader (final HttpHeader header) {
 	statusCode = header.getStatusCode ();
-	String cl = header.getHeader ("Content-Length");
+	final String cl = header.getHeader ("Content-Length");
 	if (cl != null)
 	    contentLength  = cl;
     }
 
-    void sendAndTryRestart (HttpHeader header) {
-	status = keepalive ?
-	    "Sending response and restarting" :
-	    "Sending response and closing" ;
+    void sendAndRestart (final HttpHeader header) {
+	status = "Sending response.";
 	setStatusesFromHeader (header);
+	if (!keepalive) {
+	    sendAndClose (header);
+	} else {
+	    final HttpHeaderSentListener sar = new SendAndRestartListener ();
+	    try {
+		final HttpHeaderSender hhs =
+		    new HttpHeaderSender (channel, getNioHandler (),
+					  tlh.getClient (),
+					  header, false, sar);
+		hhs.sendHeader ();
+	    } catch (IOException e) {
+		logger.log (Level.WARNING,
+			    "IOException when sending header", e);
+		closeDown ();
+	    }
+	}
+    }
 
-	HttpHeaderSentListener sar = new SendAndRestartListener ();
-	try {
-	    HttpHeaderSender hhs =
-		new HttpHeaderSender (channel, getNioHandler (),
-				      tlh.getClient (), header, false, sar);
-	    hhs.sendHeader ();
-	} catch (IOException e) {
-	    logger.log (Level.WARNING,
-			"IOException when sending header", e);
-	    closeDown ();
+    private abstract class SendAndDoListener implements HttpHeaderSentListener {
+	public void timeout () {
+	    status = "Response sending timed out, logging and closing.";
+	    logger.info ("Timeout when sending http header");
+	    logAndClose (null);
+	}
+
+	public void failed (final Exception e) {
+	    status =
+		"Response sending failed: " + e + ", logging and closing.";
+	    logger.log (Level.INFO, "Exception when sending http header", e);
+	    logAndClose (null);
+	}
+    }
+
+    private class SendAndRestartListener extends SendAndDoListener {
+	public void httpHeaderSent () {
+	    readRequest ();
 	}
     }
 
     /** Send a request and then close this connection.
      * @param header the HttpHeader to send before closing down.
      */
-    public void sendAndClose (HttpHeader header) {
+    public void sendAndClose (final HttpHeader header) {
+	status = "Sending response and closing.";
+	// Set status and content length
+	setStatusesFromHeader (header);
 	keepalive = false;
-	sendAndTryRestart (header);
-    }
-
-    private class SendAndRestartListener implements HttpHeaderSentListener {
-	public void timeout () {
-	    status = "Response sending timed out, logging and closing.";
-	    logger.info ("Timeout when sending http header");
-	    logAndClose ();
-	}
-
-	public void failed (Exception e) {
-	    status =
-		"Response sending failed: " + e + ", logging and closing.";
-	    logger.log (Level.INFO, "Exception when sending http header", e);
-	    logAndClose ();
-	}
-
-	public void httpHeaderSent () {
-	    logAndTryRestart ();
+	final HttpHeaderSentListener scl = new SendAndCloseListener ();
+	try {
+	    final HttpHeaderSender hhs =
+		new HttpHeaderSender (channel, getNioHandler (),
+				      tlh.getClient (), header, false, scl);
+	    hhs.sendHeader ();
+	} catch (IOException e) {
+	    logger.log (Level.WARNING, "IOException when sending header", e);
+	    closeDown ();
 	}
     }
 
     /** Log the current request and close/end this connection
+     * @param rh the current RequestHandler
      */
-    public void logAndClose () {
-	keepalive = false;
-	logAndTryRestart ();
-    }
-
-    /** Log the current request and start to listen for a new request if possible.
-     */
-    public void logAndTryRestart () {
-	if (getNioHandler ().isSelectorThread ()) {
-	    TaskIdentifier ti =
-		new DefaultTaskIdentifier ("logConnection",
-					   request.getRequestURI ());
-	    getNioHandler ().runThreadTask (new Runnable () {
-		    public void run () {
-			internalLogAndTryRestart ();
-		    }
-		}, ti);
-	} else {
-	    internalLogAndTryRestart ();
+    public void logAndClose (final RequestHandler rh) {
+	if (rh != null && rh.getWebConnection () != null) {
+	    proxy.releaseWebConnection (rh.getWebConnection ());
 	}
+	closeDown ();
     }
 
-    private void internalLogAndTryRestart () {
-	logConnection ();
-	if (getKeepalive ())
+    /** Log the current request and start to listen for a new request.
+     */
+    public void logAndRestart () {
+	if (keepalive)
 	    readRequest ();
 	else
 	    closeDown ();
+    }
+
+    private class SendAndCloseListener extends SendAndDoListener {
+	public void httpHeaderSent () {
+	    status = "Response sent, logging and closing.";
+	    logAndClose (null);
+	}
     }
 
     /** Get the HttpGenerator that this connection uses when it needs to
@@ -1177,14 +793,5 @@ public class Connection {
      */
     public HttpGenerator getHttpGenerator () {
 	return responseHandler;
-    }
-
-    private void logConnection () {
-	getConnectionLogger ().logConnection (Connection.this);
-	proxy.updateTrafficLog (tlh);
-	ClientTrafficLoggerHandler cth = proxy.getClientTrafficLoggerHandler ();
-	cth.logTraffic (userName, request, tlh.getClient (), tlh.getNetwork (),
-			tlh.getCache (), tlh.getProxy ());
-	tlh.clear ();
     }
 }

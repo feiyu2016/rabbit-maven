@@ -7,7 +7,7 @@
     <name>RabbIT proxy for a faster web</name>
     <groupId>com.toonetown.maven</groupId>
     <artifactId>rabbit</artifactId>
-    <version>4.12-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
     <url>https://github.com/toonetown/rabbit-maven</url>
     
 	<licenses>
@@ -27,22 +27,12 @@
         <project.reporting.outputEncoding>${sourceEncoding}</project.reporting.outputEncoding>
 
         <!-- Versions of jars and plugins -->
-        <version.dnsjava>2.1.7-SNAPSHOT</version.dnsjava>
         <version.commons-lang>2.5</version.commons-lang>
         <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
         <version.maven-assembly-plugin>2.4</version.maven-assembly-plugin>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>dnsjava</groupId>
-            <artifactId>dnsjava</artifactId>
-            <version>${version.dnsjava}</version>
-            <!-- But not junit -->
-            <exclusions>
-                <exclusion><groupId>junit</groupId><artifactId>junit</artifactId></exclusion>
-            </exclusions> 
-        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>

@@ -1,7 +1,6 @@
 package rabbit.httpio;
 
 import rabbit.rnio.NioHandler;
-import rabbit.dns.DNSHandler;
 import rabbit.io.ProxyChain;
 import rabbit.io.Resolver;
 
@@ -15,13 +14,12 @@ public class SimpleProxyChain implements ProxyChain {
 
     /** Create a new Proxy chain that always uses direct connections.
      * @param nio the NioHandler to use for running background tasks
-     * @param dnsHandler the DNSHandler to use for DNS lookups
      */
-    public SimpleProxyChain (NioHandler nio, DNSHandler dnsHandler) {
-	resolver = new SimpleResolver (nio, dnsHandler);
+    public SimpleProxyChain (final NioHandler nio) {
+	resolver = new SimpleResolver (nio);
     }
 
-    public Resolver getResolver (String url) {
+    public Resolver getResolver (final String url) {
 	return resolver;
     }
 }

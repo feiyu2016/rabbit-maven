@@ -21,7 +21,7 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
     private final NioHandler nioHandler;
 
     /** The logger to use. */
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    protected static final Logger logger = Logger.getLogger (BaseSocketHandler.class.getName ());
     
     /** The buffer handle. */
     private final BufferHandle bh;
@@ -35,8 +35,8 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
      * @param bh the BufferHandle to use for the io operation
      * @param nioHandler the NioHandler to use to wait for operations on
      */
-    public BaseSocketHandler (SocketChannel channel, BufferHandle bh, 
-			      NioHandler nioHandler) {
+    public BaseSocketHandler (final SocketChannel channel, final BufferHandle bh, 
+			      final NioHandler nioHandler) {
 	this.channel = channel;
 	this.bh = bh;
 	this.nioHandler = nioHandler;
@@ -44,14 +44,6 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
 
     protected ByteBuffer getBuffer () {
 	return bh.getBuffer ();
-    }
-
-    protected ByteBuffer getLargeBuffer () {
-	return bh.getLargeBuffer ();
-    }
-
-    protected boolean isUsingSmallBuffer (ByteBuffer buffer) {
-	return !bh.isLarge (buffer);
     }
 
     protected void releaseBuffer () {
@@ -108,7 +100,7 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
      * @param rh the handler that will be notified when more data is
      *        ready to be read
      */
-    public void waitForRead (ReadHandler rh) {
+    public void waitForRead (final ReadHandler rh) {
 	this.timeout = nioHandler.getDefaultTimeout ();
 	nioHandler.waitForRead (channel, rh);
     }
@@ -117,7 +109,7 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
      * @param rh the handler that will be notified when more data is
      *        ready to be written
      */
-    public void waitForWrite (WriteHandler rh) {
+    public void waitForWrite (final WriteHandler rh) {
 	this.timeout = nioHandler.getDefaultTimeout ();
 	nioHandler.waitForWrite (channel, rh);
     }

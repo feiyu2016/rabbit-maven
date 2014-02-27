@@ -42,7 +42,7 @@ public class Base64 {
      * @return the decoded string.
      */
     public static String decode (String base64string) {
-	StringBuilder ret = new StringBuilder (base64string.length () * 3 / 4);
+	final StringBuilder ret = new StringBuilder (base64string.length () * 3 / 4);
     
 	while ((base64string.length () % 4) != 0)
 	    base64string += "=";           // that should be safe.
@@ -72,8 +72,8 @@ public class Base64 {
      * @param str the String to encode.
      * @return the encoded string.
      */ 
-    public static String encode (String str) {
-	StringBuilder ret = new StringBuilder (str.length () * 4 / 3);
+    public static String encode (final String str) {
+	final StringBuilder ret = new StringBuilder (str.length () * 4 / 3);
 	char ch, ch1, ch2, ch3;
 	int i;
 	

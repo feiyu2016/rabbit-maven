@@ -39,7 +39,7 @@ public class SWC implements HttpHeaderSentListener,
     private char status = '0';
 
     private Exception lastException;
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (SWC.class.getName ());
 
     /** Create a new connection establisher.
      * @param con the Connection handling the request
@@ -49,9 +49,9 @@ public class SWC implements HttpHeaderSentListener,
      * @param crh the handler for client data
      * @param rh the RequestHandler to use
      */
-    public SWC (Connection con, Resolver resolver, HttpHeader header,
-		TrafficLoggerHandler tlh, ClientResourceHandler crh,
-		RequestHandler rh) {
+    public SWC (final Connection con, final Resolver resolver, final HttpHeader header,
+		final TrafficLoggerHandler tlh, final ClientResourceHandler crh,
+		final RequestHandler rh) {
 	this.con = con;
 	this.resolver = resolver;
 	this.header = header;
@@ -76,7 +76,7 @@ public class SWC implements HttpHeaderSentListener,
 	}
     }
 
-    public void connectionEstablished (WebConnection wc) {
+    public void connectionEstablished (final WebConnection wc) {
 	con.getCounter ().inc ("WebConnection established: " +
 			       attempts);
 	rh.setWebConnection (wc);
@@ -94,7 +94,7 @@ public class SWC implements HttpHeaderSentListener,
 	    if (crh != null)
 		crh.modifyRequest (header);
 
-	    HttpHeaderSender hhs =
+	    final HttpHeaderSender hhs =
 		new HttpHeaderSender (wc.getChannel (), con.getNioHandler (),
 				      tlh.getNetwork (), header,
 				      useFullURI (), this);
@@ -122,7 +122,7 @@ public class SWC implements HttpHeaderSentListener,
 	httpHeaderSentTransferDone ();
     }
 
-    public void clientResourceAborted (HttpHeader reason) {
+    public void clientResourceAborted (final HttpHeader reason) {
 	if (rh != null && rh.getWebConnection () != null) {
 	    rh.getWebConnection ().setKeepalive (false);
 	    con.getProxy ().releaseWebConnection (rh.getWebConnection ());
@@ -145,7 +145,7 @@ public class SWC implements HttpHeaderSentListener,
 	con.getCounter ().inc ("Trying read response from WebConnection: " +
 			       attempts);
 	try {
-	    HttpHeaderReader hhr =
+	    final HttpHeaderReader hhr =
 		new HttpHeaderReader (rh.getWebConnection ().getChannel (),
 				      rh.getWebHandle (), con.getNioHandler (),
 				      tlh.getNetwork (), false,
@@ -156,25 +156,25 @@ public class SWC implements HttpHeaderSentListener,
 	}
     }
 
-    public void httpHeaderRead (HttpHeader header, BufferHandle wbh,
-				boolean keepalive, boolean isChunked,
-				long dataSize) {
+    public void httpHeaderRead (final HttpHeader header, final BufferHandle wbh,
+				final boolean keepalive, final boolean isChunked,
+				final long dataSize) {
 	con.getCounter ().inc ("Read response from WebConnection: " +
 			       attempts);
 	rh.setWebHeader (header);
 	rh.setWebHandle (wbh);
 	rh.getWebConnection ().setKeepalive (keepalive);
 
-	String sc = rh.getWebHeader ().getStatusCode ();
+	final String sc = rh.getWebHeader ().getStatusCode ();
 	//if client is using http/1.1
 	if (sc.length () > 0 && (status = sc.charAt (0)) == '1' &&
 	    con.getRequestVersion ().endsWith ("1.1")) {
 	    // tell client
-	    Looper l = new Looper ();
+	    final Looper l = new Looper ();
 	    con.getCounter ().inc ("WebConnection got 1xx reply " +
 				   attempts);
 	    try {
-		HttpHeaderSender hhs =
+		final HttpHeaderSender hhs =
 		    new HttpHeaderSender (con.getChannel (),
 					  con.getNioHandler (),
 					  tlh.getClient (), header, false, l);
@@ -190,21 +190,19 @@ public class SWC implements HttpHeaderSentListener,
 	if (status == '1') {
 	    readRequest ();
 	} else {
-	    String responseVersion = rh.getWebHeader ().getResponseHTTPVersion ();
 	    setAge (rh);
-	    WarningsHandler wh = new WarningsHandler ();
+	    final WarningsHandler wh = new WarningsHandler ();
 	    wh.removeWarnings (rh.getWebHeader (), false);
-	    rh.getWebHeader ().addHeader ("Via", responseVersion + " RabbIT");
 	    rh.setSize (dataSize);
 	    setupResource (wbh, isChunked, dataSize);
 	    con.webConnectionEstablished (rh);
 	}
     }
 
-    private void setupResource (BufferHandle wbh, boolean isChunked, long dataSize) {
-	HttpProxy proxy = con.getProxy ();
-	ConnectionHandler ch = con.getProxy ().getConnectionHandler ();
-	WebConnectionResourceSource rs =
+    private void setupResource (final BufferHandle wbh, final boolean isChunked, final long dataSize) {
+	final HttpProxy proxy = con.getProxy ();
+	final ConnectionHandler ch = con.getProxy ().getConnectionHandler ();
+	final WebConnectionResourceSource rs =
 	    new WebConnectionResourceSource (ch, con.getNioHandler (),
 					     rh.getWebConnection (),
 					     wbh, tlh.getNetwork (),
@@ -224,11 +222,11 @@ public class SWC implements HttpHeaderSentListener,
     /** Calculate the age of the resource, needs ntp to be accurate.
      * @param rh the RequestHandler holding the headers
      */
-    private void setAge (RequestHandler rh) {
-	long now = System.currentTimeMillis ();
-	String age = rh.getWebHeader ().getHeader ("Age");
-	String date = rh.getWebHeader ().getHeader ("Date");
-	Date dd = HttpDateParser.getDate (date);
+    private void setAge (final RequestHandler rh) {
+	final long now = System.currentTimeMillis ();
+	final String age = rh.getWebHeader ().getHeader ("Age");
+	final String date = rh.getWebHeader ().getHeader ("Date");
+	final Date dd = HttpDateParser.getDate (date);
 	long ddt = now;
 	if (dd != null)
 	    ddt = dd.getTime ();
@@ -236,14 +234,14 @@ public class SWC implements HttpHeaderSentListener,
 	try {
 	    if (age != null)
 		lage = Long.parseLong (age);
-	    long dt = Math.max ((now - ddt) / 1000, 0);
+	    final long dt = Math.max ((now - ddt) / 1000, 0);
 	    // correct_age is found in spec, but is not actually used
 	    //long correct_age = lage + dt;
-	    long correct_recieved_age = Math.max (dt, lage);
-	    long corrected_initial_age = correct_recieved_age + dt;
+	    final long correct_recieved_age = Math.max (dt, lage);
+	    final long corrected_initial_age = correct_recieved_age + dt;
 	    if (corrected_initial_age > 0) {
 		rh.getWebHeader ().setHeader ("Age",
-					      "" + corrected_initial_age);
+					      Long.toString(corrected_initial_age));
 	    }
 	} catch (NumberFormatException e) {
 	    // if we cant parse it, we leave the Age header..
@@ -262,13 +260,13 @@ public class SWC implements HttpHeaderSentListener,
 	    SWC.this.timeout ();
 	}
 
-	public void failed (Exception e) {
+	public void failed (final Exception e) {
 	    SWC.this.failed (e);
 	}
     }
 
     private void closeDownWebConnection () {
-	WebConnection wc = rh.getWebConnection ();
+	final WebConnection wc = rh.getWebConnection ();
 	rh.setWebConnection (null);
 	if (wc != null) {
 	    con.getNioHandler ().close (wc.getChannel ());
@@ -283,7 +281,7 @@ public class SWC implements HttpHeaderSentListener,
 	establish ();
     }
 
-    public void failed (Exception e) {
+    public void failed (final Exception e) {
 	lastException = e;
 	con.getCounter ().inc ("WebConnections failed: " +
 			       attempts + ": " + e);

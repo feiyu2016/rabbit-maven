@@ -33,10 +33,10 @@ public class TransferHandler implements Runnable {
      * @param listener the listener that will be notified when the transfer has
      *        completed
      */
-    public TransferHandler (NioHandler nioHandler, Transferable t, 
-			    SocketChannel channel, 
-			    TrafficLogger tlFrom, TrafficLogger tlTo, 
-			    TransferListener listener) {
+    public TransferHandler (final NioHandler nioHandler, final Transferable t, 
+			    final SocketChannel channel, 
+			    final TrafficLogger tlFrom, final TrafficLogger tlTo, 
+			    final TransferListener listener) {
 	this.nioHandler = nioHandler;
 	this.t = t;
 	this.channel = channel;
@@ -49,8 +49,8 @@ public class TransferHandler implements Runnable {
     /** Start the data transfer. 
      */
     public void transfer () {
-	String groupId = getClass ().getSimpleName ();
-	String desc = "Transferable: " + t + ", chanel: " + channel + 
+	final String groupId = getClass ().getSimpleName ();
+	final String desc = "Transferable: " + t + ", chanel: " + channel + 
 	    ", listener: " + listener;
 	nioHandler.runThreadTask (this, 
 				  new DefaultTaskIdentifier (groupId, desc));
@@ -59,7 +59,7 @@ public class TransferHandler implements Runnable {
     public void run () {
 	try {
 	    while (count > 0) {
-		long written = 
+		final long written = 
 		    t.transferTo (pos, count, channel);
 		pos += written; 
 		count -= written;
@@ -96,8 +96,8 @@ public class TransferHandler implements Runnable {
 	}
 
 	public String getDescription () {
-	    Socket s = channel.socket ();
-	    Address a = new Address (s.getInetAddress (), s.getPort ());
+	    final Socket s = channel.socket ();
+	    final Address a = new Address (s.getInetAddress (), s.getPort ());
 	    return "TransferHandler$WriteWaiter: address: " + a;
 	}
 

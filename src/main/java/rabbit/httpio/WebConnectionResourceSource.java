@@ -17,6 +17,8 @@ import rabbit.util.TrafficLogger;
  */
 public class WebConnectionResourceSource
     implements ResourceSource, ReadHandler, ChunkDataFeeder {
+	private static final Logger logger = Logger.getLogger (WebConnectionResourceSource.class.getName ());
+
     private final ConnectionHandler con;
     private final NioHandler nioHandler;
     private final WebConnection wc;
@@ -29,7 +31,6 @@ public class WebConnectionResourceSource
     private int currentMark = 0;
     private ChunkHandler chunkHandler;
     private Long timeout;
-    private int fullReads = 0;
 
     /** Create a new ConnectionResourceSource that gets the data from the network.
      * @param con the Connection handling the request
@@ -42,11 +43,11 @@ public class WebConnectionResourceSource
      * @param strictHttp if true strict http will be used when communcating
      *        with the upstream server
      */
-    public WebConnectionResourceSource (ConnectionHandler con,
-					NioHandler nioHandler, WebConnection wc,
-					BufferHandle bufHandle,
-					TrafficLogger tl, boolean isChunked,
-					long dataSize, boolean strictHttp) {
+    public WebConnectionResourceSource (final ConnectionHandler con,
+					final NioHandler nioHandler, final WebConnection wc,
+					final BufferHandle bufHandle,
+					final TrafficLogger tl, final boolean isChunked,
+					final long dataSize, final boolean strictHttp) {
 	this.con = con;
 	this.nioHandler = nioHandler;
 	this.wc = wc;
@@ -75,13 +76,13 @@ public class WebConnectionResourceSource
 	return dataSize;
     }
 
-    public long transferTo (long position, long count,
-			    WritableByteChannel target)
+    public long transferTo (final long position, final long count,
+			    final WritableByteChannel target)
 	throws IOException {
 	throw new IllegalStateException ("transferTo can not be used.");
     }
 
-    public void addBlockListener (BlockListener listener) {
+    public void addBlockListener (final BlockListener listener) {
 	if (this.listener != null)
 	    throw new RuntimeException ("Trying to overwrite block listener: " +
 					this.listener + " with: " + listener);
@@ -112,13 +113,13 @@ public class WebConnectionResourceSource
     }
 
     private void handleBlock () {
-	BlockListener bl = listener;
+	final BlockListener bl = listener;
 	listener = null;
 	if (isChunked) {
 	    chunkHandler.handleData (bufHandle);
 	    totalRead = chunkHandler.getTotalRead ();
 	} else {
-	    ByteBuffer buffer = bufHandle.getBuffer ();
+	    final ByteBuffer buffer = bufHandle.getBuffer ();
 	    totalRead += buffer.remaining ();
 	    bl.bufferRead (bufHandle);
 	}
@@ -127,7 +128,7 @@ public class WebConnectionResourceSource
 
     public void readMore () {
 	if (!bufHandle.isEmpty ()) {
-	    ByteBuffer buffer = bufHandle.getBuffer ();
+	    final ByteBuffer buffer = bufHandle.getBuffer ();
 	    buffer.compact ();
 	    currentMark = buffer.position ();
 	    // we need to flip here so that any buffer growning
@@ -138,9 +139,7 @@ public class WebConnectionResourceSource
     }
 
     public void read () {
-	boolean useBig = fullReads > 4;
-	ByteBuffer buffer =
-	    useBig ? bufHandle.getLargeBuffer () : bufHandle.getBuffer ();
+	final ByteBuffer buffer = bufHandle.getBuffer ();
 
 	buffer.position (currentMark); // keep our saved data.
 	int limit = buffer.capacity ();
@@ -150,7 +149,7 @@ public class WebConnectionResourceSource
 	}
 	buffer.limit (limit);
 	try {
-	    int read = wc.getChannel ().read (buffer);
+	    final int read = wc.getChannel ().read (buffer);
 	    currentMark = 0;
 	    if (read == 0) {
 		bufHandle.possiblyFlush ();
@@ -160,8 +159,6 @@ public class WebConnectionResourceSource
 		cleanupAndFinish ();
 	    } else {
 		tl.read (read);
-		if (read == buffer.capacity ())
-		    fullReads++;
 		buffer.flip ();
 		handleBlock ();
 	    }
@@ -179,7 +176,6 @@ public class WebConnectionResourceSource
 	    listener.failed (new IOException ("channel closed"));
 	    listener = null;
 	} else {
-	    Logger logger = Logger.getLogger (getClass ().getName ());
 	    logger.severe ("Got close but no listener to tell!");
 	}
     }
@@ -189,7 +185,6 @@ public class WebConnectionResourceSource
 	    listener.timeout ();
 	    listener = null;
 	} else {
-	    Logger logger = Logger.getLogger (getClass ().getName ());
 	    logger.severe ("Got timeout but no listener to tell!");
 	}
     }
@@ -204,7 +199,7 @@ public class WebConnectionResourceSource
 	    wc.setKeepalive (false);
 	if (!wc.getKeepalive () && !bufHandle.isEmpty ()) {
 	    // empty the buffer so we can reuse it.
-	    ByteBuffer buffer = bufHandle.getBuffer ();
+	    final ByteBuffer buffer = bufHandle.getBuffer ();
 	    buffer.position (buffer.limit ());
 	}
 

@@ -20,9 +20,9 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
     protected ClientResourceTransferredListener listener;
     private List<ClientResourceListener> resourceListeners;
     
-    public ResourceHandlerBase (Connection con, 
-				BufferHandle bufHandle,
-				TrafficLoggerHandler tlh) {
+    public ResourceHandlerBase (final Connection con, 
+				final BufferHandle bufHandle,
+				final TrafficLoggerHandler tlh) {
 	this.con = con;
 	this.bufHandle = bufHandle;
 	this.tlh = tlh;
@@ -30,8 +30,8 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
     
     /**  Will store the variables and call doTransfer ()
      */
-    public void transfer (WebConnection wc,  
-			  ClientResourceTransferredListener crtl) {
+    public void transfer (final WebConnection wc,  
+			  final ClientResourceTransferredListener crtl) {
 	this.wc = wc;
 	this.listener = crtl;
 	doTransfer ();
@@ -44,13 +44,13 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
 	    waitForRead ();
     }
 
-    public void addContentListener (ClientResourceListener crl) {
+    public void addContentListener (final ClientResourceListener crl) {
 	if (resourceListeners == null)
 	    resourceListeners = new ArrayList<ClientResourceListener> ();
 	resourceListeners.add (crl);
     }
 
-    public void fireResourceDataRead (BufferHandle bufHandle) {
+    public void fireResouceDataRead (final BufferHandle bufHandle) {
 	if (resourceListeners == null)
 	    return;
 	for (ClientResourceListener crl : resourceListeners) {
@@ -62,7 +62,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
 
     protected void waitForRead () {
 	bufHandle.possiblyFlush ();
-	ReadHandler sh = new Reader ();
+	final ReadHandler sh = new Reader ();
 	con.getNioHandler ().waitForRead (con.getChannel (), sh);
     }
     
@@ -71,8 +71,8 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
 
 	public void read () {
 	    try {
-		ByteBuffer buffer = bufHandle.getBuffer ();
-		int read = con.getChannel ().read (buffer);
+		final ByteBuffer buffer = bufHandle.getBuffer ();
+		final int read = con.getChannel ().read (buffer);
 		if (read == 0) {
 		    waitForRead ();
 		} else if (read == -1) {
@@ -115,7 +115,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
 	listener.timeout ();
     }
 
-    public void failed (Exception e) {
+    public void failed (final Exception e) {
 	bufHandle.possiblyFlush ();
 	listener.failed (e);
     }

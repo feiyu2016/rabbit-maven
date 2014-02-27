@@ -29,13 +29,13 @@ public class HttpHeaderSender implements BlockSentListener {
      *        been sent (or sending has failed
      * @throws IOException if the header can not be converted to network data
      */
-    public HttpHeaderSender (SocketChannel channel, NioHandler nioHandler,
-			     TrafficLogger tl, HttpHeader header,
-			     boolean fullURI, HttpHeaderSentListener sender)
+    public HttpHeaderSender (final SocketChannel channel, final NioHandler nioHandler,
+			     final TrafficLogger tl, final HttpHeader header,
+			     final boolean fullURI, final HttpHeaderSentListener sender)
 	throws IOException {
 	this.fullURI = fullURI;
 	this.sender = sender;
-	BufferHandle bh = new SimpleBufferHandle (getBuffer (header));
+	final BufferHandle bh = new SimpleBufferHandle (getBuffer (header));
 	bs = new BlockSender (channel, nioHandler, tl, bh, false, this);
     }
 
@@ -45,18 +45,18 @@ public class HttpHeaderSender implements BlockSentListener {
 	bs.write ();
     }
 
-    private ByteBuffer getBuffer (HttpHeader header) throws IOException {
-	String uri = header.getRequestURI ();
+    private ByteBuffer getBuffer (final HttpHeader header) throws IOException {
+	final String uri = header.getRequestURI ();
 	try {
 	    if (header.isRequest () && !header.isSecure () &&
 		!fullURI && uri.charAt (0) != '/') {
-		URL url = new URL (uri);
+		final URL url = new URL (uri);
 		String file = url.getFile ();
 		if (file.equals (""))
 		    file = "/";
 		header.setRequestURI (file);
 	    }
-	    byte[] bytes = header.getBytes ();
+	    final byte[] bytes = header.getBytes ();
  	    return ByteBuffer.wrap (bytes);	    
 	} finally {
 	    header.setRequestURI (uri);
@@ -67,7 +67,7 @@ public class HttpHeaderSender implements BlockSentListener {
 	sender.timeout ();
     }
 
-    public void failed (Exception cause) {
+    public void failed (final Exception cause) {
 	sender.failed (cause);
     }
 

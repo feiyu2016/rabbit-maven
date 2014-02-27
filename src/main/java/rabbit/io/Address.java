@@ -19,10 +19,10 @@ public class Address {
      * @param ia the InetAddress this Address is connected to.
      * @param port the port number this Address is connected to.
      */
-    public Address (InetAddress ia, int port) {
+    public Address (final InetAddress ia, final int port) {
 	this.ia = ia;
 	this.port = port;
-	String s = ia.getHostAddress () + ":" + port;
+	final String s = ia.getHostAddress () + ":" + port;
 	hash = s.hashCode ();
     }
     
@@ -38,9 +38,9 @@ public class Address {
      * @return true if the other Object is an Address connected to 
      *  the same InetAddress and port, false otherwise.
      */
-    @Override public boolean equals (Object o) {
+    @Override public boolean equals (final Object o) {
 	if (o instanceof Address) {
-	    Address a = (Address)o;
+	    final Address a = (Address)o;
 	    return (port == a.port && ia.equals (a.ia));
 	}
 	return false;

@@ -21,7 +21,7 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
     /** The timeout for the current operation */
     public final Long timeout;
 
-    private final Logger logger = Logger.getLogger ("rabbit.rnio");
+    private static final Logger logger = Logger.getLogger ("rabbit.rnio");
 
     /**
      * @param sc the channel to handle
@@ -29,7 +29,7 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
      * @param timeout the timeout in millis, may be null if no timeout
      *        is wanted.
      */
-    public SocketHandlerBase (T sc, NioHandler nioHandler, Long timeout) {
+    public SocketHandlerBase (final T sc, final NioHandler nioHandler, final Long timeout) {
 	this.sc = sc;
 	this.nioHandler = nioHandler;
 	this.timeout = timeout;

@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import rabbit.rnio.BufferHandler;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.TaskIdentifier;
@@ -28,8 +30,7 @@ public class FileResourceSource implements ResourceSource {
     private NioHandler nioHandler;
     protected BufferHandle bufHandle;
 
-    private final Logger logger = 
-	Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (FileResourceSource.class.getName ());
     
     /** Create a new FileResourceSource using the given filename
      * @param filename the file for this resource
@@ -37,8 +38,8 @@ public class FileResourceSource implements ResourceSource {
      * @param bufHandler the BufferHandler to use when reading and writing
      * @throws IOException if the file is a valid file
      */
-    public FileResourceSource (String filename, NioHandler nioHandler, 
-			       BufferHandler bufHandler) 
+    public FileResourceSource (final String filename, final NioHandler nioHandler, 
+			       final BufferHandler bufHandler)
 	throws IOException {
 	this (new File (filename), nioHandler, bufHandler);
     }
@@ -49,8 +50,8 @@ public class FileResourceSource implements ResourceSource {
      * @param bufHandler the BufferHandler to use when reading and writing
      * @throws IOException if the file is a valid file
      */
-    public FileResourceSource (File f, NioHandler nioHandler, 
-			       BufferHandler bufHandler) 
+    public FileResourceSource (final File f, final NioHandler nioHandler, 
+			       final BufferHandler bufHandler) 
 	throws IOException {
 	if (!f.exists ())
 	    throw new FileNotFoundException ("File: " + f.getName () + 
@@ -58,7 +59,7 @@ public class FileResourceSource implements ResourceSource {
 	if (!f.isFile ())
 	    throw new FileNotFoundException ("File: " + f.getName () + 
 					     " is not a regular file");
-	FileInputStream fis = new FileInputStream (f);
+	final FileInputStream fis = new FileInputStream (f);
 	fc = fis.getChannel ();
 	this.nioHandler = nioHandler;
 	this.bufHandle = new CacheBufferHandle (bufHandler);
@@ -75,13 +76,13 @@ public class FileResourceSource implements ResourceSource {
 	try {
 	    return fc.size ();
 	} catch (IOException e) {
-	    e.printStackTrace ();
+		logger.log(Level.WARNING, "Error getting length", e);
 	    return -1;
 	}
     }
 
-    public long transferTo (long position, long count, 
-			    WritableByteChannel target)
+    public long transferTo (final long position, final long count, 
+			    final WritableByteChannel target)
 	throws IOException {
 	try {
 	    return fc.transferTo (position, count, target);
@@ -97,11 +98,11 @@ public class FileResourceSource implements ResourceSource {
 
     /** Generally we do not come into this method, but it can happen..
      */
-    public void addBlockListener (BlockListener listener) {
+    public void addBlockListener (final BlockListener listener) {
 	this.listener = listener;
 	// Get buffer on selector thread.
 	bufHandle.getBuffer ();
-	TaskIdentifier ti = 
+	final TaskIdentifier ti = 
 	    new DefaultTaskIdentifier (getClass ().getSimpleName (), 
 				       "addBlockListener: channel: " + fc);
 	nioHandler.runThreadTask (new ReadBlock (), ti);
@@ -110,8 +111,8 @@ public class FileResourceSource implements ResourceSource {
     private class ReadBlock implements Runnable {
 	public void run () {
 	    try {
-		ByteBuffer buffer = bufHandle.getBuffer ();
-		int read = fc.read (buffer);
+		final ByteBuffer buffer = bufHandle.getBuffer ();
+		final int read = fc.read (buffer);
 		if (read == -1) {
 		    returnFinished ();
 		} else {

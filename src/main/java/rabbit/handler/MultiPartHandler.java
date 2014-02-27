@@ -30,22 +30,21 @@ public class MultiPartHandler extends BaseHandler {
      * @param response the actual response.
      * @param content the resource.
      */
-    public MultiPartHandler (Connection con, TrafficLoggerHandler tlh,
-			     HttpHeader request, HttpHeader response,
-			     ResourceSource content) {
-	super (con, tlh, request, response, content, false, false, -1);
+    public MultiPartHandler (final Connection con, final TrafficLoggerHandler tlh,
+			     final HttpHeader request, final HttpHeader response,
+			     final ResourceSource content) {
+	super (con, tlh, request, response, content, -1);
 	con.setChunking (false);
 
 	//Content-Type: multipart/byteranges; boundary=B-mmrokjxyjnwsfcefrvcg\r\n	
-	String ct = response.getHeader ("Content-Type");
+	final String ct = response.getHeader ("Content-Type");
 	mpp = new MultiPartPipe (ct);
     }
 
     @Override
-    public Handler getNewInstance (Connection con, TrafficLoggerHandler tlh, 
-				   HttpHeader header, HttpHeader webHeader,
-				   ResourceSource content, boolean mayCache, 
-				   boolean mayFilter, long size) {
+    public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh, 
+				   final HttpHeader header, final HttpHeader webHeader,
+				   final ResourceSource content, final long size) {
 	return new MultiPartHandler (con, tlh, header, webHeader, content);
     }
 
@@ -91,10 +90,10 @@ public class MultiPartHandler extends BaseHandler {
      * For now we only try to read lines and if we find the ending line we stop.
      * This is not a fully correct handling, but it seems to work well enough.
      */
-    @Override public void bufferRead (BufferHandle bufHandle) {
-	ByteBuffer buf = bufHandle.getBuffer ();
+    @Override public void bufferRead (final BufferHandle bufHandle) {
+	final ByteBuffer buf = bufHandle.getBuffer ();
 	mpp.parseBuffer (buf);
-	BlockSender bs = 
+	final BlockSender bs = 
 	    new BlockSender (con.getChannel (), con.getNioHandler (),
 			     tlh.getClient (), bufHandle, 
 			     con.getChunking (), this);

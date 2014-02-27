@@ -8,11 +8,11 @@ import rabbit.util.SProperties;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class StandardHttpGeneratorFactory implements HttpGeneratorFactory {
-    public HttpGenerator create (String identity, Connection con) {
+    public HttpGenerator create (final String identity, final Connection con) {
 	return new StandardResponseHeaders (identity, con);
     }
 
-    public void setup (SProperties props) {
+    public void setup (final SProperties props) {
 	// nothing to do
     }
 }

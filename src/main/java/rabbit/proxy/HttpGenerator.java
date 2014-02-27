@@ -1,8 +1,6 @@
 package rabbit.proxy;
 
-import java.net.URL;
 import rabbit.http.HttpHeader;
-import rabbit.http.HttpHeaderWithContent;
 
 /** An interface describing the methods for http header generation.
  *
@@ -18,33 +16,18 @@ public interface HttpGenerator {
     /** Get a 200 Ok header
      * @return a 200 HttpHeader .
      */
-    HttpHeaderWithContent get200 ();
-
-    /** Get a 206 Partial Content header. 
-     * @param ifRange if the request is a range request.
-     * @param header the current HttpHeader.
-     * @return a HttpHeader with status code 206
-     */
-    HttpHeader get206 (String ifRange, HttpHeader header);
-
-    /** Get a 304 Not Modified header for the given old header
-     * @param oldresp the cached header.
-     * @return a HttpHeader with status code 304
-     */
-    HttpHeader get304 (HttpHeader oldresp);
+    HttpHeader get200 ();
+	
+	/** Returns a 302 found header
+	 * @return a 302 HttpHeader .
+	 */
+	HttpHeader get302 (String newUrl);
 
     /** Get a 400 Bad Request header for the given exception.
      * @param exception the Exception handled.
      * @return a HttpHeader for the exception.
      */
     HttpHeader get400 (Exception exception);
-
-    /** Get a 401 Authentication Required for the given realm and url.
-     * @param url the URL of the request made.
-     * @param realm the realm that requires auth.
-     * @return a suitable HttpHeader.
-     */
-    HttpHeader get401 (URL url, String realm);
 
     /** Get a 403 Forbidden header.
      * @return a HttpHeader.
@@ -57,35 +40,11 @@ public interface HttpGenerator {
      */
     HttpHeader get404 (String file);
 
-    /** Get a 407 Proxy Authentication Required for the given realm and url.
-     * @param realm the realm that requires auth.
-     * @param url the URL of the request made.
-     * @return a suitable HttpHeader.
-     */
-    HttpHeader get407 (URL url, String realm);
-
-    /** Get a 412 Precondition Failed header.
-     * @return a suitable HttpHeader.
-     */
-    HttpHeader get412 ();
-
     /** Get a 414 Request-URI Too Long header.
      * @return a suitable HttpHeader.
      */
     HttpHeader get414 ();
 
-    /** Get a Requested Range Not Satisfiable for the given exception.
-     * @param exception the Exception made.
-     * @return a suitable HttpHeader.
-     */
-    HttpHeader get416 (Throwable exception);
-
-    /** Get a 417 Expectation Failed header.
-     * @param expectation the expectation that failed.
-     * @return a suitable HttpHeader.
-     */
-    HttpHeader get417 (String expectation);
-    
     /** Get a 500 Internal Server Error header for the given exception.
      * @param requestURL the url that failed
      * @param exception the Exception made.

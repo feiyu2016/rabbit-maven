@@ -1,5 +1,6 @@
 package rabbit.httpio;
 
+import java.util.Locale;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
@@ -20,7 +21,7 @@ public class HttpHeaderParser implements LineListener {
     private boolean append = false;
     private boolean headerRead = false;
 
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (HttpHeaderParser.class.getName ());
 
     private static final ByteBuffer HTTP_IDENTIFIER = 
     ByteBuffer.wrap (new byte[]{(byte)'H', (byte)'T', (byte)'T', 
@@ -35,19 +36,10 @@ public class HttpHeaderParser implements LineListener {
      * @param strictHttp if true http headers will be strictly parsed, if false
      *                   http newlines may be single \n
      */
-    public HttpHeaderParser (boolean request, boolean strictHttp) {
+    public HttpHeaderParser (final boolean request, final boolean strictHttp) {
 	this.request = request;
 	this.strictHttp = strictHttp;
 	lr = new LineReader (strictHttp);
-    }
-
-    /** Restore the parser to its initial state
-     */
-    public void reset () {
-	header = null;
-	head = null;
-	append = false;
-	headerRead = false;
     }
 
     /** Get the current header
@@ -62,7 +54,7 @@ public class HttpHeaderParser implements LineListener {
      * @param buffer the ByteBuffer to parse
      * @return true if a full header was read, false if more data is needed.
      */
-    public boolean handleBuffer (ByteBuffer buffer) {
+    public boolean handleBuffer (final ByteBuffer buffer) {
 	if (!request && header == null && !verifyResponse (buffer))
 	    return true;
 	while (!headerRead && buffer.hasRemaining ())
@@ -77,7 +69,7 @@ public class HttpHeaderParser implements LineListener {
      * @param buffer the ByteBuffer to parse 
      * @return true if the response starts correctly
      */
-    private boolean verifyResponse (ByteBuffer buffer) {
+    private boolean verifyResponse (final ByteBuffer buffer) {
 	// some broken web servers (apache/2.0.4x) send multiple last-chunks
 	if (buffer.remaining () > 4 && 
 	    matchBuffer (buffer, EXTRA_LAST_CHUNK)) {
@@ -98,21 +90,21 @@ public class HttpHeaderParser implements LineListener {
 	return true;
     }    
 
-    private boolean matchBuffer (ByteBuffer buffer, ByteBuffer test) {
-	int len = test.remaining ();
+    private boolean matchBuffer (final ByteBuffer buffer, final ByteBuffer test) {
+	final int len = test.remaining ();
 	if (buffer.remaining () < len)
 	    return false;
-	int pos = buffer.position ();
+	final int pos = buffer.position ();
 	for (int i = 0; i < len; i++)
 	    if (buffer.get (pos + i) != test.get (i))
 		return false;
 	return true;
     }
 
-    private String getBufferStartString (ByteBuffer buffer, int size) {
+    private String getBufferStartString (final ByteBuffer buffer, final int size) {
 	try {
-	    int pos = buffer.position ();
-	    byte[] arr = new byte[size];
+	    final int pos = buffer.position ();
+	    final byte[] arr = new byte[size];
 	    buffer.get (arr);
 	    buffer.position (pos);
 	    return new String (arr, "ASCII");
@@ -122,7 +114,7 @@ public class HttpHeaderParser implements LineListener {
     }    
 
     /** Handle a newly read line. */
-    public void lineRead (String line) {
+    public void lineRead (final String line) {
 	if (line.length () == 0) {
 	    headerRead = header != null;
 	    return;
@@ -153,9 +145,9 @@ public class HttpHeaderParser implements LineListener {
 	headerRead = false;
     }
 
-    private void readHeader (String msg) {
+    private void readHeader (final String msg) {
 	if (msg == null) {
-	    String err = "Couldnt read headers, connection must be closed";
+	    final String err = "Couldnt read headers, connection must be closed";
 	    throw (new BadHttpHeaderException (err));
 	}
 	char c = msg.charAt (0);
@@ -164,17 +156,17 @@ public class HttpHeaderParser implements LineListener {
 		head.append (msg);
 		append = checkQuotes (head.getValue ());
 	    } else {
-		String ex = "Malformed header: msg: " + msg;
+		final String ex = "Malformed header: msg: " + msg;
 		throw (new BadHttpHeaderException (ex));
 	    }
 	    return;
 	}
-	int i = msg.indexOf (':');	    
+	final int i = msg.indexOf (':');	    
 	if (i < 0) {
 	    switch (msg.charAt (0)) {
 	    case 'h':
 	    case 'H':
-		if (msg.toLowerCase ().startsWith ("http/")) {
+		if (msg.toLowerCase (Locale.US).startsWith ("http/")) {
 		    /* ignoring header since it looks
 		     * like a duplicate responseline
 		     */
@@ -205,14 +197,14 @@ public class HttpHeaderParser implements LineListener {
 	header.addHeader (head);
     }
 
-    private boolean checkQuotes (String v) {
+    private boolean checkQuotes (final String v) {
 	int q = v.indexOf ('"');
 	if (q == -1)
 	    return false;
 	boolean halfquote = false;
-	int l = v.length ();
+	final int l = v.length ();
 	for (; q < l; q++) {
-	    char c = v.charAt (q);
+	    final char c = v.charAt (q);
 	    if (c == '\\')
 		q++;    // skip one...
 	    else if (c == '"')

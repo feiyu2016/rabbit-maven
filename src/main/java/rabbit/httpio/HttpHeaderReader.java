@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 import rabbit.http.HttpHeader;
@@ -17,7 +16,6 @@ import rabbit.util.TrafficLogger;
  */
 public class HttpHeaderReader extends BaseSocketHandler
     implements ReadHandler {
-    
     private final HttpHeaderListener reader;
     private final HttpHeaderParser headerParser;
 
@@ -41,10 +39,10 @@ public class HttpHeaderReader extends BaseSocketHandler
      *                   http newlines may be single \n
      * @param reader the listener for http headers
      */ 
-    public HttpHeaderReader (SocketChannel channel, BufferHandle bh, 
-			     NioHandler nioHandler, TrafficLogger tl, 
-			     boolean request, boolean strictHttp, 
-			     HttpHeaderListener reader) {
+    public HttpHeaderReader (final SocketChannel channel, final BufferHandle bh, 
+			     final NioHandler nioHandler, final TrafficLogger tl, 
+			     final boolean request, final boolean strictHttp, 
+			     final HttpHeaderListener reader) {
 	super (channel, bh, nioHandler);
 	this.tl = tl;
 	headerParser = new HttpHeaderParser (request, strictHttp);
@@ -55,9 +53,8 @@ public class HttpHeaderReader extends BaseSocketHandler
      * @throws IOException if a header can not be parsed
      */
     public void readHeader () throws IOException {
-	headerParser.reset ();
 	if (!getBufferHandle ().isEmpty ()) {
-	    ByteBuffer buffer = getBuffer ();
+	    final ByteBuffer buffer = getBuffer ();
 	    startParseAt = buffer.position ();
 	    parseBuffer (buffer);
 	} else {
@@ -67,7 +64,7 @@ public class HttpHeaderReader extends BaseSocketHandler
     }
 
     @Override public String getDescription () {
-	HttpHeader header = headerParser.getHeader ();
+	final HttpHeader header = headerParser.getHeader ();
 	return "HttpHeaderReader: channel: " + getChannel () + 
 	    ", current header lines: " + 
 	    (header == null ? 0 : header.size ());
@@ -86,18 +83,14 @@ public class HttpHeaderReader extends BaseSocketHandler
     }
     
     public void read () {
-	Logger logger = getLogger ();
 	logger.finest ("HttpHeaderReader reading data");
 	try {
 	    // read http request
 	    // make sure we have room for reading.
-	    ByteBuffer buffer = getBuffer ();
-	    int dataLimit = buffer.limit ();
-	    if (dataLimit == buffer.capacity ())
-		dataLimit = buffer.position ();
+	    final ByteBuffer buffer = getBuffer ();
+	    final int pos = buffer.position ();
 	    buffer.limit (buffer.capacity ());
-	    buffer.position (dataLimit);
-	    int read = getChannel ().read (buffer);
+	    final int read = getChannel ().read (buffer);
 	    if (read == -1) {
 		buffer.position (buffer.limit ());
 		closeDown ();
@@ -112,7 +105,7 @@ public class HttpHeaderReader extends BaseSocketHandler
 	    }
 	    tl.read (read);
 	    buffer.position (startParseAt);
-	    buffer.limit (read + dataLimit);
+	    buffer.limit (read + pos);
 	    parseBuffer (buffer);
 	} catch (BadHttpHeaderException e) {
 	    closeDown ();
@@ -124,14 +117,12 @@ public class HttpHeaderReader extends BaseSocketHandler
     }
 
     private void parseBuffer (ByteBuffer buffer) throws IOException {
-	int startPos = buffer.position ();
 	buffer.mark ();
-	boolean done = headerParser.handleBuffer (buffer);
-	Logger logger = getLogger ();
+	final boolean done = headerParser.handleBuffer (buffer);
 	if (logger.isLoggable (Level.FINEST))
 	    logger.finest ("HttpHeaderReader.parseBuffer: done " + done);
 	if (!done) {
-	    int pos = buffer.position ();
+	    final int pos = buffer.position ();
 	    buffer.reset ();
 	    if (buffer.position () > 0) {
 		// ok, some data handled, make space for more.
@@ -142,11 +133,6 @@ public class HttpHeaderReader extends BaseSocketHandler
 		// a partial long line (cookie or whatever).
 		if (buffer.limit () < buffer.capacity ()) {
 		    // try to read some more
-		} else if (isUsingSmallBuffer (buffer)) {
-		    // try to expand buffer
-		    buffer = getLargeBuffer ();
-		    buffer.position (pos - startPos);
-		    startParseAt = 0;
 		} else {
 		    releaseBuffer ();
 		    // ok, we did no progress, abort, client is sending
@@ -156,7 +142,7 @@ public class HttpHeaderReader extends BaseSocketHandler
 	    }
 	    waitForRead (this);
 	} else {
-	    HttpHeader header = headerParser.getHeader ();
+	    final HttpHeader header = headerParser.getHeader ();
 	    setState (header);
 	    releaseBuffer ();
 	    reader.httpHeaderRead (header, getBufferHandle (), 
@@ -164,9 +150,9 @@ public class HttpHeaderReader extends BaseSocketHandler
 	}
     }
 
-    private void setState (HttpHeader header) {
+    private void setState (final HttpHeader header) {
 	dataSize = -1;
-	String cl = header.getHeader ("Content-Length");
+	final String cl = header.getHeader ("Content-Length");
 	if (cl != null) {
 	    try {
 		dataSize = Long.parseLong (cl);
@@ -174,9 +160,9 @@ public class HttpHeaderReader extends BaseSocketHandler
 		dataSize = -1;
 	    }
 	}
-	String con = header.getHeader ("Connection");
+	final String con = header.getHeader ("Connection");
 	// Netscape specific header...
-	String pcon = header.getHeader ("Proxy-Connection");
+	final String pcon = header.getHeader ("Proxy-Connection");
 	if (con != null && con.equalsIgnoreCase ("close"))
 	    setKeepAlive (false);
 	if (keepalive && pcon != null && pcon.equalsIgnoreCase ("close"))
@@ -184,7 +170,7 @@ public class HttpHeaderReader extends BaseSocketHandler
 	
 	if (header.isResponse ()) {
 	    if (header.getResponseHTTPVersion ().equals ("HTTP/1.1")) {
-		String chunked = header.getHeader ("Transfer-Encoding");
+		final String chunked = header.getHeader ("Transfer-Encoding");
 		setKeepAlive (true);
 		ischunked = false;
 		
@@ -207,17 +193,17 @@ public class HttpHeaderReader extends BaseSocketHandler
 	    if (!(dataSize > -1 || ischunked))
 		setKeepAlive (false);
 	} else {
-	    String httpVersion = header.getHTTPVersion ();
+	    final String httpVersion = header.getHTTPVersion ();
 	    if (httpVersion != null) {
 		if (httpVersion.equals ("HTTP/1.1")) {
-		    String chunked = header.getHeader ("Transfer-Encoding");
+		    final String chunked = header.getHeader ("Transfer-Encoding");
 		    if (chunked != null && chunked.equalsIgnoreCase ("chunked")) {
 			ischunked = true;
 			header.removeHeader ("Content-Length");
 			dataSize = -1;
 		    }
 		} else if (httpVersion.equals ("HTTP/1.0")) {
-		    String ka = header.getHeader ("Connection");
+		    final String ka = header.getHeader ("Connection");
 		    if (ka == null || !ka.equalsIgnoreCase ("Keep-Alive"))
 			setKeepAlive (false);			
 		}
@@ -228,7 +214,7 @@ public class HttpHeaderReader extends BaseSocketHandler
     /** Set the keep alive value to currentkeepalive & keepalive
      * @param keepalive the new keepalive value.
      */
-    private void setKeepAlive (boolean keepalive) {
+    private void setKeepAlive (final boolean keepalive) {
 	this.keepalive = (this.keepalive && keepalive);
     }
 }

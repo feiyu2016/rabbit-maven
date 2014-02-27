@@ -22,7 +22,7 @@ public class Header implements Storable {
     private static final StringCache stringCache =
 	StringCache.getSharedInstance ();
 
-    private static String getCachedString (String s) {
+    private static String getCachedString (final String s) {
 	return stringCache.getCachedString (s);
     }
 
@@ -35,7 +35,7 @@ public class Header implements Storable {
      * @param type the type of this header
      * @param value the actual value
      */
-    public Header (String type, String value) {
+    public Header (final String type, final String value) {
 	this.type = getCachedString (type);
 	this.value = getCachedString (value);
     }
@@ -57,11 +57,11 @@ public class Header implements Storable {
     /** Set the value of this header to the new value given.
      * @param newValue the new value
      */
-    public void setValue (String newValue) {
+    public void setValue (final String newValue) {
 	value = newValue;
     }
 
-    @Override public boolean equals (Object o) {
+    @Override public boolean equals (final Object o) {
 	if (o instanceof Header) {
 	    return (((Header)o).type.equalsIgnoreCase (type));
 	}
@@ -75,17 +75,17 @@ public class Header implements Storable {
     /** Update the value by appending the given string to it.
      * @param s the String to append to the current value
      */
-    public void append (String s) {
+    public void append (final String s) {
 	value += CRLF + s;
 	value = getCachedString (value);
     }
 
-    public void write (DataOutput out) throws IOException {
+    public void write (final DataOutput out) throws IOException {
 	out.writeUTF (type);
 	out.writeUTF (value);
     }
 
-    public void read (DataInput in) throws IOException {
+    public void read (final DataInput in) throws IOException {
 	type = getCachedString (in.readUTF ());
 	value = getCachedString (in.readUTF ());
     }

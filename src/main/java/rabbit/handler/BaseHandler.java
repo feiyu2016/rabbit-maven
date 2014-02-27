@@ -1,21 +1,12 @@
 package rabbit.handler;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
-import java.util.Date;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import rabbit.cache.Cache;
-import rabbit.cache.CacheEntry;
-import rabbit.cache.CacheException;
-import rabbit.http.ContentRangeParser;
-import rabbit.http.HttpDateParser;
 import rabbit.http.HttpHeader;
 import rabbit.httpio.BlockListener;
 import rabbit.httpio.BlockSender;
@@ -30,7 +21,6 @@ import rabbit.io.BufferHandle;
 import rabbit.io.FileHelper;
 import rabbit.proxy.Connection;
 import rabbit.proxy.HttpProxy;
-import rabbit.proxy.PartialCacher;
 import rabbit.proxy.TrafficLoggerHandler;
 import rabbit.util.SProperties;
 
@@ -54,15 +44,6 @@ public class BaseHandler
     /** The resource */
     protected ResourceSource content;
 
-    /** The cache entry if available. */
-    protected CacheEntry<HttpHeader, HttpHeader> entry = null;
-    /** The cache channel. */
-    protected WritableByteChannel cacheChannel;
-
-    /** May we cache this request. */
-    protected boolean mayCache;
-    /** May we filter this request */
-    protected boolean mayFilter;
     /** The length of the data beeing handled or -1 if unknown.*/
     protected long size = -1;
     /** The total amount of data that we read. */
@@ -71,7 +52,7 @@ public class BaseHandler
     /** The flag for the last empty chunk */
     private boolean emptyChunkSent = false;
 
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (BaseHandler.class.getName ());
 
     /** For creating the factory.
      */
@@ -85,14 +66,11 @@ public class BaseHandler
      * @param request the actual request made.
      * @param response the actual response.
      * @param content the resource.
-     * @param mayCache May we cache this request?
-     * @param mayFilter May we filter this request?
      * @param size the size of the data beeing handled.
      */
-    public BaseHandler (Connection con, TrafficLoggerHandler tlh,
-			HttpHeader request, HttpHeader response,
-			ResourceSource content,
-			boolean mayCache, boolean mayFilter, long size) {
+    public BaseHandler (final Connection con, final TrafficLoggerHandler tlh,
+			final HttpHeader request, final HttpHeader response,
+			final ResourceSource content, final long size) {
 	this.con = con;
 	this.tlh = tlh;
 	this.request = request;
@@ -100,17 +78,13 @@ public class BaseHandler
 	if (!request.isDot9Request () && response == null)
 	    throw new IllegalArgumentException ("response may not be null");
 	this.content = content;
-	this.mayCache = mayCache;
-	this.mayFilter = mayFilter;
 	this.size = size;
     }
 
-    public Handler getNewInstance (Connection con, TrafficLoggerHandler tlh,
-				   HttpHeader header, HttpHeader webHeader,
-				   ResourceSource content, boolean mayCache,
-				   boolean mayFilter, long size) {
-	return new BaseHandler (con, tlh, header, webHeader, content,
-				mayCache, mayFilter, size);
+    public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh,
+				   final HttpHeader header, final HttpHeader webHeader,
+				   final ResourceSource content, final long size) {
+	return new BaseHandler (con, tlh, header, webHeader, content, size);
     }
 
     protected Logger getLogger () {
@@ -147,7 +121,7 @@ public class BaseHandler
 
     protected void sendHeader () {
 	try {
-	    HttpHeaderSender hhs =
+	    final HttpHeaderSender hhs =
 		new HttpHeaderSender (con.getChannel (), con.getNioHandler (),
 				      tlh.getClient (), response, false, this);
 	    hhs.sendHeader ();
@@ -157,7 +131,6 @@ public class BaseHandler
     }
 
     public void httpHeaderSent () {
-	addCache ();
 	prepare ();
     }
 
@@ -174,8 +147,8 @@ public class BaseHandler
     protected void finishData () {
 	if (con.getChunking () && !emptyChunkSent) {
 	    emptyChunkSent = true;
-	    BlockSentListener bsl = new Finisher ();
-	    ChunkEnder ce = new ChunkEnder ();
+	    final BlockSentListener bsl = new Finisher ();
+	    final ChunkEnder ce = new ChunkEnder ();
 	    ce.sendChunkEnding (con.getChannel (), con.getNioHandler (),
 				tlh.getClient (), bsl);
 	} else {
@@ -183,30 +156,11 @@ public class BaseHandler
 	}
     }
 
-    private void removePrivateParts (HttpHeader header, String type) {
-	for (String val : header.getHeaders ("Cache-Control")) {
-	    int j = val.indexOf (type);
-	    if (j >= 0) {
-		String p = val.substring (j + type.length ());
-		StringTokenizer st = new StringTokenizer (p, ",\"");
-		while (st.hasMoreTokens ()) {
-		    String t = st.nextToken ();
-		    header.removeHeader (t);
-		}
-	    }
-	}
-    }
-
-    private void removePrivateParts (HttpHeader header) {
-	removePrivateParts (header, "private=");
-	removePrivateParts (header, "no-cache=");
-    }
-
     /** Mark the current response as a partial response.
      * @param shouldbe the number of byte that the resource ought to be
      */
-    protected void setPartialContent (long shouldbe) {
-	response.setHeader ("RabbIT-Partial", "" + shouldbe);
+    protected void setPartialContent (final long shouldbe) {
+	response.setHeader ("RabbIT-Partial", Long.toString(shouldbe));
     }
 
     /** Close nesseccary channels and adjust the cached files.
@@ -214,20 +168,11 @@ public class BaseHandler
      * @param good if true then the connection may be restarted,
      *             if false then the connection may not be restared
      */
-    protected void finish (boolean good) {
+    protected void finish (final boolean good) {
 	boolean ok = false;
 	try {
 	    if (content != null)
 		content.release ();
-	    if (cacheChannel != null) {
-		try {
-		    cacheChannel.close ();
-		} catch (IOException e) {
-		    failed (e);
-		}
-	    }
-
-	    finishCache ();
 	    if (response != null
 		&& response.getHeader ("Content-Length") != null)
 		con.setContentLength (response.getHeader ("Content-length"));
@@ -238,208 +183,16 @@ public class BaseHandler
 	    request = null;
 	    response = null;
 	    content = null;
-	    entry = null;
-	    cacheChannel = null;
 	}
 	// Not sure why we need this, seems to call finish multiple times.
 	if (con != null) {
 	    if (good && ok)
-		con.logAndTryRestart ();
+		con.logAndRestart ();
 	    else
-		con.logAndClose ();
+		con.logAndClose (null);
 	}
 	tlh = null;
 	con = null;
-    }
-
-    private void finishCache () {
-	if (entry == null || !mayCache)
-	    return;
-	Cache<HttpHeader, HttpHeader> cache = con.getProxy ().getCache ();
-	File entryName = cache.getEntryName (entry.getId (), false, null);
-	long filesize = entryName.length ();
-	String cl = response.getHeader ("Content-Length");
-	if (cl == null) {
-	    response.removeHeader ("Transfer-Encoding");
-	    response.setHeader ("Content-Length", "" + filesize);
-	}
-	removePrivateParts (response);
-	try {
-	    cache.addEntry (entry);
-	} catch (CacheException e) {
-	    getLogger ().log (Level.WARNING, 
-			      "Failed to add cache entry: "  + 
-			      request.getRequestURI (),
-			      e);
-	}
-    }
-
-    /** Try to use the resource size to decide if we may cache or not.
-     *  If the size is known and the size is bigger than the maximum cache
-     *  size, then we dont want to cache the resource.
-     * @return true if the current resource may be cached, false otherwise
-     */
-    protected boolean mayCacheFromSize () {
-	Cache<HttpHeader, HttpHeader> cache = con.getProxy ().getCache ();
-	long maxSize = cache.getCacheConfiguration ().getMaxSize ();
-        return !(maxSize == 0 || (size > 0 && size > maxSize));
-    }
-
-    /** Check if this handler may force the cached resource to be
-     *  less than the cache max size.
-     * @return true
-     */
-    protected boolean mayRestrictCacheSize () {
-	return true;
-    }
-
-    /** Set the expire time on the cache entry.
-     *  If the expire time is 0 then the cache is not written.
-     */
-    private void setCacheExpiry () {
-	String expires = response.getHeader ("Expires");
-	if (expires != null) {
-	    Date exp = HttpDateParser.getDate (expires);
-	    // common case, handle it...
-	    if (exp == null && expires.equals ("0"))
-		exp = new Date (0);
-	    if (exp != null) {
-		long now = System.currentTimeMillis ();
-		if (now > exp.getTime ()) {
-		    getLogger ().config ("expire date in the past: '" +
-					 expires + "'");
-		    entry = null;
-		    return;
-		}
-		entry.setExpires (exp.getTime ());
-	    } else {
-		getLogger ().config ("unable to parse expire date: '" +
-				     expires + "' for URI: '" +
-				     request.getRequestURI () + "'");
-		entry = null;
-		}
-	}
-    }
-
-    private void updateRange (CacheEntry<HttpHeader, HttpHeader> old,
-			      PartialCacher pc,
-			      Cache<HttpHeader, HttpHeader> cache) 
-	throws CacheException {
-	HttpHeader oldRequest = old.getKey ();
-	HttpHeader oldResponse = old.getDataHook ();
-	String cr = oldResponse.getHeader ("Content-Range");
-	if (cr == null) {
-	    String cl = oldResponse.getHeader ("Content-Length");
-	    if (cl != null) {
-		long size = Long.parseLong (cl);
-		cr = "bytes 0-" + (size - 1) + "/" + size;
-	    }
-	}
-	ContentRangeParser crp = new ContentRangeParser (cr);
-	if (crp.isValid ()) {
-	    long start = crp.getStart ();
-	    long end = crp.getEnd ();
-	    long total = crp.getTotal ();
-	    String t = total < 0 ? "*" : Long.toString (total);
-	    if (end == pc.getStart () - 1) {
-		oldRequest.setHeader ("Range",
-				      "bytes=" + start + "-" + end);
-		oldResponse.setHeader ("Content-Range",
-				       "bytes " + start + "-" +
-				       pc.getEnd () + "/" + t);
-	    } else {
-		oldRequest.addHeader ("Range",
-				      "bytes=" + start + "-" + end);
-		oldResponse.addHeader ("Content-Range",
-				       "bytes " + start + "-" +
-				       pc.getEnd () + "/" + t);
-	    }
-	    cache.entryChanged (old, oldRequest, oldResponse);
-	}
-    }
-
-    private void setupPartial (CacheEntry<HttpHeader, HttpHeader> oldEntry,
-			       CacheEntry<HttpHeader, HttpHeader> entry,
-			       File entryName,
-			       Cache<HttpHeader, HttpHeader> cache)
-	throws IOException {
-	if (oldEntry != null) {
-	    File oldName = cache.getEntryName (oldEntry.getId (), true, null);
-	    PartialCacher pc = new PartialCacher (oldName, response);
-	    cacheChannel = pc.getChannel ();
-	    try {
-		updateRange (oldEntry, pc, cache);
-	    } catch (CacheException e) {
-		getLogger ().log (Level.WARNING,
-				  "Failed to update range: " + 
-				  request.getRequestURI (),
-				  e);
-	    }
-	    return;
-	}
-	entry.setDataHook (response);
-	PartialCacher pc = new PartialCacher (entryName, response);
-	cacheChannel = pc.getChannel ();
-    }
-
-    /** Set up the cache stream if available.
-     */
-    protected void addCache () {
-	if (mayCache && mayCacheFromSize ()) {
-	    Cache<HttpHeader, HttpHeader> cache = con.getProxy ().getCache ();
-	    try {
-		entry = cache.newEntry (request);
-	    } catch (CacheException e) {
-		getLogger ().log (Level.WARNING,
-				  "Failed to create new entry for: " +
-				  request + ", will not cache",
-				  e);
-	    }
-	    setCacheExpiry ();
-	    if (entry == null) {
-		getLogger ().config ("Expiry =< 0 set on entry, will not cache");
-		return;
-	    }
-	    File entryName = cache.getEntryName (entry.getId (), false, null);
-	    if (response.getStatusCode ().equals ("206")) {
-		CacheEntry<HttpHeader, HttpHeader> oldEntry = null;
-		try {
-		    oldEntry = cache.getEntry (request);
-		} catch (CacheException e) {
-		    getLogger ().log (Level.WARNING,
-				      "Failed to get old entry: " +
-				      request.getRequestURI (),
-				      e);
-		}
-		try {
-		    setupPartial (oldEntry, entry, entryName, cache);
-		} catch (IOException e) {
-		    getLogger ().log (Level.WARNING,
-				      "Got IOException, not updating cache",
-				      e);
-		    entry = null;
-		    cacheChannel = null;
-		}
-	    } else {
-		entry.setDataHook (response);
-		try {
-		    FileOutputStream cacheStream =
-			new FileOutputStream (entryName);
-		    /* TODO: implement this:
-		       if (mayRestrictCacheSize ())
-		       cacheStream = new MaxSizeOutputStream (cacheStream,
-		       cache.getMaxSize ());
-		    */
-		    cacheChannel = cacheStream.getChannel ();
-		} catch (IOException e) {
-		    getLogger ().log (Level.WARNING,
-				      "Got IOException, not caching",
-				      e);
-		    entry = null;
-		    cacheChannel = null;
-		}
-	    }
-	}
     }
 
     /** Check if this handler supports direct transfers.
@@ -453,8 +206,8 @@ public class BaseHandler
 	if (mayTransfer ()
 	    && content.length () > 0
 	    && content.supportsTransfer ()) {
-	    TransferListener tl = new ContentTransferListener ();
-	    TransferHandler th =
+	    final TransferListener tl = new ContentTransferListener ();
+	    final TransferHandler th =
 		new TransferHandler (con.getNioHandler (), content,
 				     con.getChannel (),
 				     tlh.getCache (), tlh.getClient (), tl);
@@ -469,39 +222,24 @@ public class BaseHandler
 	    finishData ();
 	}
 
-	public void failed (Exception cause) {
+	public void failed (final Exception cause) {
 	    BaseHandler.this.failed (cause);
 	}
     }
 
-    protected void writeCache (ByteBuffer buf) throws IOException {
-	// TODO: another thread?
-	int currentPosition = buf.position ();
-	while (buf.hasRemaining ())
-	    cacheChannel.write (buf);
-	buf.position (currentPosition);
-	tlh.getCache ().write (buf.remaining ());
-    }
-
-    public void bufferRead (BufferHandle bufHandle) {
+    public void bufferRead (final BufferHandle bufHandle) {
 	if (con == null) {
 	    // not sure why this can happen, client has closed connection.
 	    return;
 	}
-	try {
-	    // TODO: do this in another thread?
-	    ByteBuffer buffer = bufHandle.getBuffer ();
-	    if (cacheChannel != null)
-		writeCache (buffer);
-	    totalRead += buffer.remaining ();
-	    BlockSender bs =
-		new BlockSender (con.getChannel (), con.getNioHandler (),
-				 tlh.getClient (), bufHandle,
-				 con.getChunking (), this);
-	    bs.write ();
-	} catch (IOException e) {
-	    failed (e);
-	}
+	// TODO: do this in another thread?
+	final ByteBuffer buffer = bufHandle.getBuffer ();
+	totalRead += buffer.remaining ();
+	final BlockSender bs =
+	new BlockSender (con.getChannel (), con.getNioHandler (),
+			 tlh.getClient (), bufHandle,
+			 con.getChunking (), this);
+	bs.write ();
     }
 
     public void blockSent () {
@@ -518,7 +256,7 @@ public class BaseHandler
 	public void blockSent () {
 	    finish (true);
 	}
-	public void failed (Exception cause) {
+	public void failed (final Exception cause) {
 	    BaseHandler.this.failed (cause);
 	}
 	public void timeout () {
@@ -526,14 +264,14 @@ public class BaseHandler
 	}
     }
 
-    String getStackTrace (Exception cause) {
-	StringWriter sw = new StringWriter ();
-	PrintWriter ps = new PrintWriter (sw);
+    String getStackTrace (final Exception cause) {
+	final StringWriter sw = new StringWriter ();
+	final PrintWriter ps = new PrintWriter (sw);
 	cause.printStackTrace (ps);
 	return sw.toString ();
     }
 
-    protected void deleteFile (File f) {
+    protected void deleteFile (final File f) {
 	try {
 	    FileHelper.delete (f);
 	} catch (IOException e) {
@@ -543,31 +281,12 @@ public class BaseHandler
 	}
     }
 
-    protected void removeCache () {
-	if (cacheChannel != null) {
-	    try {
-		cacheChannel.close ();
-		Cache<HttpHeader, HttpHeader> cache =
-		    con.getProxy ().getCache ();
-		File entryName = cache.getEntryName (entry.getId (), false, null);
-		deleteFile (entryName);
-		entry = null;
-	    } catch (IOException e) {
-		getLogger ().log (Level.WARNING,
-				  "failed to remove cache entry: ",
-				  e);
-	    } finally {
-		cacheChannel = null;
-	    }
-	}
-    }
-
-    public void failed (Exception cause) {
+    public void failed (final Exception cause) {
 	if (con != null) {
 	    String st;
 	    if (cause instanceof IOException) {
-		IOException ioe = (IOException)cause;
-		String msg = ioe.getMessage ();
+		final IOException ioe = (IOException)cause;
+		final String msg = ioe.getMessage ();
 		if ("Broken pipe".equals (msg))
 		    st = ioe.toString () + ", probably cancelled pipeline";
 		else if ("Connection reset by peer".equals (msg))
@@ -585,7 +304,6 @@ public class BaseHandler
 	    ei = ei == null ? cause.toString () : (ei + ", " + cause);
 	    con.setExtraInfo (ei);
 	}
-	removeCache ();
 	finish (false);
     }
 
@@ -593,11 +311,10 @@ public class BaseHandler
 	if (con != null)
 	    getLogger ().warning ("BaseHandler: timeout: uri: " +
 				  request.getRequestURI ());
-	removeCache ();
 	finish (false);
     }
 
-    public void setup (SProperties properties, HttpProxy proxy) {
+    public void setup (final SProperties properties, final HttpProxy proxy) {
 	// nothing to do.
     }
 }

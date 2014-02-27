@@ -100,7 +100,7 @@ public enum StatusCode {
     private final int code;
     private final String description;
 
-    private StatusCode (int code, String description) {
+    private StatusCode (final int code, final String description) {
 	this.code = code;
 	this.description = description;
     }
@@ -123,7 +123,7 @@ public enum StatusCode {
      * @param httpVersion the HTTP version to use
      * @return the formatted status line
      */
-    public String getStatusLine (String httpVersion) {
-	return httpVersion + " " + getCode () + " " + getDescription ();
+    public String getStatusLine (final String httpVersion) {
+	return httpVersion + " " + code + " " + description;
     }
 }

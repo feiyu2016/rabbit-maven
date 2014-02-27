@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadFactory;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class SimpleThreadFactory implements ThreadFactory {
-    @Override public Thread newThread(Runnable r) {
+    @Override public Thread newThread(final Runnable r) {
 	return new Thread (r);
     }
 }

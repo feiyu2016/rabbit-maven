@@ -1,6 +1,5 @@
 package rabbit.proxy;
 
-import rabbit.cache.CacheEntry;
 import rabbit.handler.HandlerFactory;
 import rabbit.http.HttpHeader;
 import rabbit.httpio.ResourceSource;
@@ -13,27 +12,23 @@ import rabbit.io.WebConnection;
  */
 class RequestHandler {
     private BufferHandle webHandle; 
-    private final ConditionalChecker cond;
 
     private ResourceSource content = null;
     private HttpHeader webHeader = null;
-    private CacheEntry<HttpHeader, HttpHeader> entry = null;
     private HttpHeader dataHook = null; // the entrys datahook if any.
     private HandlerFactory handlerFactory = null;
     private long size = -1;
     private WebConnection wc = null;	
-    private boolean conditional;
     
-    public RequestHandler (Connection con) {
-	webHandle = new CacheBufferHandle (con.getProxy ().getBufferHandler ());
-	cond = new ConditionalChecker ();
+    public RequestHandler (final Connection con) {
+	webHandle = new CacheBufferHandle (con.getBufferHandler ());
     }
 
     public synchronized BufferHandle getWebHandle () {
 	return webHandle;
     }
 
-    public synchronized void setWebHandle (BufferHandle webHandle) {
+    public synchronized void setWebHandle (final BufferHandle webHandle) {
 	this.webHandle = webHandle;
     }
 
@@ -41,7 +36,7 @@ class RequestHandler {
 	return webHeader;
     }
 
-    public  synchronized void setWebHeader (HttpHeader webHeader) {
+    public  synchronized void setWebHeader (final HttpHeader webHeader) {
 	this.webHeader = webHeader;
     }
     
@@ -49,43 +44,23 @@ class RequestHandler {
 	return dataHook;
     }
 
-    public synchronized void setDataHook (HttpHeader dataHook) {
+    public synchronized void setDataHook (final HttpHeader dataHook) {
 	this.dataHook = dataHook;
-    }
-
-    public ConditionalChecker getCond () {
-	return cond;
-    }
-
-    public synchronized CacheEntry<HttpHeader, HttpHeader> getEntry () {
-	return entry;
-    }
-
-    public synchronized void setEntry (CacheEntry<HttpHeader, HttpHeader> entry) {
-	this.entry = entry;
     }
 
     public synchronized WebConnection getWebConnection () {
 	return wc;
     }
 
-    public synchronized void setWebConnection (WebConnection wc) {
+    public synchronized void setWebConnection (final WebConnection wc) {
 	this.wc = wc;
-    }
-
-    public synchronized boolean isConditional () {
-	return conditional;
-    }
-
-    public synchronized void setConditional (boolean conditional) {
-	this.conditional = conditional;
     }
 
     public synchronized ResourceSource getContent () {
 	return content;
     }
 
-    public synchronized void setContent (ResourceSource content) {
+    public synchronized void setContent (final ResourceSource content) {
 	this.content = content;
     }
 
@@ -93,7 +68,7 @@ class RequestHandler {
 	return handlerFactory;
     }
 
-    public synchronized void setHandlerFactory (HandlerFactory handlerFactory) {
+    public synchronized void setHandlerFactory (final HandlerFactory handlerFactory) {
 	this.handlerFactory = handlerFactory;
     }
 
@@ -101,7 +76,7 @@ class RequestHandler {
 	return size;
     }
 
-    public synchronized void setSize (long size) {
+    public synchronized void setSize (final long size) {
 	this.size = size;
     }
 }

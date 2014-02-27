@@ -17,10 +17,10 @@ class ContentTransferHandler extends ResourceHandlerBase
     private long transferred = 0;
     private long toTransfer = 0;
 
-    public ContentTransferHandler (Connection con,
-				   BufferHandle bufHandle,
-				   long dataSize,
-				   TrafficLoggerHandler tlh) {
+    public ContentTransferHandler (final Connection con,
+				   final BufferHandle bufHandle,
+				   final long dataSize,
+				   final TrafficLoggerHandler tlh) {
 	super (con, bufHandle, tlh);
 	this.dataSize = dataSize;
     }
@@ -33,40 +33,28 @@ class ContentTransferHandler extends ResourceHandlerBase
 	super.doTransfer ();
     }
 
-    public void modifyRequest (HttpHeader header) {
+    public void modifyRequest (final HttpHeader header) {
 	// nothing.
     }
 
     @Override void sendBuffer () {
-	ByteBuffer buffer = bufHandle.getBuffer ();
+	final ByteBuffer buffer = bufHandle.getBuffer ();
 	toTransfer = Math.min (buffer.remaining (),
 			       dataSize - transferred);
 	BufferHandle sbufHandle = bufHandle;
 	if (toTransfer < buffer.remaining ()) {
-	    int limit = buffer.limit ();
+	    final int limit = buffer.limit ();
 	    // int cast is safe since buffer.remaining returns an int
 	    buffer.limit (buffer.position () + (int)toTransfer);
-	    ByteBuffer sendBuffer = buffer.slice ();
-	    // update buffer position with what we have read
-	    buffer.position (buffer.limit ());
-	    // restore original limit so that we can read next request
+	    final ByteBuffer sendBuffer = buffer.slice ();
 	    buffer.limit (limit);
 	    sbufHandle = new SimpleBufferHandle (sendBuffer);
-	} else {
-	    ByteBuffer sendBuffer = buffer.slice ();
-	    // update buffer position with what we have read
-	    buffer.position (buffer.limit ());
-	    sbufHandle = new SimpleBufferHandle (sendBuffer);
 	}
-	fireResourceDataRead (sbufHandle);
-	if (wc != null) {
-	    BlockSender bs =
-		new BlockSender (wc.getChannel (), con.getNioHandler (),
-				 tlh.getNetwork (), sbufHandle, false, this);
-	    bs.write ();
-	} else {
-	    blockSent ();
-	}
+	fireResouceDataRead (sbufHandle);
+	final BlockSender bs =
+	    new BlockSender (wc.getChannel (), con.getNioHandler (),
+			     tlh.getNetwork (), sbufHandle, false, this);
+	bs.write ();
     }
 
     public void blockSent () {

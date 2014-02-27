@@ -33,18 +33,19 @@ public class AcceptingServer {
      * @param defaultTimeout the default timeout value for the NioHandler
      * @throws IOException if network setup fails
      */
-    public AcceptingServer (InetAddress addr, int port, 
-			    AcceptorListener listener, 
-			    ExecutorService es, 
-			    int selectorThreads, 
-			    Long defaultTimeout) 
+    public AcceptingServer (final InetAddress addr, 
+							final int port, 
+							final AcceptorListener listener, 
+							final ExecutorService es, 
+							final int selectorThreads, 
+							final Long defaultTimeout) 
 	throws IOException {
 	ssc = ServerSocketChannel.open ();
 	ssc.configureBlocking (false);
-	ServerSocket ss = ssc.socket ();
+	final ServerSocket ss = ssc.socket ();
 	ss.bind (new InetSocketAddress (addr, port));
 	this.listener = listener;
-	StatisticsHolder stats = new BasicStatisticsHolder ();
+	final StatisticsHolder stats = new BasicStatisticsHolder ();
 	nioHandler = 
 	    new MultiSelectorNioHandler (es, stats, selectorThreads, 
 					 defaultTimeout);
@@ -54,7 +55,7 @@ public class AcceptingServer {
      */
     public void start () {
 	nioHandler.start (new SimpleThreadFactory ());
-	Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
+	final Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
 	acceptor.register ();
     }
 

@@ -3,7 +3,6 @@ package rabbit.httpio;
 import java.net.URL;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.impl.DefaultTaskIdentifier;
-import rabbit.dns.DNSHandler;
 import rabbit.io.InetAddressListener;
 import rabbit.io.Resolver;
 
@@ -12,25 +11,22 @@ import rabbit.io.Resolver;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class SimpleResolver implements Resolver {
-    private final DNSHandler dnsHandler;
     private final NioHandler nio;
 
     /** Create a new Resolver that does normal DNS lookups.
      * @param nio the NioHandler to use for running background tasks
-     * @param dnsHandler the DNSHandler to use for the DNS lookup
      */
-    public SimpleResolver (NioHandler nio, DNSHandler dnsHandler) {
-	this.dnsHandler = dnsHandler;
+    public SimpleResolver (final NioHandler nio) {
 	this.nio = nio;
     }
 
-    public void getInetAddress (URL url, InetAddressListener listener) {
-	String groupId = getClass ().getSimpleName ();
-	nio.runThreadTask (new ResolvRunner (dnsHandler, url, listener), 
+    public void getInetAddress (final URL url, final InetAddressListener listener) {
+	final String groupId = getClass ().getSimpleName ();
+	nio.runThreadTask (new ResolvRunner (url, listener), 
 			   new DefaultTaskIdentifier (groupId, url.toString ()));
     }
 
-    public int getConnectPort (int port) {
+    public int getConnectPort (final int port) {
 	return port;
     } 
 

@@ -33,7 +33,7 @@ public class HttpDateParser {
     /** Set the time offset relative GMT.
      * @param offset the time difference in millis
      */
-    public static void setOffset (long offset) {
+    public static void setOffset (final long offset) {
 	HttpDateParser.offset = offset;
     }
 
@@ -42,7 +42,7 @@ public class HttpDateParser {
      * @param date the String we are trying to parse.
      * @return a Date or null if parsing was not possible.
      */
-    public static Date getDate (String date) {	
+    public static Date getDate (final String date) {	
 	if (date == null)
 	    return null;
 
@@ -59,9 +59,9 @@ public class HttpDateParser {
 	return d;
     }
 
-    private static Date getDate (String date, DateFormat sdf, long offsetUsed) {
+    private static Date getDate (final String date, final DateFormat sdf, final long offsetUsed) {
 	try {
-	    ParsePosition pos = new ParsePosition (0);
+	    final ParsePosition pos = new ParsePosition (0);
 	    Date d;
 	    synchronized (sdf) {
 		d = sdf.parse (date, pos);
@@ -80,53 +80,9 @@ public class HttpDateParser {
      * @param d the Date to format.
      * @return a String describing the date in the right way.
      */
-    public static String getDateString (Date d) {
+    public static String getDateString (final Date d) {
 	synchronized (sdf1) {
 	    return sdf1.format (d);
 	}
-    }
-
-    private static void compare (String d1, String d2) {
-	Date dd1 = getDate (d1);
-	Date dd2 = getDate (d2);
-	if (dd1 != null) {
-	    System.out.println ("dd1: " + dd1 + "\ndd2: " + dd2);
-	    if (dd2 != null)
-		System.out.println ("diff: " + (dd1.getTime () - dd2.getTime ()));
-	}
-    }
-
-    /** Simple self test method.
-     * @param args the command line arguments
-     */
-    public static void main (String[] args) {
-	String d1 = "Sat, 07 Feb 2004 22:14:05 GMT";
-	String d2 = "Sun, 06 Nov 2043 08:49:37 GMT - 49 years (1994)";
-	String d3 = "Tue, 18 Feb 2003 12:32:40 GMT";
-	String d4 = "Tue, 18 Feb 2003 13:32:40 GMT";
-	String d5 = "Sun Mar 12 13:37:23 2003";
-	String d6 = "Sun Mar  2 13:47:48 2003";
-
-	String d7 = "Sun, 09 Mar 2003 10:54:32 GMT";
-	String d8 = "Sunday, 09-Mar-103 10:54:32 GMT";
-
-	String d9 = "Sun, 09 Mar 2003 10:54:34 GMT";
-	String d10 = "Sun Mar  9 10:54:34 2003";
-	
-	Date date1 = getDate (d1);
-	System.out.println ("date1: " + date1);
-	Date date2 = getDate (d2);
-	System.out.println ("date2: " + date2);
-	Date date3 = getDate (d3);
-	System.out.println ("date3: " + date3);
-	Date date4 = getDate (d4);
-	System.out.println ("date4: " + date4);
-	Date date5 = getDate (d5);
-	System.out.println ("date5: " + date5);
-	Date date6 = getDate (d6);
-	System.out.println ("date6: " + date6);
-	
-	compare (d7, d8);
-	compare (d9, d10);
     }
 }

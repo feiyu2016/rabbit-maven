@@ -19,8 +19,6 @@ public interface HandlerFactory {
      * @param header the request.
      * @param webheader the response.
      * @param content the resource.
-     * @param mayCache if the handler may cache the response.
-     * @param mayFilter if the handler may filter the response.
      * @param size the Size of the data beeing handled (-1 = unknown length).
      * @return the new Handler
      */
@@ -29,8 +27,6 @@ public interface HandlerFactory {
 			    HttpHeader header,
 			    HttpHeader webheader,
 			    ResourceSource content, 
-			    boolean mayCache,
-			    boolean mayFilter,
 			    long size);
     
     /** setup the handler factory. 

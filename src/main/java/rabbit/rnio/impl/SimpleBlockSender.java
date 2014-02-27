@@ -19,8 +19,7 @@ public abstract class SimpleBlockSender
     extends SocketHandlerBase<SocketChannel>
     implements WriteHandler {
     private final ByteBuffer buf;
-    private final Logger logger =
-	Logger.getLogger ("rabbit.rnio");
+    private static final Logger logger = Logger.getLogger ("rabbit.rnio");
 
     /**
      * @param sc the channel to handle
@@ -29,10 +28,10 @@ public abstract class SimpleBlockSender
      * @param timeout the timeout in millis, may be null if no timeout
      *        is wanted.
      */
-    public SimpleBlockSender (SocketChannel sc, 
-			      NioHandler nioHandler, 
-			      ByteBuffer buf, 
-			      Long timeout) {
+    public SimpleBlockSender (final SocketChannel sc, 
+			      final NioHandler nioHandler, 
+			      final ByteBuffer buf, 
+			      final Long timeout) {
 	super (sc, nioHandler, timeout);
 	this.buf = buf;
     }
@@ -62,7 +61,7 @@ public abstract class SimpleBlockSender
     /** Handle the exception, default is to log it and to close the channel. 
      * @param e the IOException that is the cause of data write failure
      */
-    public void handleIOException (IOException e) {
+    public void handleIOException (final IOException e) {
 	logger.log (Level.WARNING, "Failed to send data", e);
 	Closer.close (sc, logger);
     }

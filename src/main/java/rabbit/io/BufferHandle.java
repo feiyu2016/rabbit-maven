@@ -18,17 +18,6 @@ public interface BufferHandle {
      */
     ByteBuffer getBuffer ();
 
-    /** Get a byte buffer of reasonable size, the buffer will have been cleared.
-     * @return the large buffer to use
-     */
-    ByteBuffer getLargeBuffer ();
-    
-    /** Check if the given buffer is a large buffer 
-     * @param buffer the ByteBuffer to check
-     * @return true if the given buffer is large
-     */
-    boolean isLarge (ByteBuffer buffer);
-
     /** release a buffer if possible. */
     void possiblyFlush ();
 

@@ -1,7 +1,8 @@
 package rabbit.io;
 
-import rabbit.rnio.BufferHandler;
 import java.nio.ByteBuffer;
+
+import rabbit.rnio.BufferHandler;
 
 /** A handle to a ByteBuffer that uses a buffer handler
  *
@@ -16,7 +17,7 @@ public class CacheBufferHandle implements BufferHandle {
      *  for the caching of the ByteBuffer:s
      * @param bh the BufferHandler that is the actual cache
      */
-    public CacheBufferHandle (BufferHandler bh) {
+    public CacheBufferHandle (final BufferHandler bh) {
 	this.bh = bh;
     }
 
@@ -30,17 +31,6 @@ public class CacheBufferHandle implements BufferHandle {
 	return buffer;
     }
     
-    public synchronized ByteBuffer getLargeBuffer () {
-	if (buffer != null && isLarge (buffer))
-	    return buffer;
-	buffer = bh.growBuffer (buffer);
-	return buffer;
-    }
-
-    public boolean isLarge (ByteBuffer buffer) {
-	return bh.isLarge (buffer);
-    }
-
     public synchronized void possiblyFlush () {
 	if (!mayBeFlushed)
 	    throw new IllegalStateException ("buffer may not be flushed!: " +
@@ -53,7 +43,7 @@ public class CacheBufferHandle implements BufferHandle {
 	}
     }
 
-    public synchronized void setMayBeFlushed (boolean mayBeFlushed) {
+    public synchronized void setMayBeFlushed (final boolean mayBeFlushed) {
 	this.mayBeFlushed = mayBeFlushed;
     }
 

@@ -29,7 +29,7 @@ public class StringCache extends WeakHashMap<String, WeakReference<String>> {
      * @param s the string to get a shared string for.
      * @return the shared string
      */
-    public String getCachedString (String s) {
+    public String getCachedString (final String s) {
 	if (s == null)
 	    return null;
 	synchronized (this) {

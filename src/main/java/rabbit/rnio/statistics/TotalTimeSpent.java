@@ -15,7 +15,7 @@ public class TotalTimeSpent {
      * @param ce the CompletionEntry that we want to update our information 
      *        with
      */
-    public void update (CompletionEntry ce) {
+    public void update (final CompletionEntry ce) {
 	if (ce.wasOk)
 	    successful++;
 	else

@@ -2,6 +2,7 @@ package rabbit.httpio;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+
 import rabbit.rnio.BufferHandler;
 import rabbit.rnio.NioHandler;
 import rabbit.http.HttpHeader;
@@ -37,11 +38,11 @@ public class HttpResponseReader
      *        been read.
      * @throws IOException if the request can not be sent
      */
-    public HttpResponseReader (SocketChannel channel, NioHandler nioHandler, 
-			       TrafficLogger tl, BufferHandler bufHandler, 
-			       HttpHeader header, boolean fullURI, 
-			       boolean strictHttp, 
-			       HttpResponseListener listener)
+    public HttpResponseReader (final SocketChannel channel, final NioHandler nioHandler, 
+			       final TrafficLogger tl, final BufferHandler bufHandler, 
+			       final HttpHeader header, final boolean fullURI, 
+			       final boolean strictHttp, 
+			       final HttpResponseListener listener)
 	throws IOException {
 	this.channel = channel;
 	this.nioHandler = nioHandler;
@@ -61,8 +62,8 @@ public class HttpResponseReader
     
     public void httpHeaderSent () {
 	try {
-	    BufferHandle bh = new CacheBufferHandle (bufHandler);
-	    HttpHeaderReader reader = 
+	    final BufferHandle bh = new CacheBufferHandle (bufHandler);
+	    final HttpHeaderReader reader = 
 		new HttpHeaderReader (channel, bh, nioHandler,
 				      tl, false, strictHttp, this);
 	    reader.readHeader ();
@@ -71,9 +72,9 @@ public class HttpResponseReader
 	}
     }
     
-    public void httpHeaderRead (HttpHeader header, BufferHandle bh, 
-				boolean keepalive, boolean isChunked, 
-				long dataSize) {
+    public void httpHeaderRead (final HttpHeader header, final BufferHandle bh, 
+				final boolean keepalive, final boolean isChunked, 
+				final long dataSize) {
 	listener.httpResponse (header, bh, keepalive, isChunked, dataSize);
     }
     
@@ -81,7 +82,7 @@ public class HttpResponseReader
 	listener.failed (new IOException ("Connection closed"));
     }
     
-    public void failed (Exception cause) {
+    public void failed (final Exception cause) {
 	listener.failed (cause);
     }
 

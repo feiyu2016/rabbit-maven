@@ -16,10 +16,10 @@ public class MultiPartPipe {
     /** Create a new MultiPartPipe
      * @param ctHeader the content type header hodling the boundary
      */
-    public MultiPartPipe (String ctHeader) {
-	StringTokenizer st = new StringTokenizer (ctHeader, " =\n\r\t;");
+    public MultiPartPipe (final String ctHeader) {
+	final StringTokenizer st = new StringTokenizer (ctHeader, " =\n\r\t;");
 	while (st.hasMoreTokens ()) {
-	    String t = st.nextToken ();
+	    final String t = st.nextToken ();
 	    if (t.equals ("boundary") && st.hasMoreTokens ()) {
 		boundary = st.nextToken ();
 		break;
@@ -34,10 +34,10 @@ public class MultiPartPipe {
     /** Parse the buffer, will set the position and the limit.
      * @param buf the ByteBuffer to parse
      */
-    public void parseBuffer (ByteBuffer buf) {
-	int pos = buf.position ();
-	LineReader lr = new LineReader (true);
-	LineHandler lh = new LineHandler (buf);
+    public void parseBuffer (final ByteBuffer buf) {
+	final int pos = buf.position ();
+	final LineReader lr = new LineReader (true);
+	final LineHandler lh = new LineHandler (buf);
 	do {
 	    lr.readLine (buf, lh);
 	} while (!endFound && buf.hasRemaining ());
@@ -56,13 +56,13 @@ public class MultiPartPipe {
     private class LineHandler implements LineListener {
 	private final ByteBuffer buf;
 	
-	public LineHandler (ByteBuffer buf) {
+	public LineHandler (final ByteBuffer buf) {
 	    this.buf = buf;
 	}
 	
 	// check for end line and if it is found we limit the buffer to 
 	// this position.
-	public void lineRead (String line) {
+	public void lineRead (final String line) {
 	    if (line.startsWith ("--") && line.endsWith ("--") &&
 		line.substring (2, line.length () - 2).equals (boundary)) {
 		buf.limit (buf.position ());

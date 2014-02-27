@@ -24,8 +24,7 @@ public class WebConnection implements Closeable {
     private SocketChannel channel;
     private long releasedAt = -1;
     private boolean keepalive = true;
-    private boolean mayPipeline = false;
-    private final Logger logger = Logger.getLogger (getClass ().getName ());
+    private static final Logger logger = Logger.getLogger (WebConnection.class.getName ());
 
     private static final AtomicInteger idCounter = new AtomicInteger (0);
 
@@ -34,8 +33,8 @@ public class WebConnection implements Closeable {
      * @param binder the SocketBinder to use when creating the network socket
      * @param counter the Counter to used to collect statistics
      */
-    public WebConnection (Address address, SocketBinder binder,
-			  Counter counter) {
+    public WebConnection (final Address address, final SocketBinder binder,
+			  final Counter counter) {
 	this.id = idCounter.getAndIncrement ();
 	this.address = address;
 	this.binder = binder;
@@ -44,7 +43,7 @@ public class WebConnection implements Closeable {
     }
 
     @Override public String toString () {
-	int port = channel != null ? channel.socket ().getLocalPort () : -1;
+	final int port = channel != null ? channel.socket ().getLocalPort () : -1;
 	return "WebConnection(id: " + id +
 	    ", address: "  + address +
 	    ", keepalive: " + keepalive +
@@ -75,12 +74,9 @@ public class WebConnection implements Closeable {
      * @param nioHandler the NioHandler to use for network tasks
      * @param wcl the listener that will be notified when the connection
      *        has been extablished.
-     * @param setTcpNoDelay pass true if you want to enable tcp no delay,
-     *        false to leave it at default.
      * @throws IOException if the network operations fail
      */
-    public void connect (NioHandler nioHandler, WebConnectionListener wcl,
-			 boolean setTcpNoDelay)
+    public void connect (final NioHandler nioHandler, final WebConnectionListener wcl)
 	throws IOException {
 	// if we are a keepalive connection then just say so..
 	if (channel != null && channel.isConnected ()) {
@@ -91,12 +87,10 @@ public class WebConnection implements Closeable {
 	    channel.socket ().bind (new InetSocketAddress (binder.getInetAddress (),
 							   binder.getPort ()));
 	    channel.configureBlocking (false);
-	    if (setTcpNoDelay)
-		channel.socket ().setTcpNoDelay (true);
-	    SocketAddress addr =
+	    final SocketAddress addr =
 		new InetSocketAddress (address.getInetAddress (),
 				       address.getPort ());
-	    boolean connected = channel.connect (addr);
+	    final boolean connected = channel.connect (addr);
 	    if (connected) {
 		wcl.connectionEstablished (this);
 	    } else {
@@ -110,11 +104,11 @@ public class WebConnection implements Closeable {
 	private final WebConnectionListener wcl;
 	private Long timeout;
 
-	public ConnectListener (WebConnectionListener wcl) {
+	public ConnectListener (final WebConnectionListener wcl) {
 	    this.wcl = wcl;
 	}
 
-	public void waitForConnection (NioHandler nioHandler) {
+	public void waitForConnection (final NioHandler nioHandler) {
 	    this.nioHandler = nioHandler;
 	    timeout = nioHandler.getDefaultTimeout ();
 	    nioHandler.waitForConnect (channel, this);
@@ -172,7 +166,7 @@ public class WebConnection implements Closeable {
      *  Can only be turned off.
      * @param b the new keepalive value.
      */
-    public void setKeepalive (boolean b) {
+    public void setKeepalive (final boolean b) {
 	keepalive &= b;
     }
 
@@ -194,19 +188,5 @@ public class WebConnection implements Closeable {
      */
     public long getReleasedAt () {
 	return releasedAt;
-    }
-
-    /** Mark this WebConnection for pipelining.
-     * @param b if true this connection may be used for pipelining.
-     */
-    public void setMayPipeline (boolean b) {
-	mayPipeline = b;
-    }
-
-    /** Check if this WebConnection may be used for pipelining.
-     * @return true if this connection may be used for pipelining
-     */
-    public boolean mayPipeline () {
-	return mayPipeline;
     }
 }
