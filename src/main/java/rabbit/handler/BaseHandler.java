@@ -22,6 +22,7 @@ import rabbit.io.FileHelper;
 import rabbit.proxy.Connection;
 import rabbit.proxy.HttpProxy;
 import rabbit.proxy.TrafficLoggerHandler;
+import rabbit.rnio.WriteHandler;
 import rabbit.util.SProperties;
 
 /** This class is an implementation of the Handler interface.
@@ -241,7 +242,7 @@ public class BaseHandler
         // TODO: do this in another thread?
         final ByteBuffer buffer = bufHandle.getBuffer();
         totalRead += buffer.remaining();
-        final BlockSender bs =
+        final WriteHandler bs =
                 new BlockSender(con.getChannel(), con.getNioHandler(),
                                 tlh.getClient(), bufHandle,
                                 con.getChunking(), this);

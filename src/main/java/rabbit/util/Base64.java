@@ -74,7 +74,7 @@ public class Base64 {
      * @param str the String to encode.
      * @return the encoded string.
      */
-    public static String encode(final String str) {
+    public static String encode(final CharSequence str) {
         final StringBuilder ret = new StringBuilder(str.length() * 4 / 3);
         char ch, ch1, ch2, ch3;
         int i;

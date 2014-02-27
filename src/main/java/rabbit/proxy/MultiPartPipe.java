@@ -38,7 +38,7 @@ public class MultiPartPipe {
     public void parseBuffer(final ByteBuffer buf) {
         final int pos = buf.position();
         final LineReader lr = new LineReader(true);
-        final LineHandler lh = new LineHandler(buf);
+        final LineListener lh = new LineHandler(buf);
         do {
             lr.readLine(buf, lh);
         } while (!endFound && buf.hasRemaining());

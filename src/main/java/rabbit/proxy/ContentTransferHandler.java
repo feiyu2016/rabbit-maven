@@ -6,6 +6,7 @@ import rabbit.httpio.BlockSender;
 import rabbit.httpio.BlockSentListener;
 import rabbit.io.BufferHandle;
 import rabbit.io.SimpleBufferHandle;
+import rabbit.rnio.WriteHandler;
 
 /** A handler that transfers request resources with a known content length.
  *
@@ -52,7 +53,7 @@ class ContentTransferHandler extends ResourceHandlerBase
             sbufHandle = new SimpleBufferHandle(sendBuffer);
         }
         fireResouceDataRead(sbufHandle);
-        final BlockSender bs =
+        final WriteHandler bs =
                 new BlockSender(wc.getChannel(), con.getNioHandler(),
                                 tlh.getNetwork(), sbufHandle, false, this);
         bs.write();

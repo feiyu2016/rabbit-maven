@@ -3,6 +3,8 @@ package rabbit.proxy;
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Logger;
+
+import rabbit.httpio.ResourceSource;
 import rabbit.rnio.impl.Closer;
 import rabbit.http.HttpDateParser;
 import rabbit.http.HttpHeader;
@@ -207,7 +209,7 @@ public class SWC implements HttpHeaderSentListener,
     private void setupResource(final BufferHandle wbh, final boolean isChunked, final long dataSize) {
         final HttpProxy proxy = con.getProxy();
         final ConnectionHandler ch = con.getProxy().getConnectionHandler();
-        final WebConnectionResourceSource rs =
+        final ResourceSource rs =
                 new WebConnectionResourceSource(ch, con.getNioHandler(),
                                                 rh.getWebConnection(),
                                                 wbh, tlh.getNetwork(),

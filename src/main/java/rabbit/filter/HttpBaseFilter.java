@@ -1,5 +1,6 @@
 package rabbit.filter;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -30,7 +31,7 @@ public class HttpBaseFilter implements HttpFilter {
     private static final BigInteger ZERO = BigInteger.ZERO;
     private static final BigInteger ONE = BigInteger.ONE;
 
-    private final List<String> removes = new ArrayList<>();
+    private final Collection<String> removes = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(HttpBaseFilter.class.getName());
 
     private static final String BASIC = "Basic";

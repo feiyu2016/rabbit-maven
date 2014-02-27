@@ -8,6 +8,7 @@ import rabbit.httpio.ChunkDataFeeder;
 import rabbit.httpio.ChunkEnder;
 import rabbit.httpio.ChunkHandler;
 import rabbit.io.BufferHandle;
+import rabbit.rnio.WriteHandler;
 
 /** A handler that transfers chunked request resources.
  *  Will chunk data to the real server or fail. Note that we can only
@@ -45,7 +46,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
     @Override
     public void bufferRead(final BufferHandle bufHandle) {
         fireResouceDataRead(bufHandle);
-        final BlockSender bs =
+        final WriteHandler bs =
                 new BlockSender(wc.getChannel(), con.getNioHandler(),
                                 tlh.getNetwork(), bufHandle, true, this);
         bs.write();

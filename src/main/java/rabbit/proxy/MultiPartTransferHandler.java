@@ -6,6 +6,7 @@ import rabbit.httpio.BlockSender;
 import rabbit.httpio.BlockSentListener;
 import rabbit.io.BufferHandle;
 import rabbit.io.SimpleBufferHandle;
+import rabbit.rnio.WriteHandler;
 
 /** A handler that transfers request resources with multipart data.
  *  Will send the multipart upstream. Note that we can only do this 
@@ -40,7 +41,7 @@ class MultiPartTransferHandler extends ResourceHandlerBase
         final BufferHandle sbh = new SimpleBufferHandle(sendBuffer);
         mpp.parseBuffer(sendBuffer);
         fireResouceDataRead(sbh);
-        final BlockSender bs =
+        final WriteHandler bs =
                 new BlockSender(wc.getChannel(), con.getNioHandler(),
                                 tlh.getNetwork(), sbh, false, this);
         bs.write();

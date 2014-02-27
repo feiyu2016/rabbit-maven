@@ -1,6 +1,7 @@
 package rabbit.rnio.impl;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import rabbit.rnio.BufferHandler;
@@ -36,7 +37,7 @@ public class CachingBufferHandler implements BufferHandler {
         return getBuffer(cache, 4096);
     }
 
-    private void addCache(final Queue<BufferHolder> bufs, final BufferHolder bh) {
+    private void addCache(final Collection<BufferHolder> bufs, final BufferHolder bh) {
         bufs.add(bh);
     }
 

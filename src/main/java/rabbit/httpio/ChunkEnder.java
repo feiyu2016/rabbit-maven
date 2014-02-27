@@ -5,6 +5,7 @@ import java.nio.channels.SocketChannel;
 import rabbit.rnio.NioHandler;
 import rabbit.io.BufferHandle;
 import rabbit.io.SimpleBufferHandle;
+import rabbit.rnio.WriteHandler;
 import rabbit.util.TrafficLogger;
 
 /** A class that sends the chunk ending (with an empty footer).
@@ -26,7 +27,7 @@ public class ChunkEnder {
                                 final TrafficLogger tl, final BlockSentListener bsl) {
         final ByteBuffer bb = ByteBuffer.wrap(CHUNK_ENDING);
         final BufferHandle bh = new SimpleBufferHandle(bb);
-        final BlockSender bs =
+        final WriteHandler bs =
                 new BlockSender(channel, nioHandler, tl, bh, false, bsl);
         bs.write();
     }

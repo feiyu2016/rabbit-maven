@@ -29,7 +29,7 @@ public abstract class Config {
     /** get the available sections
      * @return an Enumeration of the available sections (including the empty section).
      */
-    public Collection<String> getSections() {
+    public Iterable<String> getSections() {
         return configs.keySet();
     }
 

@@ -3,6 +3,7 @@ package rabbit.proxy;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -203,10 +204,10 @@ class StandardResponseHeaders implements HttpGenerator {
         return header;
     }
 
-    public StringBuilder getPlaces(final URL u) {
+    public CharSequence getPlaces(final URL u) {
         final StringBuilder content = new StringBuilder();
         content.append("<ul>");
-        final Set<String> places = new HashSet<>();
+        final Collection<String> places = new HashSet<>();
         for (String[] placeTransformer : placeTransformers) {
             final String pre = placeTransformer[0];
             final String suf = placeTransformer[1];

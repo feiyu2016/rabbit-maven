@@ -7,6 +7,7 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -284,7 +285,7 @@ class SingleSelectorRunner implements Runnable {
                        ", diff: " + diff);
         // Keys are generally writable, try to flip OP_WRITE
         // so that the selector will remove the bad keys.
-        final Set<SelectionKey> triedKeys = new HashSet<>();
+        final Collection<SelectionKey> triedKeys = new HashSet<>();
         for (SelectionKey sk : selector.keys()) {
             final int ops = sk.interestOps();
             if (ops == 0) {

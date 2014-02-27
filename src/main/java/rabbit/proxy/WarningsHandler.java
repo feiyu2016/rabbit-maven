@@ -11,7 +11,7 @@ import rabbit.http.HttpHeader;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 class WarningsHandler {
-    private int nextNonBlank(final String s, int start) {
+    private int nextNonBlank(final CharSequence s, int start) {
         char c;
         final int len = s.length();
         while (start < len && ((c = s.charAt(start)) == ' ' || c == '\n' || c == '\r' || c == '\t')) {
@@ -20,7 +20,7 @@ class WarningsHandler {
         return start;
     }
 
-    private int nextBlank(final String s, int start) {
+    private int nextBlank(final CharSequence s, int start) {
         char c;
         final int len = s.length();
         while (start < len && !((c = s.charAt(start)) == ' ' || c == '\n' || c == '\r' || c == '\t')) {

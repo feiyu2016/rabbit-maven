@@ -8,6 +8,7 @@ import rabbit.io.BufferHandle;
 import rabbit.proxy.Connection;
 import rabbit.proxy.MultiPartPipe;
 import rabbit.proxy.TrafficLoggerHandler;
+import rabbit.rnio.WriteHandler;
 
 /** This class handles multipart responses, this handler does not 
  *  filter the resource.
@@ -93,7 +94,7 @@ public class MultiPartHandler extends BaseHandler {
     @Override public void bufferRead(final BufferHandle bufHandle) {
         final ByteBuffer buf = bufHandle.getBuffer();
         mpp.parseBuffer(buf);
-        final BlockSender bs =
+        final WriteHandler bs =
                 new BlockSender(con.getChannel(), con.getNioHandler(),
                                 tlh.getClient(), bufHandle,
                                 con.getChunking(), this);

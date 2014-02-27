@@ -1,6 +1,7 @@
 package rabbit.rnio.impl;
 
 import java.nio.channels.SelectionKey;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import rabbit.rnio.AcceptHandler;
 import rabbit.rnio.ConnectHandler;
@@ -110,7 +111,7 @@ class ChannelOpsHandler {
         this.connectHandler = connectHandler;
     }
 
-    private void handleRead(final ExecutorService executorService,
+    private void handleRead(final Executor executorService,
                             final ReadHandler rh) {
         if (rh.useSeparateThread()) {
             executorService.execute(new Runnable() {
@@ -124,7 +125,7 @@ class ChannelOpsHandler {
         }
     }
 
-    private void handleWrite(final ExecutorService executorService,
+    private void handleWrite(final Executor executorService,
                              final WriteHandler wh) {
         if (wh.useSeparateThread()) {
             executorService.execute(new Runnable() {
@@ -138,7 +139,7 @@ class ChannelOpsHandler {
         }
     }
 
-    private void handleAccept(final ExecutorService executorService,
+    private void handleAccept(final Executor executorService,
                               final AcceptHandler ah) {
         if (ah.useSeparateThread()) {
             executorService.execute(new Runnable() {
@@ -152,7 +153,7 @@ class ChannelOpsHandler {
         }
     }
 
-    private void handleConnect(final ExecutorService executorService,
+    private void handleConnect(final Executor executorService,
                                final ConnectHandler ch) {
         if (ch.useSeparateThread()) {
             executorService.execute(new Runnable() {
@@ -166,7 +167,7 @@ class ChannelOpsHandler {
         }
     }
 
-    public void handle(final ExecutorService executorService, final SelectionKey sk) {
+    public void handle(final Executor executorService, final SelectionKey sk) {
         sk.interestOps(0);
         final ReadHandler rh = readHandler;
         final WriteHandler wh = writeHandler;

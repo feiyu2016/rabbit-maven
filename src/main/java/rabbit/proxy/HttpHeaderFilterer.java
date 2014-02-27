@@ -2,6 +2,7 @@ package rabbit.proxy;
 
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,7 +38,7 @@ class HttpHeaderFilterer {
     }
 
     private HttpHeader filter(final Connection con, final SocketChannel channel,
-                              final HttpHeader in, final List<HttpFilter> filters,
+                              final HttpHeader in, final Iterable<HttpFilter> filters,
                               final FilterHandler fh) {
         for (final HttpFilter hf : filters) {
             final HttpHeader badresponse = fh.filter(hf, channel, in, con);
@@ -106,7 +107,7 @@ class HttpHeaderFilterer {
                       new ConnectFilterer());
     }
 
-    private void loadHttpFilters(final String filters, final List<HttpFilter> ls,
+    private void loadHttpFilters(final String filters, final Collection<HttpFilter> ls,
                                  final Config config, final HttpProxy proxy) {
         final Logger log = Logger.getLogger(getClass().getName());
         final String[] filterArray = filters.split(",");
