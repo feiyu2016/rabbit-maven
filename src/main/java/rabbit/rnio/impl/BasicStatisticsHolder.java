@@ -17,30 +17,30 @@ import rabbit.rnio.statistics.TotalTimeSpent;
 public class BasicStatisticsHolder implements StatisticsHolder {
     // Map is group id to TaskIdentifier
     private Map<String, List<TaskIdentifier>> pendingTasks =
-            new HashMap<String, List<TaskIdentifier>> ();
+            new HashMap<>();
 
     // Map is group id to TaskIdentifier
     private Map<String, List<TaskIdentifier>> runningTasks =
-            new HashMap<String, List<TaskIdentifier>> ();
+            new HashMap<>();
 
     private int maxLatest = 10;
     // Map is group id to CompletionEntry
     private Map<String, List<CompletionEntry>> latest =
-            new HashMap<String, List<CompletionEntry>> ();
+            new HashMap<>();
 
     private int maxLongest = 10;
     // Map is group id to CompletionEntry
     private Map<String, List<CompletionEntry>> longest =
-            new HashMap<String, List<CompletionEntry>> ();
+            new HashMap<>();
 
     private Map<String, TotalTimeSpent> total =
-            new HashMap<String, TotalTimeSpent> ();
+            new HashMap<>();
 
     private <T> List<T> getList (final String id,
                                  final Map<String, List<T>> tasks) {
         List<T> ls = tasks.get (id);
         if (ls == null) {
-            ls = new ArrayList<T> ();
+            ls = new ArrayList<>();
             tasks.put (id, ls);
         }
         return ls;
@@ -129,9 +129,9 @@ public class BasicStatisticsHolder implements StatisticsHolder {
     }
 
     private <K, V> Map<K, List<V>> copy (final Map<K, List<V>> m) {
-        final Map<K, List<V>> ret = new HashMap<K, List<V>> ();
+        final Map<K, List<V>> ret = new HashMap<>();
         for (Map.Entry<K, List<V>> me : m.entrySet ()) {
-            ret.put (me.getKey (), new ArrayList<V> (me.getValue ()));
+            ret.put (me.getKey (), new ArrayList<>(me.getValue ()));
         }
         return ret;
     }

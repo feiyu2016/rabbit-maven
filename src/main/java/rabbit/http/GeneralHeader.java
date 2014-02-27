@@ -16,7 +16,7 @@ public class GeneralHeader implements Storable {
 
     /** The headers of this Header in order.
      */
-    protected final ArrayList<Header> headers = new ArrayList<Header> ();
+    protected final ArrayList<Header> headers = new ArrayList<>();
 
     /** Create a new HTTPHeader from scratch
      */
@@ -45,12 +45,11 @@ public class GeneralHeader implements Storable {
      */
     protected void fillBuffer (final StringBuilder sb) {
         final int hsize = headers.size ();
-        for (int i = 0; i < hsize; i++) {
-            final Header h = headers.get (i);
-            sb.append (h.getType ());
-            sb.append (": ");
-            sb.append (h.getValue ());
-            sb.append (Header.CRLF);
+        for (final Header h : headers) {
+            sb.append(h.getType());
+            sb.append(": ");
+            sb.append(h.getValue());
+            sb.append(Header.CRLF);
         }
         sb.append (Header.CRLF);
     }
@@ -61,9 +60,8 @@ public class GeneralHeader implements Storable {
      */
     public String getHeader (final String type) {
         final int s = headers.size ();
-        for (int i = 0; i < s; i++) {
-            final Header h = headers.get (i);
-            if (h.getType ().equalsIgnoreCase (type)) {
+        for (final Header h : headers) {
+            if (h.getType().equalsIgnoreCase(type)) {
                 return h.getValue();
             }
         }
@@ -75,10 +73,9 @@ public class GeneralHeader implements Storable {
      */
     public void setHeader (final String type, final String value) {
         final int s = headers.size ();
-        for (int i = 0; i < s; i++) {
-            final Header h = headers.get (i);
-            if (h.getType ().equalsIgnoreCase (type)) {
-                h.setValue (value);
+        for (final Header h : headers) {
+            if (h.getType().equalsIgnoreCase(type)) {
+                h.setValue(value);
                 return;
             }
         }
@@ -92,10 +89,9 @@ public class GeneralHeader implements Storable {
      */
     public void setExistingValue (final String current, final String newValue) {
         final int s = headers.size ();
-        for (int i = 0; i < s; i++) {
-            final Header h = headers.get (i);
-            if (h.getValue ().equals (current)) {
-                h.setValue (newValue);
+        for (final Header h : headers) {
+            if (h.getValue().equals(current)) {
+                h.setValue(newValue);
                 return;
             }
         }
@@ -155,13 +151,12 @@ public class GeneralHeader implements Storable {
     public List<String> getHeaders (final String type) {
         List<String> ret = null;
         final int s = headers.size ();
-        for (int i = 0; i < s; i++) {
-            final Header h = headers.get (i);
-            if (h.getType ().equalsIgnoreCase (type)) {
+        for (final Header h : headers) {
+            if (h.getType().equalsIgnoreCase(type)) {
                 if (ret == null) {
-                    ret = new ArrayList<String>();
+                    ret = new ArrayList<>();
                 }
-                ret.add (h.getValue ());
+                ret.add(h.getValue());
             }
         }
         if (ret == null) {

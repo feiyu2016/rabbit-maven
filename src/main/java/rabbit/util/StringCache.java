@@ -40,7 +40,7 @@ public class StringCache extends WeakHashMap<String, WeakReference<String>> {
             if (wr != null && ((k = wr.get ()) != null)) {
                 return k;
             }
-            wr = new WeakReference<String> (s);
+            wr = new WeakReference<>(s);
             put (s, wr);
             return s;
         }

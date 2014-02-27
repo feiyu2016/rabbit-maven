@@ -21,13 +21,13 @@ class HttpHeaderFilterer {
 
     public HttpHeaderFilterer (final String in, final String out, final String connect,
                                final Config config, final HttpProxy proxy) {
-        httpInFilters = new ArrayList<HttpFilter> ();
+        httpInFilters = new ArrayList<>();
         loadHttpFilters (in, httpInFilters, config, proxy);
 
-        httpOutFilters = new ArrayList<HttpFilter> ();
+        httpOutFilters = new ArrayList<>();
         loadHttpFilters (out, httpOutFilters, config, proxy);
 
-        connectFilters = new ArrayList<HttpFilter> ();
+        connectFilters = new ArrayList<>();
         loadHttpFilters (connect, connectFilters, config, proxy);
     }
 
@@ -40,9 +40,8 @@ class HttpHeaderFilterer {
                                final HttpHeader in, final List<HttpFilter> filters,
                                final FilterHandler fh) {
         final int s = filters.size();
-        for (int i = 0; i < s; i++) {
-            final HttpFilter hf = filters.get (i);
-            final HttpHeader badresponse = fh.filter (hf, channel, in, con);
+        for (final HttpFilter hf : filters) {
+            final HttpHeader badresponse = fh.filter(hf, channel, in, con);
             if (badresponse != null) {
                 return badresponse;
             }

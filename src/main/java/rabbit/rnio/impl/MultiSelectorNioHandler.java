@@ -58,11 +58,11 @@ public class MultiSelectorNioHandler implements NioHandler {
             final String err = "Must have at least one selector: " + numSelectors;
             throw new IllegalArgumentException (err);
         }
-        selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
+        selectorRunners = new ArrayList<>(numSelectors);
         for (int i = 0; i < numSelectors; i++) {
             selectorRunners.add (new SingleSelectorRunner (executorService));
         }
-        if (defaultTimeout != null && defaultTimeout.longValue () <= 0) {
+        if (defaultTimeout != null && defaultTimeout <= 0) {
             final String err = "Default timeout may not be zero or negative";
             throw new IllegalArgumentException (err);
         }
@@ -95,8 +95,8 @@ public class MultiSelectorNioHandler implements NioHandler {
         if (defaultTimeout == null) {
             return null;
         }
-        return Long.valueOf (System.currentTimeMillis () +
-                             defaultTimeout.longValue ());
+        return System.currentTimeMillis() +
+               defaultTimeout;
     }
 
     @Override

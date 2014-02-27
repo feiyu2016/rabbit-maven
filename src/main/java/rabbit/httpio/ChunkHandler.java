@@ -197,7 +197,7 @@ public class ChunkHandler {
      */
     private List<ByteBuffer> getAllChunks (final BufferHandle bufHandle,
                                            int thisChunk) {
-        final List<ByteBuffer> ret = new ArrayList<ByteBuffer> ();
+        final List<ByteBuffer> ret = new ArrayList<>();
         final ByteBuffer buffer = bufHandle.getBuffer ();
         do {
             final ByteBuffer copy = buffer.duplicate ();

@@ -15,9 +15,9 @@ import rabbit.rnio.BufferHandler;
  */
 public class CachingBufferHandler implements BufferHandler {
     private Queue<BufferHolder> cache =
-            new ConcurrentLinkedQueue<BufferHolder> ();
+            new ConcurrentLinkedQueue<>();
     private Queue<BufferHolder> largeCache =
-            new ConcurrentLinkedQueue<BufferHolder> ();
+            new ConcurrentLinkedQueue<>();
 
     private ByteBuffer getBuffer (final Queue<BufferHolder> bufs, final int size) {
         final BufferHolder r = bufs.poll ();

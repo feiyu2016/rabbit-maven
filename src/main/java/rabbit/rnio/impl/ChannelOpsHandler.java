@@ -212,7 +212,7 @@ class ChannelOpsHandler {
         if (t == null) {
             return false;
         }
-        final boolean ret = t.longValue () < now;
+        final boolean ret = t < now;
         if (ret) {
             sch.timeout();
         }
@@ -247,7 +247,7 @@ class ChannelOpsHandler {
         if (t2 == null) {
             return t;
         }
-        return t2.longValue () < t.longValue () ? t2 : t;
+        return t2 < t ? t2 : t;
     }
 
     public Long getMinimumTimeout () {

@@ -104,7 +104,7 @@ public class HttpProxy {
     protected List<Integer> sslports = null;
 
     /** All the currently active connections. */
-    private final List<Connection> connections = new ArrayList<Connection> ();
+    private final List<Connection> connections = new ArrayList<>();
 
     /** The total traffic in and out of this proxy. */
     private final TrafficLoggerHandler tlh = new TrafficLoggerHandler ();
@@ -140,7 +140,7 @@ public class HttpProxy {
         final int threads = getInt (section, "num_selector_threads", cpus);
         final ExecutorService es = Executors.newCachedThreadPool ();
         final StatisticsHolder sh = new BasicStatisticsHolder ();
-        final Long timeout = Long.valueOf (15000);
+        final Long timeout = (long) 15000;
         try {
             nioHandler =
                     new MultiSelectorNioHandler (es, sh, threads, timeout);
@@ -213,26 +213,30 @@ public class HttpProxy {
     private void setupSSLSupport () {
         String ssl = config.getProperty (getClass ().getName (), "proxySSL", "no");
         ssl = ssl.trim ();
-        if (ssl.equals ("no")) {
-            proxySSL = false;
-        } else if (ssl.equals ("yes")) {
-            proxySSL = true;
-            sslports = null;
-        } else {
-            proxySSL = true;
-            // ok, try to get the portnumbers.
-            sslports = new ArrayList<Integer> ();
-            final StringTokenizer st = new StringTokenizer (ssl, ",");
-            while (st.hasMoreTokens ()) {
-                String s = null;
-                try {
-                    final Integer port = Integer.valueOf(s = st.nextToken());
-                    sslports.add (port);
-                } catch (NumberFormatException e) {
-                    logger.warning ("bad number: '" + s +
-                                    "' for ssl port, ignoring.");
+        switch (ssl) {
+            case "no":
+                proxySSL = false;
+                break;
+            case "yes":
+                proxySSL = true;
+                sslports = null;
+                break;
+            default:
+                proxySSL = true;
+                // ok, try to get the portnumbers.
+                sslports = new ArrayList<>();
+                final StringTokenizer st = new StringTokenizer(ssl, ",");
+                while (st.hasMoreTokens()) {
+                    String s = null;
+                    try {
+                        final Integer port = Integer.valueOf(s = st.nextToken());
+                        sslports.add(port);
+                    } catch (NumberFormatException e) {
+                        logger.warning("bad number: '" + s +
+                                       "' for ssl port, ignoring.");
+                    }
                 }
-            }
+                break;
         }
     }
 

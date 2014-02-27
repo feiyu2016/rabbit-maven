@@ -306,12 +306,16 @@ public class BaseHandler
             if (cause instanceof IOException) {
                 final IOException ioe = (IOException)cause;
                 final String msg = ioe.getMessage ();
-                if ("Broken pipe".equals (msg)) {
-                    st = ioe.toString () + ", probably cancelled pipeline";
-                } else if ("Connection reset by peer".equals (msg)) {
-                    st = ioe.toString () + ", client aborted connection";
-                } else {
-                    st = getStackTrace (cause);
+                switch (msg) {
+                    case "Broken pipe":
+                        st = ioe.toString() + ", probably cancelled pipeline";
+                        break;
+                    case "Connection reset by peer":
+                        st = ioe.toString() + ", client aborted connection";
+                        break;
+                    default:
+                        st = getStackTrace(cause);
+                        break;
                 }
             } else {
                 st = getStackTrace (cause);

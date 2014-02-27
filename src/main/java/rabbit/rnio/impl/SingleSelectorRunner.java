@@ -33,9 +33,9 @@ class SingleSelectorRunner implements Runnable {
     /** The queue to get back on the main thread. */
     private final Object returnedTasksLock = new Object ();
     private List<SelectorRunnable> returnedTasks1 =
-            new ArrayList<SelectorRunnable> ();
+            new ArrayList<>();
     private List<SelectorRunnable> returnedTasks2 =
-            new ArrayList<SelectorRunnable> ();
+            new ArrayList<>();
 
     private Thread selectorThread;
 
@@ -81,11 +81,7 @@ class SingleSelectorRunner implements Runnable {
                 close (sk.channel ());
             }
             selector.close ();
-        } catch (InterruptedException e) {
-            logger.log (Level.WARNING,
-                        "Got exception while closing selector",
-                        e);
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.log (Level.WARNING,
                         "Got exception while closing selector",
                         e);
@@ -226,7 +222,7 @@ class SingleSelectorRunner implements Runnable {
 
                 final Long nextTimeout = findNextTimeout ();
                 if (nextTimeout != null) {
-                    sleepTime = nextTimeout.longValue() - now;
+                    sleepTime = nextTimeout - now;
                 } else {
                     sleepTime = 100 * 1000;
                 }
@@ -255,7 +251,7 @@ class SingleSelectorRunner implements Runnable {
             final Long timeout = coh.getMinimumTimeout ();
             if (timeout != null) {
                 if (min != null) {
-                    min = min.longValue () < timeout.longValue () ?
+                    min = min < timeout ?
                           min : timeout;
                 } else {
                     min = timeout;
@@ -288,7 +284,7 @@ class SingleSelectorRunner implements Runnable {
                         ", diff: " + diff);
         // Keys are generally writable, try to flip OP_WRITE
         // so that the selector will remove the bad keys.
-        final Set<SelectionKey> triedKeys = new HashSet<SelectionKey> ();
+        final Set<SelectionKey> triedKeys = new HashSet<>();
         for (SelectionKey sk : selector.keys ()) {
             final int ops = sk.interestOps ();
             if (ops == 0) {
@@ -380,17 +376,17 @@ class SingleSelectorRunner implements Runnable {
         if (s > 0 && logger.isLoggable (Level.FINEST)) {
             logger.finest(id + ": Selector running " + s + " returned tasks");
         }
-        for (int i = 0; i < s; i++) {
+        for (SelectorRunnable aReturnedTasks2 : returnedTasks2) {
             try {
-                final SelectorRunnable sr = returnedTasks2.get (i);
-                if (logger.isLoggable (Level.FINEST)) {
+                final SelectorRunnable sr = aReturnedTasks2;
+                if (logger.isLoggable(Level.FINEST)) {
                     logger.finest(id + ": Selector running task " + sr);
                 }
-                sr.run (this);
+                sr.run(this);
             } catch (IOException e) {
-                logger.log (Level.WARNING,
-                            "Got exception when running returned task",
-                            e);
+                logger.log(Level.WARNING,
+                           "Got exception when running returned task",
+                           e);
             }
         }
         returnedTasks2.clear ();

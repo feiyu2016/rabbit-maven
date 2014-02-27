@@ -108,10 +108,7 @@ public class HttpHeaderReader extends BaseSocketHandler
             buffer.position (startParseAt);
             buffer.limit (read + pos);
             parseBuffer (buffer);
-        } catch (BadHttpHeaderException e) {
-            closeDown ();
-            reader.failed (e);
-        } catch (IOException e) {
+        } catch (BadHttpHeaderException | IOException e) {
             closeDown ();
             reader.failed (e);
         }

@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Counter {
     // All the messages we count.
     private final ConcurrentMap<String, AtomicInteger> counters =
-            new ConcurrentHashMap<String, AtomicInteger> ();
+            new ConcurrentHashMap<>();
 
     /** Increase a logentry.
      * @param log the event to increase 

@@ -83,11 +83,11 @@ class StandardResponseHeaders implements HttpGenerator {
         return header;
     }
 
+    private static final String UTF8 = "UTF-8";
     /** Get a 400 Bad Request header for the given exception.
      * @param exception the Exception handled.
      * @return a HttpHeader for the exception.
      */
-    private static final String UTF8 = "UTF-8";
     @Override
     public HttpHeader get400 (final Exception exception) {
         // in most cases we should have a header out already, but to be sure...
@@ -207,18 +207,18 @@ class StandardResponseHeaders implements HttpGenerator {
     public StringBuilder getPlaces (final URL u) {
         final StringBuilder content = new StringBuilder ();
         content.append ("<ul>");
-        final Set<String> places = new HashSet<String> ();
-        for (int i = 0; i < placeTransformers.length; i++) {
-            final String pre = placeTransformers[i][0];
-            final String suf = placeTransformers[i][1];
-            final String place = getPlace (u, pre, suf);
-            if (place != null && !places.contains (place)) {
-                content.append ("<li><a href=\"" +
-                                StringEscapeUtils.escapeHtml (place) +
-                                "\">" +
-                                StringEscapeUtils.escapeHtml (place) +
-                                "</a></li>\n");
-                places.add (place);
+        final Set<String> places = new HashSet<>();
+        for (String[] placeTransformer : placeTransformers) {
+            final String pre = placeTransformer[0];
+            final String suf = placeTransformer[1];
+            final String place = getPlace(u, pre, suf);
+            if (place != null && !places.contains(place)) {
+                content.append("<li><a href=\"" +
+                               StringEscapeUtils.escapeHtml(place) +
+                               "\">" +
+                               StringEscapeUtils.escapeHtml(place) +
+                               "</a></li>\n");
+                places.add(place);
             }
         }
         content.append ("</ul>");

@@ -30,14 +30,14 @@ public class HttpBaseFilter implements HttpFilter {
     private static final BigInteger ZERO = BigInteger.ZERO;
     private static final BigInteger ONE = BigInteger.ONE;
 
-    private final List<String> removes = new ArrayList<String> ();
+    private final List<String> removes = new ArrayList<>();
     private static final Logger logger = Logger.getLogger (HttpBaseFilter.class.getName ());
 
+    private static final String BASIC = "Basic";
     /** We got a proxy authentication, handle it...
      * @param uap the authentication string.
      * @param con the Connection.
      */
-    private static final String BASIC = "Basic";
     private void handleProxyAuthentication (String uap, final Connection con) {
         // guess we should handle digest here also.. :-/
         if (uap.startsWith (BASIC)) {
@@ -108,7 +108,6 @@ public class HttpBaseFilter implements HttpFilter {
     /** Check if this is a noproxy request, and if so handle it.
      * @param requri the requested resource.
      * @param header the actual request.
-     * @param con the Connection.
      * @return the new request URI
      */
     private String handleNoProxyRequest (String requri, final HttpHeader header) {
@@ -148,52 +147,51 @@ public class HttpBaseFilter implements HttpFilter {
     private void removeConnectionTokens (final HttpHeader header) {
         final List<String> cons = header.getHeaders ("Connection");
         final int l = cons.size ();
-        for (int i = 0; i < l; i++) {
-            final String val = cons.get (i);
-	    /* ok, split it... */
+        for (final String val : cons) {
+            /* ok, split it... */
             int s;
             int start = 0;
-            while (start < val.length ()) {
-                while (val.length () > start + 1
-                       && (val.charAt (start) == ' '
-                           || val.charAt (start) == ',')) {
+            while (start < val.length()) {
+                while (val.length() > start + 1
+                       && (val.charAt(start) == ' '
+                           || val.charAt(start) == ',')) {
                     start++;
                 }
-                if (val.length () > start + 1 && val.charAt (start) == '"') {
+                if (val.length() > start + 1 && val.charAt(start) == '"') {
                     start++;
-                    s = val.indexOf ('"', start);
+                    s = val.indexOf('"', start);
                     while (s >= -1
-                           && val.charAt (s - 1) == '\\'
-                           && val.length () > s + 1) {
+                           && val.charAt(s - 1) == '\\'
+                           && val.length() > s + 1) {
                         s = val.indexOf('"', s + 1);
                     }
                     if (s == -1) {
                         s = val.length();
                     }
-                    String t = val.substring (start, s).trim ();
-		    /* ok, unquote the value... */
-                    StringBuilder sb = new StringBuilder (t.length ());
-                    for (int c = 0; c < t.length (); c++) {
-                        final char z = t.charAt (c);
+                    String t = val.substring(start, s).trim();
+            /* ok, unquote the value... */
+                    StringBuilder sb = new StringBuilder(t.length());
+                    for (int c = 0; c < t.length(); c++) {
+                        final char z = t.charAt(c);
                         if (z != '\\') {
                             sb.append(z);
                         }
                     }
-                    t = sb.toString ();
-                    header.removeHeader (t);
-                    s = val.indexOf (',', s + 1);
+                    t = sb.toString();
+                    header.removeHeader(t);
+                    s = val.indexOf(',', s + 1);
                     if (s == -1) {
                         start = val.length();
                     } else {
                         start = s + 1;
                     }
                 } else {
-                    s = val.indexOf (',', start + 1);
+                    s = val.indexOf(',', start + 1);
                     if (s == -1) {
                         s = val.length();
                     }
-                    final String t = val.substring (start, s).trim ();
-                    header.removeHeader (t);
+                    final String t = val.substring(start, s).trim();
+                    header.removeHeader(t);
                     start = s + 1;
                 }
             }

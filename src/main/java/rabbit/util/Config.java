@@ -18,7 +18,7 @@ public abstract class Config {
     /** create an empty Config (has only section "" with no data in it)
      */
     public Config () {
-        configs = new HashMap<String, SProperties> ();
+        configs = new HashMap<>();
         final SProperties current = new SProperties (); // the main thing.
         configs.put("", current);
         populateConfigs(configs);

@@ -49,7 +49,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
     @Override
     public void addContentListener (final ClientResourceListener crl) {
         if (resourceListeners == null) {
-            resourceListeners = new ArrayList<ClientResourceListener>();
+            resourceListeners = new ArrayList<>();
         }
         resourceListeners.add (crl);
     }

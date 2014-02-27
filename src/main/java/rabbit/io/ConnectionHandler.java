@@ -59,8 +59,8 @@ public class ConnectionHandler {
         this.proxyChain = proxyChain;
         this.nioHandler = nioHandler;
 
-        activeConnections = new HashMap<Address, List<WebConnection>> ();
-        wc2closer = new ConcurrentHashMap<WebConnection, CloseListener> ();
+        activeConnections = new HashMap<>();
+        wc2closer = new ConcurrentHashMap<>();
     }
 
     /** Set the keep alive time for this handler.
@@ -82,7 +82,7 @@ public class ConnectionHandler {
      */
     public Map<Address, List<WebConnection>> getActiveConnections () {
         final Map<Address, List<WebConnection>> ret =
-                new HashMap<Address, List<WebConnection>> ();
+                new HashMap<>();
         synchronized (activeConnections) {
             for (Map.Entry<Address, List<WebConnection>> me :
                     activeConnections.entrySet ()) {
@@ -214,7 +214,7 @@ public class ConnectionHandler {
         synchronized (activeConnections) {
             List<WebConnection> pool = activeConnections.get (a);
             if (pool == null) {
-                pool = new ArrayList<WebConnection> ();
+                pool = new ArrayList<>();
                 activeConnections.put (a, pool);
             } else {
                 if (pool.contains (wc)) {

@@ -56,7 +56,7 @@ public class SSLHandler implements TunnelDoneListener {
     public boolean isAllowed () {
         final String hp = request.getRequestURI ();
         final int c = hp.indexOf (':');
-        Integer port = Integer.valueOf (443);
+        Integer port = 443;
         if (c >= 0) {
             try {
                 port = Integer.valueOf(hp.substring (c + 1));
