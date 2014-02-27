@@ -33,8 +33,9 @@ public class SimpleBufferHandle implements BufferHandle {
     }
 
     public void possiblyFlush () {
-        if (!buffer.hasRemaining ())
+        if (!buffer.hasRemaining ()) {
             buffer = null;
+        }
     }
 
     public void setMayBeFlushed (final boolean mayBeFlushed) {

@@ -60,8 +60,9 @@ public class BlockSender extends BaseSocketHandler implements WriteHandler {
         final StringBuilder sb =
                 new StringBuilder ("BlockSender: buffers: " + buffers.length);
         for (int i = 0; i < buffers.length; i++) {
-            if (i > 0)
-                sb.append (", ");
+            if (i > 0) {
+                sb.append(", ");
+            }
             sb.append ("i: ").append (buffers[i].remaining ());
         }
         return sb.toString ();

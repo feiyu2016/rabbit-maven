@@ -170,10 +170,11 @@ class StandardResponseHeaders implements HttpGenerator {
             final URL u = new URL (uri);
             final StringBuilder content =
                     new StringBuilder (HtmlPage.getPageHeader (con, rabbit.http.StatusCode._504));
-            if (dnsError)
-                content.append ("Server not found");
-            else
-                content.append ("Unable to handle request");
+            if (dnsError) {
+                content.append("Server not found");
+            } else {
+                content.append("Unable to handle request");
+            }
 
             content.append (":<br><b>" +
                             StringEscapeUtils.escapeHtml (e.getMessage ()));
@@ -181,8 +182,9 @@ class StandardResponseHeaders implements HttpGenerator {
             content.append ("\n\n<br>Did you mean to go to: ");
             content.append (getPlaces (u));
             String message = "";
-            if (!dnsError)
-                message = "<xmp>" + StackTraceUtil.getStackTrace (e) + "</xmp>";
+            if (!dnsError) {
+                message = "<xmp>" + StackTraceUtil.getStackTrace(e) + "</xmp>";
+            }
             content.append ("</b><br>" + message + "</body></html>\n");
 
             header.setContent (content.toString (), UTF8);
@@ -216,12 +218,15 @@ class StandardResponseHeaders implements HttpGenerator {
 
     private String getPlace (final URL u, String hostPrefix, String hostSuffix) {
         final String host = u.getHost ();
-        if (host.startsWith (hostPrefix))
+        if (host.startsWith (hostPrefix)) {
             hostPrefix = "";
-        if (host.endsWith (hostSuffix))
+        }
+        if (host.endsWith (hostSuffix)) {
             hostSuffix = "";
-        if (hostPrefix.equals ("") && hostSuffix.equals (""))
+        }
+        if (hostPrefix.equals ("") && hostSuffix.equals ("")) {
             return null;
+        }
         return u.getProtocol () + "://" + hostPrefix + u.getHost () +
                hostSuffix +
                (u.getPort () == -1 ? "" : ":" + u.getPort ()) +

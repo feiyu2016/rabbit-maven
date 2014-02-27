@@ -61,10 +61,11 @@ public class ChunkHandler {
             } else if (readExtension) {
                 tryToReadExtension (bufHandle);
             } else {
-                if (currentChunkSize == 0)
-                    readFooter (bufHandle);
-                else
-                    handleChunkData (bufHandle);
+                if (currentChunkSize == 0) {
+                    readFooter(bufHandle);
+                } else {
+                    handleChunkData(bufHandle);
+                }
             }
         } catch (BadChunkException e) {
             listener.failed (e);
@@ -163,11 +164,13 @@ public class ChunkHandler {
             final List<ByteBuffer> chunks = getAllChunks (bufHandle, thisChunk);
             if (chunks.size () > 1) {
                 int size = 0;
-                for (ByteBuffer buf : chunks)
+                for (ByteBuffer buf : chunks) {
                     size += buf.remaining ();
+                }
                 final ByteBuffer chunksData = ByteBuffer.allocate (size);
-                for (ByteBuffer buf : chunks)
+                for (ByteBuffer buf : chunks) {
                     chunksData.put (buf);
+                }
                 chunksData.flip ();
                 listener.bufferRead (new SimpleBufferHandle (chunksData));
             } else {
@@ -211,8 +214,9 @@ public class ChunkHandler {
                 readFromChunk = 0;
             }
 
-            if (buffer.remaining () < 2)
+            if (buffer.remaining () < 2) {
                 break;
+            }
             readOffCRLF (buffer);
             readTrailingCRLF = true;
             thisChunk = getSizeOfNextChunk (bufHandle);
@@ -224,8 +228,9 @@ public class ChunkHandler {
 
     private int getSizeOfNextChunk (final BufferHandle bufHandle) {
         final ByteBuffer buffer = bufHandle.getBuffer ();
-        if (buffer.remaining () < 2)
+        if (buffer.remaining () < 2) {
             return -1;
+        }
         buffer.mark ();
         final LineReader lr = new LineReader (strictHttp);
         lr.readLine (buffer, new ChunkSizeHandler ());
@@ -239,10 +244,11 @@ public class ChunkHandler {
         final int pos = buffer.position ();
         final byte b1 = buffer.get ();
         final byte b2 = buffer.get ();
-        if (!(b1 == '\r' && b2 == '\n'))
-            throw new BadChunkException ("Failed to read CRLF: " +
-                                         (int)b1 + ", " + (int)b2 +
-                                         ", pos: " + pos);
+        if (!(b1 == '\r' && b2 == '\n')) {
+            throw new BadChunkException("Failed to read CRLF: " +
+                                        (int) b1 + ", " + (int) b2 +
+                                        ", pos: " + pos);
+        }
         readTrailingCRLF = true;
     }
 

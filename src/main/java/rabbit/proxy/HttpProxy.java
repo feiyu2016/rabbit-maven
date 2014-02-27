@@ -203,8 +203,9 @@ public class HttpProxy {
         } else if (!pname.equals ("") && !pport.equals ("")) {
             proxyChain = setupProxiedProxyChain (pname, pport, pauth);
         }
-        if (proxyChain == null)
+        if (proxyChain == null) {
             proxyChain = new SimpleProxyChain(nioHandler);
+        }
     }
 
     /** Configure the SSL support RabbIT should have.
@@ -353,8 +354,9 @@ public class HttpProxy {
     }
 
     private void closeNioHandler () {
-        if (nioHandler != null)
-            nioHandler.shutdown ();
+        if (nioHandler != null) {
+            nioHandler.shutdown();
+        }
     }
 
     /** Make sure all filters and handlers are available
@@ -463,8 +465,9 @@ public class HttpProxy {
     public boolean isSelf (final String uhost, final int urlport) {
         if (urlport == port) {
             final String proxyhost = localhost.getHostName ();
-            if (uhost.equalsIgnoreCase (proxyhost))
+            if (uhost.equalsIgnoreCase (proxyhost)) {
                 return true;
+            }
             try {
                 final Enumeration<NetworkInterface> e =
                         NetworkInterface.getNetworkInterfaces();
@@ -473,11 +476,13 @@ public class HttpProxy {
                     final Enumeration<InetAddress> ei = ni.getInetAddresses ();
                     while (ei.hasMoreElements ()) {
                         final InetAddress ia = ei.nextElement ();
-                        if (ia.getHostAddress ().equalsIgnoreCase (uhost))
+                        if (ia.getHostAddress ().equalsIgnoreCase (uhost)) {
                             return true;
+                        }
                         if (ia.isLoopbackAddress () &&
-                            ia.getHostName ().equalsIgnoreCase (uhost))
+                            ia.getHostName ().equalsIgnoreCase (uhost)) {
                             return true;
+                        }
                     }
                 }
             } catch (SocketException e) {

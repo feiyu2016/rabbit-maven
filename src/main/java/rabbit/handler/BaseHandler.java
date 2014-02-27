@@ -75,8 +75,9 @@ public class BaseHandler
         this.tlh = tlh;
         this.request = request;
         this.response = response;
-        if (!request.isDot9Request () && response == null)
-            throw new IllegalArgumentException ("response may not be null");
+        if (!request.isDot9Request () && response == null) {
+            throw new IllegalArgumentException("response may not be null");
+        }
         this.content = content;
         this.size = size;
     }
@@ -106,10 +107,11 @@ public class BaseHandler
      * have all succeded
      */
     public void handle () {
-        if (request.isDot9Request ())
+        if (request.isDot9Request ()) {
             send ();
-        else
+        } else {
             sendHeader ();
+        }
     }
 
     /**
@@ -171,11 +173,13 @@ public class BaseHandler
     protected void finish (final boolean good) {
         boolean ok = false;
         try {
-            if (content != null)
-                content.release ();
+            if (content != null) {
+                content.release();
+            }
             if (response != null
-                && response.getHeader ("Content-Length") != null)
-                con.setContentLength (response.getHeader ("Content-length"));
+                && response.getHeader ("Content-Length") != null) {
+                con.setContentLength(response.getHeader("Content-length"));
+            }
 
             ok = true;
         } finally {
@@ -186,10 +190,11 @@ public class BaseHandler
         }
         // Not sure why we need this, seems to call finish multiple times.
         if (con != null) {
-            if (good && ok)
+            if (good && ok) {
                 con.logAndRestart ();
-            else
+            } else {
                 con.logAndClose (null);
+            }
         }
         tlh = null;
         con = null;
@@ -247,8 +252,9 @@ public class BaseHandler
     }
 
     public void finishedRead () {
-        if (size > 0 && totalRead != size)
-            setPartialContent (size);
+        if (size > 0 && totalRead != size) {
+            setPartialContent(size);
+        }
         finishData ();
     }
 
@@ -287,18 +293,19 @@ public class BaseHandler
             if (cause instanceof IOException) {
                 final IOException ioe = (IOException)cause;
                 final String msg = ioe.getMessage ();
-                if ("Broken pipe".equals (msg))
+                if ("Broken pipe".equals (msg)) {
                     st = ioe.toString () + ", probably cancelled pipeline";
-                else if ("Connection reset by peer".equals (msg))
+                } else if ("Connection reset by peer".equals (msg)) {
                     st = ioe.toString () + ", client aborted connection";
-                else
+                } else {
                     st = getStackTrace (cause);
+                }
             } else {
                 st = getStackTrace (cause);
             }
-            getLogger ().warning ("BaseHandler: error handling request: " +
-                                  request.getRequestURI () + ": " +
-                                  st);
+            getLogger ().warning("BaseHandler: error handling request: " +
+                                 request.getRequestURI() + ": " +
+                                 st);
             con.setStatusCode ("500");
             String ei = con.getExtraInfo ();
             ei = ei == null ? cause.toString () : (ei + ", " + cause);
@@ -308,9 +315,10 @@ public class BaseHandler
     }
 
     public void timeout () {
-        if (con != null)
-            getLogger ().warning ("BaseHandler: timeout: uri: " +
-                                  request.getRequestURI ());
+        if (con != null) {
+            getLogger().warning("BaseHandler: timeout: uri: " +
+                                request.getRequestURI());
+        }
         finish (false);
     }
 

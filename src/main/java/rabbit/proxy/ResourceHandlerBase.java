@@ -38,21 +38,24 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
     }
 
     protected void doTransfer () {
-        if (!bufHandle.isEmpty ())
-            sendBuffer ();
-        else
-            waitForRead ();
+        if (!bufHandle.isEmpty ()) {
+            sendBuffer();
+        } else {
+            waitForRead();
+        }
     }
 
     public void addContentListener (final ClientResourceListener crl) {
-        if (resourceListeners == null)
-            resourceListeners = new ArrayList<ClientResourceListener> ();
+        if (resourceListeners == null) {
+            resourceListeners = new ArrayList<ClientResourceListener>();
+        }
         resourceListeners.add (crl);
     }
 
     public void fireResouceDataRead (final BufferHandle bufHandle) {
-        if (resourceListeners == null)
+        if (resourceListeners == null) {
             return;
+        }
         for (ClientResourceListener crl : resourceListeners) {
             crl.resourceDataRead (bufHandle);
         }

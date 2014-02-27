@@ -32,8 +32,9 @@ public class ProxyConnectionAcceptor implements AcceptorListener {
     public void connectionAccepted (final SocketChannel sc)
             throws IOException {
         proxy.getCounter ().inc ("Socket accepts");
-        if (logger.isLoggable (Level.FINE))
-            logger.fine ("Accepted connection from: " + sc);
+        if (logger.isLoggable (Level.FINE)) {
+            logger.fine("Accepted connection from: " + sc);
+        }
         final BufferHandler bh = proxy.getBufferHandler ();
         final Connection c = new Connection (getId (), sc, proxy, bh);
         c.readRequest ();

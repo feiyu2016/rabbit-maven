@@ -59,9 +59,10 @@ class ContentTransferHandler extends ResourceHandlerBase
 
     public void blockSent () {
         transferred += toTransfer;
-        if (transferred < dataSize)
-            doTransfer ();
-        else
-            listener.clientResourceTransferred ();
+        if (transferred < dataSize) {
+            doTransfer();
+        } else {
+            listener.clientResourceTransferred();
+        }
     }
 }

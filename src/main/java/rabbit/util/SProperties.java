@@ -24,8 +24,9 @@ public class SProperties extends HashMap<String, String> {
      */
     public String getProperty (final String key, final String defaultValue) {
         final String val = get (key);
-        if (val == null)
+        if (val == null) {
             return defaultValue;
+        }
         return val;
     }
 

@@ -45,9 +45,10 @@ class MultiPartTransferHandler extends ResourceHandlerBase
         bs.write ();
     }
     public void blockSent () {
-        if (!mpp.isFinished ())
-            doTransfer ();
-        else
-            listener.clientResourceTransferred ();
+        if (!mpp.isFinished ()) {
+            doTransfer();
+        } else {
+            listener.clientResourceTransferred();
+        }
     }
 }

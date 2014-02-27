@@ -61,15 +61,17 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
     }
 
     public void readMore () {
-        if (!bufHandle.isEmpty ())
-            bufHandle.getBuffer ().compact ();
+        if (!bufHandle.isEmpty ()) {
+            bufHandle.getBuffer().compact();
+        }
         register ();
     }
 
     public void blockSent () {
-        if (sentEndChunk)
-            listener.clientResourceTransferred ();
-        else
-            doTransfer ();
+        if (sentEndChunk) {
+            listener.clientResourceTransferred();
+        } else {
+            doTransfer();
+        }
     }
 }

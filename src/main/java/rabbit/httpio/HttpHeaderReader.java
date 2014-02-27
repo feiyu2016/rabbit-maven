@@ -119,8 +119,9 @@ public class HttpHeaderReader extends BaseSocketHandler
     private void parseBuffer (ByteBuffer buffer) throws IOException {
         buffer.mark ();
         final boolean done = headerParser.handleBuffer (buffer);
-        if (logger.isLoggable (Level.FINEST))
-            logger.finest ("HttpHeaderReader.parseBuffer: done " + done);
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.finest("HttpHeaderReader.parseBuffer: done " + done);
+        }
         if (!done) {
             final int pos = buffer.position ();
             buffer.reset ();
@@ -163,10 +164,12 @@ public class HttpHeaderReader extends BaseSocketHandler
         final String con = header.getHeader ("Connection");
         // Netscape specific header...
         final String pcon = header.getHeader ("Proxy-Connection");
-        if (con != null && con.equalsIgnoreCase ("close"))
-            setKeepAlive (false);
-        if (keepalive && pcon != null && pcon.equalsIgnoreCase ("close"))
-            setKeepAlive (false);
+        if (con != null && con.equalsIgnoreCase ("close")) {
+            setKeepAlive(false);
+        }
+        if (keepalive && pcon != null && pcon.equalsIgnoreCase ("close")) {
+            setKeepAlive(false);
+        }
 
         if (header.isResponse ()) {
             if (header.getResponseHTTPVersion ().equals ("HTTP/1.1")) {
@@ -190,8 +193,9 @@ public class HttpHeaderReader extends BaseSocketHandler
                 setKeepAlive (false);
             }
 
-            if (!(dataSize > -1 || ischunked))
-                setKeepAlive (false);
+            if (!(dataSize > -1 || ischunked)) {
+                setKeepAlive(false);
+            }
         } else {
             final String httpVersion = header.getHTTPVersion ();
             if (httpVersion != null) {
@@ -204,8 +208,9 @@ public class HttpHeaderReader extends BaseSocketHandler
                     }
                 } else if (httpVersion.equals ("HTTP/1.0")) {
                     final String ka = header.getHeader ("Connection");
-                    if (ka == null || !ka.equalsIgnoreCase ("Keep-Alive"))
-                        setKeepAlive (false);
+                    if (ka == null || !ka.equalsIgnoreCase ("Keep-Alive")) {
+                        setKeepAlive(false);
+                    }
                 }
             }
         }

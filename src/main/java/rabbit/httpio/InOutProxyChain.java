@@ -27,8 +27,9 @@ public class InOutProxyChain implements ProxyChain {
 
     public Resolver getResolver (final String url) {
         final Matcher m = insidePattern.matcher (url);
-        if (m.find ())
+        if (m.find ()) {
             return directResolver;
+        }
         return proxiedResolver;
     }
 }

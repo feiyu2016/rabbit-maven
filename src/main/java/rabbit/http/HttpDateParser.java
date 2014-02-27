@@ -43,8 +43,9 @@ public class HttpDateParser {
      * @return a Date or null if parsing was not possible.
      */
     public static Date getDate (final String date) {
-        if (date == null)
+        if (date == null) {
             return null;
+        }
 
         Date d = getDate (date, sdf1, offset);
         if (d == null) {
@@ -66,8 +67,9 @@ public class HttpDateParser {
             synchronized (sdf) {
                 d = sdf.parse (date, pos);
             }
-            if (pos.getIndex () == 0 || pos.getIndex () != date.length ())
+            if (pos.getIndex () == 0 || pos.getIndex () != date.length ()) {
                 return null;
+            }
             d.setTime (d.getTime () + offsetUsed);
             return d;
         } catch (NumberFormatException e) {

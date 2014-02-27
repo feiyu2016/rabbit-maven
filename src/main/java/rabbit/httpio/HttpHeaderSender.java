@@ -52,8 +52,9 @@ public class HttpHeaderSender implements BlockSentListener {
                 !fullURI && uri.charAt (0) != '/') {
                 final URL url = new URL (uri);
                 String file = url.getFile ();
-                if (file.equals (""))
+                if (file.equals ("")) {
                     file = "/";
+                }
                 header.setRequestURI (file);
             }
             final byte[] bytes = header.getBytes ();

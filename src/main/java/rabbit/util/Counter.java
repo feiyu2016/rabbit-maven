@@ -17,8 +17,9 @@ public class Counter {
      */
     public void inc (final String log) {
         final AtomicInteger l = counters.putIfAbsent (log, new AtomicInteger ());
-        if (l != null)
-            l.incrementAndGet ();
+        if (l != null) {
+            l.incrementAndGet();
+        }
     }
 
     /** Get all events
@@ -34,8 +35,9 @@ public class Counter {
      */
     public int get (final String key) {
         final AtomicInteger l = counters.get (key);
-        if (l == null)
+        if (l == null) {
             return 0;
+        }
         return l.get ();
     }
 }

@@ -44,8 +44,9 @@ public class Base64 {
     public static String decode (String base64string) {
         final StringBuilder ret = new StringBuilder (base64string.length () * 3 / 4);
 
-        while ((base64string.length () % 4) != 0)
+        while ((base64string.length () % 4) != 0) {
             base64string += "=";           // that should be safe.
+        }
         int i = 0;
         int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
         while (i < base64string.length () &&
@@ -60,10 +61,11 @@ public class Base64 {
             i += 4;
         }
 
-        if (c3 > 63)
+        if (c3 > 63) {
             ret.setLength (ret.length () - 2);
-        else if (c4 > 63)
+        } else if (c4 > 63) {
             ret.setLength (ret.length () - 1);
+        }
         return ret.toString ();
     }
 
@@ -95,8 +97,9 @@ public class Base64 {
         }
 
         // are we done yet?
-        if (i == str.length ())
-            return ret.toString ();
+        if (i == str.length ()) {
+            return ret.toString();
+        }
 
         // no so handle the trailing characters.
         ch1 = str.charAt (i);

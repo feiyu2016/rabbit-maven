@@ -54,8 +54,9 @@ class SingleSelectorRunner implements Runnable {
     }
 
     public void start (final ThreadFactory tf) {
-        if (running.get ())
-            throw new IllegalStateException ("Already started");
+        if (running.get ()) {
+            throw new IllegalStateException("Already started");
+        }
         running.set (true);
         synchronized (this) {
             selectorThread = tf.newThread (this);
@@ -65,8 +66,9 @@ class SingleSelectorRunner implements Runnable {
     }
 
     public void shutdown () {
-        if (!running.get ())
+        if (!running.get ()) {
             return;
+        }
         running.set (false);
         try {
             selector.wakeup ();
@@ -75,8 +77,9 @@ class SingleSelectorRunner implements Runnable {
                     selectorThread.join (10000);
                 }
             }
-            for (SelectionKey sk : selector.keys ())
+            for (SelectionKey sk : selector.keys ()) {
                 close (sk.channel ());
+            }
             selector.close ();
         } catch (InterruptedException e) {
             logger.log (Level.WARNING,
@@ -111,9 +114,10 @@ class SingleSelectorRunner implements Runnable {
             return;
         }
 
-        if (logger.isLoggable (Level.FINEST))
-            logger.fine ("SingleSelectorRunner." + id + ": updating " +
-                         "selection key for: " + sk);
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.fine("SingleSelectorRunner." + id + ": updating " +
+                        "selection key for: " + sk);
+        }
         if (sk == null) {
             final ChannelOpsHandler coh = new ChannelOpsHandler ();
             updater.addHandler (coh);
@@ -124,17 +128,19 @@ class SingleSelectorRunner implements Runnable {
                 updater.addHandler (coh);
                 sk.interestOps (coh.getInterestOps ());
             } else {
-                if (logger.isLoggable (Level.FINEST))
-                    logger.fine ("SingleSelectorRunner." + id +
-                                 ": sk not valid, calling closed ()");
+                if (logger.isLoggable (Level.FINEST)) {
+                    logger.fine("SingleSelectorRunner." + id +
+                                ": sk not valid, calling closed ()");
+                }
                 cancelKeyAndCloseChannel (sk);
                 coh.closed ();
                 handler.closed ();
             }
         }
-        if (logger.isLoggable (Level.FINEST) && sk != null && sk.isValid ())
-            logger.fine ("SingleSelectorRunner." + id + ": sk.interestOps " +
-                         sk.interestOps ());
+        if (logger.isLoggable (Level.FINEST) && sk != null && sk.isValid ()) {
+            logger.fine("SingleSelectorRunner." + id + ": sk.interestOps " +
+                        sk.interestOps());
+        }
     }
 
     public void waitForRead (final SelectableChannel channel,
@@ -184,16 +190,19 @@ class SingleSelectorRunner implements Runnable {
         runReturnedTasks ();
         while (running.get ()) {
             try {
-                if (logger.isLoggable (Level.FINEST))
-                    logger.finest (id + ": going into select: " + sleepTime);
+                if (logger.isLoggable (Level.FINEST)) {
+                    logger.finest(id + ": going into select: " + sleepTime);
+                }
                 selector.select (sleepTime);
                 final long now = System.currentTimeMillis ();
                 final long diff = now - lastRun;
-                if (diff > 100)
+                if (diff > 100) {
                     counter = 0;
+                }
 
-                if (logger.isLoggable (Level.FINEST))
-                    logger.finest (id + ": after select, time taken: " + diff);
+                if (logger.isLoggable (Level.FINEST)) {
+                    logger.finest(id + ": after select, time taken: " + diff);
+                }
                 cancelTimeouts (now);
                 int num = handleSelects ();
                 int rt = 0;
@@ -201,8 +210,9 @@ class SingleSelectorRunner implements Runnable {
                     rt = runReturnedTasks ();
                     num += rt;
                 } while (rt > 0);
-                if (num == 0)
+                if (num == 0) {
                     counter++;
+                }
 
                 if (counter > 100000) {
                     tryAvoidSpinning (counter, now, diff);
@@ -210,10 +220,11 @@ class SingleSelectorRunner implements Runnable {
                 }
 
                 final Long nextTimeout = findNextTimeout ();
-                if (nextTimeout != null)
-                    sleepTime = nextTimeout.longValue () - now;
-                else
+                if (nextTimeout != null) {
+                    sleepTime = nextTimeout.longValue() - now;
+                } else {
                     sleepTime = 100 * 1000;
+                }
 
                 lastRun = now;
             } catch (IOException e) {
@@ -233,8 +244,9 @@ class SingleSelectorRunner implements Runnable {
         Long min = null;
         for (SelectionKey sk : selector.keys ()) {
             final ChannelOpsHandler coh = (ChannelOpsHandler)sk.attachment ();
-            if (coh == null)
+            if (coh == null) {
                 continue;
+            }
             final Long timeout = coh.getMinimumTimeout ();
             if (timeout != null) {
                 if (min != null) {
@@ -307,8 +319,9 @@ class SingleSelectorRunner implements Runnable {
     private void cancelTimeouts (final long now) {
         for (SelectionKey sk : selector.keys ()) {
             final ChannelOpsHandler coh = (ChannelOpsHandler)sk.attachment ();
-            if (coh == null)
+            if (coh == null) {
                 continue;
+            }
             if (coh.doTimeouts (now) && sk.isValid ()){
                 sk.interestOps (coh.getInterestOps ());
             }
@@ -333,12 +346,14 @@ class SingleSelectorRunner implements Runnable {
     private int handleSelects () {
         final Set<SelectionKey> selected = selector.selectedKeys ();
         final int ret = selected.size ();
-        if (logger.isLoggable (Level.FINEST))
-            logger.finest (id + ": Selector handling " + ret + " selected keys");
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.finest(id + ": Selector handling " + ret + " selected keys");
+        }
         for (SelectionKey sk : selected) {
             final ChannelOpsHandler coh = (ChannelOpsHandler)sk.attachment ();
-            if (logger.isLoggable (Level.FINEST))
-                logger.finest (id + ": ChanneOpsHandler " + coh);
+            if (logger.isLoggable (Level.FINEST)) {
+                logger.finest(id + ": ChanneOpsHandler " + coh);
+            }
             if (sk.isValid ()) {
                 coh.handle (executorService, sk);
             } else {
@@ -357,13 +372,15 @@ class SingleSelectorRunner implements Runnable {
             returnedTasks2 = toRun;
         }
         final int s = returnedTasks2.size ();
-        if (s > 0 && logger.isLoggable (Level.FINEST))
-            logger.finest (id + ": Selector running " + s + " returned tasks");
+        if (s > 0 && logger.isLoggable (Level.FINEST)) {
+            logger.finest(id + ": Selector running " + s + " returned tasks");
+        }
         for (int i = 0; i < s; i++) {
             try {
                 final SelectorRunnable sr = returnedTasks2.get (i);
-                if (logger.isLoggable (Level.FINEST))
-                    logger.finest (id + ": Selector running task " + sr);
+                if (logger.isLoggable (Level.FINEST)) {
+                    logger.finest(id + ": Selector running task " + sr);
+                }
                 sr.run (this);
             } catch (IOException e) {
                 logger.log (Level.WARNING,
@@ -403,20 +420,23 @@ class SingleSelectorRunner implements Runnable {
     public void cancel (final SelectableChannel channel,
                         final SocketChannelHandler handler) {
         final SelectionKey sk = channel.keyFor (selector);
-        if (sk == null)
+        if (sk == null) {
             return;
+        }
         final ChannelOpsHandler coh = (ChannelOpsHandler)sk.attachment ();
         coh.cancel (handler);
         synchronized (sk) {
-            if (sk.isValid ())
-                sk.interestOps (coh.getInterestOps ());
+            if (sk.isValid ()) {
+                sk.interestOps(coh.getInterestOps());
+            }
         }
     }
 
     public void close (final SelectableChannel channel) {
         final SelectionKey sk = channel.keyFor (selector);
-        if (sk == null)
+        if (sk == null) {
             return;
+        }
         final ChannelOpsHandler coh = (ChannelOpsHandler)sk.attachment ();
         cancelKeyAndCloseChannel (sk);
         coh.closed ();

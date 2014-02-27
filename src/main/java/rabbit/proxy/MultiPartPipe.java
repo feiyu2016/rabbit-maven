@@ -25,10 +25,11 @@ public class MultiPartPipe {
                 break;
             }
         }
-        if (boundary == null)
-            throw new IllegalArgumentException ("failed to find multipart " +
-                                                "boundary in: '" + ctHeader +
-                                                "'");
+        if (boundary == null) {
+            throw new IllegalArgumentException("failed to find multipart " +
+                                               "boundary in: '" + ctHeader +
+                                               "'");
+        }
     }
 
     /** Parse the buffer, will set the position and the limit.

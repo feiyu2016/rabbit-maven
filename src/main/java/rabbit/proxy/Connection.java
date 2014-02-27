@@ -126,8 +126,9 @@ public class Connection {
     }
 
     private boolean connectionReset (final Throwable t) {
-        if (t instanceof IOException)
-            return "Connection reset by peer".equals (t.getMessage ());
+        if (t instanceof IOException) {
+            return "Connection reset by peer".equals(t.getMessage());
+        }
         return false;
     }
 
@@ -187,8 +188,9 @@ public class Connection {
         this.request = request;
         this.requestHandle = bh;
         requestVersion = request.getHTTPVersion ();
-        if (request.isDot9Request ())
+        if (request.isDot9Request ()) {
             requestVersion = "HTTP/0.9";
+        }
         requestVersion = requestVersion.toUpperCase (Locale.US);
 
         requestLine = request.getRequestLine ();
@@ -209,12 +211,13 @@ public class Connection {
             } else {
                 // no? then try regular data
                 final String ct = request.getHeader ("Content-Type");
-                if (hasRegularContent (request, ct, dataSize))
-                    setupClientResourceHandler (dataSize);
-                else
+                if (hasRegularContent (request, ct, dataSize)) {
+                    setupClientResourceHandler(dataSize);
+                } else
                     // still no? then try multipart
-                    if (ct != null)
-                        readMultiPart (ct);
+                    if (ct != null) {
+                        readMultiPart(ct);
+                    }
             }
 
             final TaskIdentifier ti =
@@ -233,10 +236,12 @@ public class Connection {
 
     private boolean hasRegularContent (final HttpHeader request, final String ct,
                                        final long dataSize) {
-        if (request.getContent () != null)
+        if (request.getContent () != null) {
             return true;
-        if (ct != null && ct.startsWith ("multipart/byteranges"))
+        }
+        if (ct != null && ct.startsWith ("multipart/byteranges")) {
             return false;
+        }
         return dataSize > -1;
     }
 
@@ -287,11 +292,13 @@ public class Connection {
     public void webConnectionSetupFailed (final RequestHandler rh, final Exception cause) {
         if (cause instanceof UnknownHostException)
             // do we really want this in the log?
-            logger.warning (cause.toString () + ": " +
-                            request.getRequestURI ());
-        else
-            logger.warning ("Failed to set up web connection to: " +
-                            request.getRequestURI () + ", cause: " + cause);
+        {
+            logger.warning(cause.toString() + ": " +
+                           request.getRequestURI());
+        } else {
+            logger.warning("Failed to set up web connection to: " +
+                           request.getRequestURI() + ", cause: " + cause);
+        }
         doGateWayTimeout (cause);
     }
 
@@ -365,8 +372,9 @@ public class Connection {
                     // "text/html; charset=iso-8859-1"
                     // "text/html;charset=iso-8859-1"
                     ct = ct.replace ("; ", ";");
-                    if (ct.startsWith ("multipart/byteranges"))
-                        rh.setHandlerFactory (new MultiPartHandler ());
+                    if (ct.startsWith ("multipart/byteranges")) {
+                        rh.setHandlerFactory(new MultiPartHandler());
+                    }
                 }
             }
             rh.setHandlerFactory (new BaseHandler ());
@@ -396,8 +404,9 @@ public class Connection {
     }
 
     private void finalFixesOnWebHeader (final RequestHandler rh, final Handler handler) {
-        if (rh.getWebHeader () == null)
+        if (rh.getWebHeader () == null) {
             return;
+        }
         if (chunk) {
             if (rh.getSize () < 0 || handler.changesContentSize ()) {
                 rh.getWebHeader ().removeHeader ("Content-Length");
@@ -695,8 +704,9 @@ public class Connection {
     private void setStatusesFromHeader (final HttpHeader header) {
         statusCode = header.getStatusCode ();
         final String cl = header.getHeader ("Content-Length");
-        if (cl != null)
-            contentLength  = cl;
+        if (cl != null) {
+            contentLength = cl;
+        }
     }
 
     void sendAndRestart (final HttpHeader header) {
@@ -774,10 +784,11 @@ public class Connection {
     /** Log the current request and start to listen for a new request.
      */
     public void logAndRestart () {
-        if (keepalive)
-            readRequest ();
-        else
-            closeDown ();
+        if (keepalive) {
+            readRequest();
+        } else {
+            closeDown();
+        }
     }
 
     private class SendAndCloseListener extends SendAndDoListener {

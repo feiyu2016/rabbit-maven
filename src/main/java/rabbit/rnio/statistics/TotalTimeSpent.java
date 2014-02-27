@@ -16,10 +16,11 @@ public class TotalTimeSpent {
      *        with
      */
     public void update (final CompletionEntry ce) {
-        if (ce.wasOk)
+        if (ce.wasOk) {
             successful++;
-        else
+        } else {
             failures++;
+        }
         totalMillis += ce.timeSpent;
     }
 

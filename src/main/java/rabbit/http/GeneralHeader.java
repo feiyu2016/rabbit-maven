@@ -63,8 +63,9 @@ public class GeneralHeader implements Storable {
         final int s = headers.size ();
         for (int i = 0; i < s; i++) {
             final Header h = headers.get (i);
-            if (h.getType ().equalsIgnoreCase (type))
-                return h.getValue ();
+            if (h.getType ().equalsIgnoreCase (type)) {
+                return h.getValue();
+            }
         }
         return null;
     }
@@ -157,13 +158,15 @@ public class GeneralHeader implements Storable {
         for (int i = 0; i < s; i++) {
             final Header h = headers.get (i);
             if (h.getType ().equalsIgnoreCase (type)) {
-                if (ret == null)
-                    ret = new ArrayList<String> ();
+                if (ret == null) {
+                    ret = new ArrayList<String>();
+                }
                 ret.add (h.getValue ());
             }
         }
-        if (ret == null)
-            ret = Collections.emptyList ();
+        if (ret == null) {
+            ret = Collections.emptyList();
+        }
         return ret;
     }
 
@@ -188,8 +191,9 @@ public class GeneralHeader implements Storable {
 
     public void write (final DataOutput out) throws IOException {
         out.writeInt (headers.size ());
-        for (Header h : headers)
+        for (Header h : headers) {
             h.write (out);
+        }
     }
 }
     

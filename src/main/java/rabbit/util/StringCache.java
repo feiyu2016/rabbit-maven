@@ -18,8 +18,9 @@ public class StringCache extends WeakHashMap<String, WeakReference<String>> {
      * @return the StringCache
      */
     public static synchronized StringCache getSharedInstance () {
-        if (instance == null)
-            instance = new StringCache ();
+        if (instance == null) {
+            instance = new StringCache();
+        }
         return instance;
     }
 
@@ -30,13 +31,15 @@ public class StringCache extends WeakHashMap<String, WeakReference<String>> {
      * @return the shared string
      */
     public String getCachedString (final String s) {
-        if (s == null)
+        if (s == null) {
             return null;
+        }
         synchronized (this) {
             WeakReference<String> wr = get (s);
             String k;
-            if (wr != null && ((k = wr.get ()) != null))
+            if (wr != null && ((k = wr.get ()) != null)) {
                 return k;
+            }
             wr = new WeakReference<String> (s);
             put (s, wr);
             return s;

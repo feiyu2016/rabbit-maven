@@ -55,10 +55,12 @@ public class HttpHeaderParser implements LineListener {
      * @return true if a full header was read, false if more data is needed.
      */
     public boolean handleBuffer (final ByteBuffer buffer) {
-        if (!request && header == null && !verifyResponse (buffer))
+        if (!request && header == null && !verifyResponse (buffer)) {
             return true;
-        while (!headerRead && buffer.hasRemaining ())
-            lr.readLine (buffer, this);
+        }
+        while (!headerRead && buffer.hasRemaining ()) {
+            lr.readLine(buffer, this);
+        }
         return headerRead;
     }
 
@@ -92,12 +94,15 @@ public class HttpHeaderParser implements LineListener {
 
     private boolean matchBuffer (final ByteBuffer buffer, final ByteBuffer test) {
         final int len = test.remaining ();
-        if (buffer.remaining () < len)
+        if (buffer.remaining () < len) {
             return false;
+        }
         final int pos = buffer.position ();
-        for (int i = 0; i < len; i++)
-            if (buffer.get (pos + i) != test.get (i))
+        for (int i = 0; i < len; i++) {
+            if (buffer.get (pos + i) != test.get (i)) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -178,8 +183,9 @@ public class HttpHeaderParser implements LineListener {
             }
         }
         int j = i;
-        while (j > 0 && ((c = msg.charAt (j - 1)) == ' ' || c == '\t'))
+        while (j > 0 && ((c = msg.charAt (j - 1)) == ' ' || c == '\t')) {
             j--;
+        }
         // ok, the header may be empty, so trim away whites.
         String value = msg.substring (i + 1);
 	
@@ -189,26 +195,30 @@ public class HttpHeaderParser implements LineListener {
 	 * msg is: 'Cache-control: must-revalidate"'
 	 * so we only check for append when in strict mode...
 	 */
-        if (strictHttp)
-            append = checkQuotes (value);
-        if (!append)
-            value = value.trim ();
+        if (strictHttp) {
+            append = checkQuotes(value);
+        }
+        if (!append) {
+            value = value.trim();
+        }
         head = new Header (msg.substring (0, j), value);
         header.addHeader (head);
     }
 
     private boolean checkQuotes (final String v) {
         int q = v.indexOf ('"');
-        if (q == -1)
+        if (q == -1) {
             return false;
+        }
         boolean halfquote = false;
         final int l = v.length ();
         for (; q < l; q++) {
             final char c = v.charAt (q);
-            if (c == '\\')
+            if (c == '\\') {
                 q++;    // skip one...
-            else if (c == '"')
+            } else if (c == '"') {
                 halfquote = !halfquote;
+            }
         }
         return halfquote;
     }

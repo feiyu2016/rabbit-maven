@@ -38,8 +38,9 @@ public class HttpHeader extends GeneralHeader {
         sb.append (getRequestLine ());
         sb.append (Header.CRLF);
         super.fillBuffer (sb);
-        if (content != null)
-            sb.append (new String(content));
+        if (content != null) {
+            sb.append(new String(content));
+        }
     }
 
     /** Convert this header to a byte[].
@@ -54,8 +55,9 @@ public class HttpHeader extends GeneralHeader {
         super.fillBuffer (sb);
         try {
             final byte[] header = sb.toString ().getBytes ("US-ASCII");
-            if (content == null)
+            if (content == null) {
                 return header;
+            }
             final byte[] res = new byte[header.length + content.length];
             System.arraycopy (header, 0, res, 0, header.length);
             System.arraycopy (content, 0, res, header.length, content.length);
@@ -310,8 +312,9 @@ public class HttpHeader extends GeneralHeader {
         method = in.readUTF ();
         requestURI = in.readUTF ();
         httpVersion = in.readUTF ();
-        if ("".equals (httpVersion))
+        if ("".equals (httpVersion)) {
             httpVersion = null;
+        }
         hashCodeValue = requestURI.toLowerCase (Locale.US).hashCode ();
         super.read (in);
     }

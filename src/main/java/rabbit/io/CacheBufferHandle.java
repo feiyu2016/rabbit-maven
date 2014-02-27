@@ -26,17 +26,20 @@ public class CacheBufferHandle implements BufferHandle {
     }
 
     public synchronized ByteBuffer getBuffer () {
-        if (buffer == null)
-            buffer = bh.getBuffer ();
+        if (buffer == null) {
+            buffer = bh.getBuffer();
+        }
         return buffer;
     }
 
     public synchronized void possiblyFlush () {
-        if (!mayBeFlushed)
-            throw new IllegalStateException ("buffer may not be flushed!: " +
-                                             System.identityHashCode (buffer));
-        if (buffer == null)
+        if (!mayBeFlushed) {
+            throw new IllegalStateException("buffer may not be flushed!: " +
+                                            System.identityHashCode(buffer));
+        }
+        if (buffer == null) {
             return;
+        }
         if (!buffer.hasRemaining ()) {
             bh.putBuffer (buffer);
             buffer = null;

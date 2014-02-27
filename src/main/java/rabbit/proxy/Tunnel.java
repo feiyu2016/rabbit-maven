@@ -42,8 +42,9 @@ public class Tunnel {
                    final SocketChannel to, final BufferHandle toHandle,
                    final TrafficLogger toLogger,
                    final TunnelDoneListener listener) {
-        if (logger.isLoggable (Level.FINEST))
-            logger.finest ("Tunnel created from: " + from + " to: " + to);
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.finest("Tunnel created from: " + from + " to: " + to);
+        }
         this.nioHandler = nioHandler;
         fromToTo = new OneWayTunnel (from, to, fromHandle, fromLogger);
         toToFrom = new OneWayTunnel (to, from, toHandle, toLogger);
@@ -53,8 +54,9 @@ public class Tunnel {
     /** Start tunneling data in both directions.
      */
     public void start () {
-        if (logger.isLoggable (Level.FINEST))
-            logger.finest ("Tunnel started");
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.finest("Tunnel started");
+        }
         fromToTo.start ();
         toToFrom.start ();
     }
@@ -74,13 +76,15 @@ public class Tunnel {
         }
 
         public void start () {
-            if (logger.isLoggable (Level.FINEST))
-                logger.finest ("OneWayTunnel started: bh.isEmpty: " +
-                               bh.isEmpty ());
-            if (bh.isEmpty ())
-                waitForRead ();
-            else
-                writeData ();
+            if (logger.isLoggable (Level.FINEST)) {
+                logger.finest("OneWayTunnel started: bh.isEmpty: " +
+                              bh.isEmpty());
+            }
+            if (bh.isEmpty ()) {
+                waitForRead();
+            } else {
+                writeData();
+            }
         }
 
         private void waitForRead () {
@@ -115,16 +119,18 @@ public class Tunnel {
                     int written;
                     do {
                         written = to.write (buf);
-                        if (logger.isLoggable (Level.FINEST))
-                            logger.finest ("OneWayTunnel wrote: " + written);
+                        if (logger.isLoggable (Level.FINEST)) {
+                            logger.finest("OneWayTunnel wrote: " + written);
+                        }
                         tl.write (written);
                     } while (written > 0 && buf.hasRemaining ());
                 }
 
-                if (buf.hasRemaining ())
-                    waitForWrite ();
-                else
-                    waitForRead ();
+                if (buf.hasRemaining ()) {
+                    waitForWrite();
+                } else {
+                    waitForRead();
+                }
             } catch (IOException e) {
                 logger.warning ("Got exception writing to tunnel: " + e);
                 closeDown ();
@@ -162,8 +168,9 @@ public class Tunnel {
                 final ByteBuffer buffer = bh.getBuffer ();
                 buffer.clear ();
                 final int read = from.read (buffer);
-                if (logger.isLoggable (Level.FINEST))
-                    logger.finest ("OneWayTunnel read: " + read);
+                if (logger.isLoggable (Level.FINEST)) {
+                    logger.finest("OneWayTunnel read: " + read);
+                }
                 if (read == -1) {
                     buffer.position (buffer.limit ());
                     closeDown ();

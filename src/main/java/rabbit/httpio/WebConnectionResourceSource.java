@@ -54,8 +54,9 @@ public class WebConnectionResourceSource
         this.bufHandle = bufHandle;
         this.tl = tl;
         this.isChunked = isChunked;
-        if (isChunked)
-            chunkHandler = new ChunkHandler (this, strictHttp);
+        if (isChunked) {
+            chunkHandler = new ChunkHandler(this, strictHttp);
+        }
         this.dataSize = dataSize;
     }
 
@@ -83,12 +84,14 @@ public class WebConnectionResourceSource
     }
 
     public void addBlockListener (final BlockListener listener) {
-        if (this.listener != null)
-            throw new RuntimeException ("Trying to overwrite block listener: " +
-                                        this.listener + " with: " + listener);
+        if (this.listener != null) {
+            throw new RuntimeException("Trying to overwrite block listener: " +
+                                       this.listener + " with: " + listener);
+        }
         this.listener = listener;
-        if (isChunked)
-            chunkHandler.setBlockListener (listener);
+        if (isChunked) {
+            chunkHandler.setBlockListener(listener);
+        }
 
         if (dataSize > -1 && totalRead >= dataSize) {
             cleanupAndFinish ();
@@ -195,8 +198,9 @@ public class WebConnectionResourceSource
 
     public void release () {
         if (!bufHandle.isEmpty () && wc.getKeepalive () &&
-            (dataSize < 0 || totalRead != dataSize))
-            wc.setKeepalive (false);
+            (dataSize < 0 || totalRead != dataSize)) {
+            wc.setKeepalive(false);
+        }
         if (!wc.getKeepalive () && !bufHandle.isEmpty ()) {
             // empty the buffer so we can reuse it.
             final ByteBuffer buffer = bufHandle.getBuffer ();

@@ -49,10 +49,11 @@ public abstract class SimpleBlockSender
             do {
                 written = sc.write (buf);
             } while (buf.hasRemaining () && written > 0);
-            if (buf.hasRemaining ())
-                register ();
-            else
-                done ();
+            if (buf.hasRemaining ()) {
+                register();
+            } else {
+                done();
+            }
         } catch (IOException e) {
             handleIOException (e);
         }

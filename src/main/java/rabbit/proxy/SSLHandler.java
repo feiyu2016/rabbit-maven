@@ -65,13 +65,16 @@ public class SSLHandler implements TunnelDoneListener {
                 return false;
             }
         }
-        if (!proxy.proxySSL)
+        if (!proxy.proxySSL) {
             return false;
-        if (proxy.proxySSL && proxy.sslports == null)
+        }
+        if (proxy.proxySSL && proxy.sslports == null) {
             return true;
+        }
         for (int i = 0; i < proxy.sslports.size (); i++) {
-            if (port.equals (proxy.sslports.get (i)))
+            if (port.equals (proxy.sslports.get (i))) {
                 return true;
+            }
         }
         return false;
     }
@@ -87,9 +90,10 @@ public class SSLHandler implements TunnelDoneListener {
             final String auth = resolver.getProxyAuthString ();
             // it should look like this (using RabbIT:RabbIT):
             // Proxy-authorization: Basic UmFiYklUOlJhYmJJVA==
-            if (auth != null && !auth.equals (""))
-                request.setHeader ("Proxy-authorization",
-                                   "Basic " + Base64.encode (auth));
+            if (auth != null && !auth.equals ("")) {
+                request.setHeader("Proxy-authorization",
+                                  "Basic " + Base64.encode(auth));
+            }
         }
         final WebConnectionListener wcl = new WebConnector ();
         proxy.getWebConnection (request, wcl);
@@ -129,10 +133,12 @@ public class SSLHandler implements TunnelDoneListener {
     }
 
     private void closeDown () {
-        if (bh != null)
-            bh.possiblyFlush ();
-        if (sbh != null)
-            sbh.possiblyFlush ();
+        if (bh != null) {
+            bh.possiblyFlush();
+        }
+        if (sbh != null) {
+            sbh.possiblyFlush();
+        }
         Closer.close (wc, logger);
         wc = null;
         con.logAndClose (null);

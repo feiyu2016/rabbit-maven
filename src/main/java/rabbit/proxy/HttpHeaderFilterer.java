@@ -43,8 +43,9 @@ class HttpHeaderFilterer {
         for (int i = 0; i < s; i++) {
             final HttpFilter hf = filters.get (i);
             final HttpHeader badresponse = fh.filter (hf, channel, in, con);
-            if (badresponse != null)
+            if (badresponse != null) {
                 return badresponse;
+            }
         }
         return null;
     }
@@ -110,8 +111,9 @@ class HttpHeaderFilterer {
         final String[] filterArray = filters.split (",");
         for (String className : filterArray) {
             className = className.trim ();
-            if (className.length() == 0)
+            if (className.length() == 0) {
                 continue;
+            }
             try {
                 className = className.trim();
                 final Class<? extends HttpFilter> cls =

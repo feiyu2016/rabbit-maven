@@ -68,8 +68,9 @@ public abstract class Config {
         final SProperties p = getProperties (section);
         if (p != null) {
             final String s = p.get (key);
-            if (s != null)
+            if (s != null) {
                 return s;
+            }
         }
         return defaultstring;
     }
@@ -101,13 +102,15 @@ public abstract class Config {
             for (Map.Entry<String, String> me : pr.entrySet ()) {
                 final String key = me.getKey ();
                 String value = me.getValue ();
-                if (value == null)
+                if (value == null) {
                     value = "";
+                }
                 final StringTokenizer st = new StringTokenizer (key, "=", true);
                 while (st.hasMoreTokens ()) {
                     final String token = st.nextToken ();
-                    if (token.equals ("="))
-                        res.append ('\\');
+                    if (token.equals ("=")) {
+                        res.append('\\');
+                    }
                     res.append (token);
                 }
                 res.append ('=');
@@ -127,8 +130,9 @@ public abstract class Config {
     public void merge (final Config other) {
         for (String section : other.getSections ()) {
             final SProperties p = other.getProperties (section);
-            if (p == null)
+            if (p == null) {
                 continue;
+            }
             for (Map.Entry<String, String> me : p.entrySet ()) {
                 final String key = me.getKey ();
                 final String value = me.getValue ();

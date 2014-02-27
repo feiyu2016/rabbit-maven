@@ -15,8 +15,9 @@ class WarningsHandler {
         char c;
         final int len = s.length ();
         while (start < len && ((c = s.charAt (start)) == ' '
-                               || c == '\n' || c == '\r' || c == '\t'))
+                               || c == '\n' || c == '\r' || c == '\t')) {
             start++;
+        }
         return start;
     }
 
@@ -24,8 +25,9 @@ class WarningsHandler {
         char c;
         final int len = s.length ();
         while (start < len && !((c = s.charAt (start)) == ' '
-                                || c == '\n' || c == '\r' || c == '\t'))
+                                || c == '\n' || c == '\r' || c == '\t')) {
             start++;
+        }
         return start;
     }
 
@@ -59,35 +61,41 @@ class WarningsHandler {
                         final int n = val.indexOf ('"', m + 1);
                         date = val.substring (m + 1, n);
                         final int c2 = val.indexOf (',', n + 1);
-                        if (c2 != -1)
+                        if (c2 != -1) {
                             start = c2;
-                        else
+                        } else {
                             start = n + 1;
+                        }
                     }
                     char s;
                     while (start < val.length ()
-                           && ((s = val.charAt (start)) == ' ' || s == ','))
+                           && ((s = val.charAt (start)) == ' ' || s == ',')) {
                         start++;
+                    }
 
                     Date d1 = null, d2 = null;
-                    if (date != null)
-                        d1 = HttpDateParser.getDate (date);
-                    if (rdate != null)
-                        d2 = HttpDateParser.getDate (rdate);
+                    if (date != null) {
+                        d1 = HttpDateParser.getDate(date);
+                    }
+                    if (rdate != null) {
+                        d2 = HttpDateParser.getDate(rdate);
+                    }
                     if (!((d1 != null && !d1.equals (d2))
                           || (remove1xx && code.charAt (0) == '1')
                              && !"RabbIT".equals (agent))) {
-                        if (!first)
-                            sb.append (", ");
+                        if (!first) {
+                            sb.append(", ");
+                        }
                         sb.append (code + " " + agent + " \"" + text);
                         sb.append (date != null ? "\" \"" + date + "\"" : "\"");
                         first = false;
                     }
                 }
-                if (sb.length () != 0)
-                    header.setExistingValue (val, sb.toString ());
-                else
-                    header.removeValue (val);
+                if (sb.length () != 0) {
+                    header.setExistingValue(val, sb.toString());
+                } else {
+                    header.removeValue(val);
+                }
             } catch (StringIndexOutOfBoundsException e) {
                 final Logger logger = Logger.getLogger (getClass ().getName ());
                 logger.warning ("bad warning header: '" + val + "'");
@@ -96,7 +104,8 @@ class WarningsHandler {
     }
 
     public void updateWarnings (final HttpHeader header, final HttpHeader webheader) {
-        for (String warn : webheader.getHeaders ("Warning"))
+        for (String warn : webheader.getHeaders ("Warning")) {
             header.addHeader ("Warning", warn);
+        }
     }
 }

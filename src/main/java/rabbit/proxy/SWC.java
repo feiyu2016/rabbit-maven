@@ -91,8 +91,9 @@ public class SWC implements HttpHeaderSentListener,
                    && (method.equals ("GET") || method.equals ("HEAD")));
 
         try {
-            if (crh != null)
-                crh.modifyRequest (header);
+            if (crh != null) {
+                crh.modifyRequest(header);
+            }
 
             final HttpHeaderSender hhs =
                     new HttpHeaderSender (wc.getChannel (), con.getNioHandler (),
@@ -112,10 +113,11 @@ public class SWC implements HttpHeaderSentListener,
     }
 
     public void httpHeaderSent () {
-        if (crh != null)
-            crh.transfer (rh.getWebConnection (), this);
-        else
-            httpHeaderSentTransferDone ();
+        if (crh != null) {
+            crh.transfer(rh.getWebConnection(), this);
+        } else {
+            httpHeaderSentTransferDone();
+        }
     }
 
     public void clientResourceTransferred () {
@@ -228,12 +230,14 @@ public class SWC implements HttpHeaderSentListener,
         final String date = rh.getWebHeader ().getHeader ("Date");
         final Date dd = HttpDateParser.getDate (date);
         long ddt = now;
-        if (dd != null)
-            ddt = dd.getTime ();
+        if (dd != null) {
+            ddt = dd.getTime();
+        }
         long lage = 0;
         try {
-            if (age != null)
-                lage = Long.parseLong (age);
+            if (age != null) {
+                lage = Long.parseLong(age);
+            }
             final long dt = Math.max ((now - ddt) / 1000, 0);
             // correct_age is found in spec, but is not actually used
             //long correct_age = lage + dt;

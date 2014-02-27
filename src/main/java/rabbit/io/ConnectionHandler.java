@@ -139,8 +139,9 @@ public class ConnectionHandler {
                 wc = new WebConnection (a, socketBinder, counter);
             } else {
                 wc = getPooledConnection (a, activeConnections);
-                if (wc == null)
-                    wc = new WebConnection (a, socketBinder, counter);
+                if (wc == null) {
+                    wc = new WebConnection(a, socketBinder, counter);
+                }
             }
             try {
                 wc.connect (nioHandler, wcl);
@@ -159,8 +160,9 @@ public class ConnectionHandler {
             final List<WebConnection> pool = conns.get (a);
             if (pool != null && pool.size () > 0) {
                 final WebConnection wc = pool.remove (pool.size () - 1);
-                if (pool.isEmpty ())
-                    conns.remove (a);
+                if (pool.isEmpty ()) {
+                    conns.remove(a);
+                }
                 return unregister (wc);
             }
         }
@@ -170,8 +172,9 @@ public class ConnectionHandler {
     private WebConnection unregister (final WebConnection wc) {
         CloseListener closer;
         closer = wc2closer.remove (wc);
-        if (closer != null)
-            nioHandler.cancel (wc.getChannel (), closer);
+        if (closer != null) {
+            nioHandler.cancel(wc.getChannel(), closer);
+        }
         return wc;
     }
 
@@ -181,8 +184,9 @@ public class ConnectionHandler {
             final List<WebConnection> pool = conns.get (wc.getAddress ());
             if (pool != null) {
                 pool.remove (wc);
-                if (pool.isEmpty ())
-                    conns.remove (wc.getAddress ());
+                if (pool.isEmpty ()) {
+                    conns.remove(wc.getAddress());
+                }
             }
         }
     }
@@ -225,10 +229,12 @@ public class ConnectionHandler {
     }
 
     private void closeWebConnection (final WebConnection wc) {
-        if (wc == null)
+        if (wc == null) {
             return;
-        if (!wc.getChannel ().isOpen ())
+        }
+        if (!wc.getChannel ().isOpen ()) {
             return;
+        }
         try {
             wc.close ();
         } catch (IOException e) {
@@ -296,8 +302,9 @@ public class ConnectionHandler {
      * @param config the properties to read the configuration from
      */
     public void setup (final SProperties config) {
-        if (config == null)
+        if (config == null) {
             return;
+        }
         final String kat = config.getProperty ("keepalivetime", "1000");
         try {
             setKeepaliveTime (Long.parseLong (kat));

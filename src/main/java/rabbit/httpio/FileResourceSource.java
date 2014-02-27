@@ -53,12 +53,14 @@ public class FileResourceSource implements ResourceSource {
     public FileResourceSource (final File f, final NioHandler nioHandler,
                                final BufferHandler bufHandler)
             throws IOException {
-        if (!f.exists ())
-            throw new FileNotFoundException ("File: " + f.getName () +
-                                             " not found");
-        if (!f.isFile ())
-            throw new FileNotFoundException ("File: " + f.getName () +
-                                             " is not a regular file");
+        if (!f.exists ()) {
+            throw new FileNotFoundException("File: " + f.getName() +
+                                            " not found");
+        }
+        if (!f.isFile ()) {
+            throw new FileNotFoundException("File: " + f.getName() +
+                                            " is not a regular file");
+        }
         final FileInputStream fis = new FileInputStream (f);
         fc = fis.getChannel ();
         this.nioHandler = nioHandler;

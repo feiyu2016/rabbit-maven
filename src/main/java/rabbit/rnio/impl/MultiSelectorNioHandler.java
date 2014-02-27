@@ -59,8 +59,9 @@ public class MultiSelectorNioHandler implements NioHandler {
             throw new IllegalArgumentException (err);
         }
         selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
-        for (int i = 0; i < numSelectors; i++)
+        for (int i = 0; i < numSelectors; i++) {
             selectorRunners.add (new SingleSelectorRunner (executorService));
+        }
         if (defaultTimeout != null && defaultTimeout.longValue () <= 0) {
             final String err = "Default timeout may not be zero or negative";
             throw new IllegalArgumentException (err);
@@ -69,24 +70,27 @@ public class MultiSelectorNioHandler implements NioHandler {
     }
 
     public void start (final ThreadFactory tf) {
-        for (SingleSelectorRunner ssr : selectorRunners)
+        for (SingleSelectorRunner ssr : selectorRunners) {
             ssr.start (tf);
+        }
     }
 
     public void shutdown () {
         final Thread t = new Thread (new Runnable () {
             public void run () {
                 executorService.shutdown ();
-                for (SingleSelectorRunner ssr : selectorRunners)
+                for (SingleSelectorRunner ssr : selectorRunners) {
                     ssr.shutdown ();
+                }
             }
         });
         t.start ();
     }
 
     public Long getDefaultTimeout () {
-        if (defaultTimeout == null)
+        if (defaultTimeout == null) {
             return null;
+        }
         return Long.valueOf (System.currentTimeMillis () +
                              defaultTimeout.longValue ());
     }
@@ -130,9 +134,10 @@ public class MultiSelectorNioHandler implements NioHandler {
 
     public void waitForRead (final SelectableChannel channel,
                              final ReadHandler handler) {
-        if (logger.isLoggable (Level.FINEST))
-            logger.fine ("Waiting for read for: channel: " + channel +
-                         ", handler: " + handler);
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.fine("Waiting for read for: channel: " + channel +
+                        ", handler: " + handler);
+        }
         runSelectorTask (channel, new SelectorRunnable () {
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForRead (channel, handler);
@@ -142,9 +147,10 @@ public class MultiSelectorNioHandler implements NioHandler {
 
     public void waitForWrite (final SelectableChannel channel,
                               final WriteHandler handler) {
-        if (logger.isLoggable (Level.FINEST))
-            logger.fine ("Waiting for write for: channel: " + channel +
-                         ", handler: " + handler);
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.fine("Waiting for write for: channel: " + channel +
+                        ", handler: " + handler);
+        }
         runSelectorTask (channel, new SelectorRunnable () {
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForWrite (channel, handler);
@@ -154,9 +160,10 @@ public class MultiSelectorNioHandler implements NioHandler {
 
     public void waitForAccept (final SelectableChannel channel,
                                final AcceptHandler handler) {
-        if (logger.isLoggable (Level.FINEST))
-            logger.fine ("Waiting for accept for: channel: " + channel +
-                         ", handler: " + handler);
+        if (logger.isLoggable (Level.FINEST)) {
+            logger.fine("Waiting for accept for: channel: " + channel +
+                        ", handler: " + handler);
+        }
         runSelectorTask (channel, new SelectorRunnable () {
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForAccept (channel, handler);
@@ -196,8 +203,9 @@ public class MultiSelectorNioHandler implements NioHandler {
 
     public void visitSelectors (final SelectorVisitor visitor) {
         // TODO: do we need to run on the respective threads?
-        for (SingleSelectorRunner sr : selectorRunners)
+        for (SingleSelectorRunner sr : selectorRunners) {
             sr.visit (visitor);
+        }
         visitor.end ();
     }
 

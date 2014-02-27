@@ -18,8 +18,9 @@ public class Closer {
      * @param logger the Logger to use if the close fails
      */
     public static void close (final Closeable c, final Logger logger) {
-        if (c == null)
+        if (c == null) {
             return;
+        }
         try {
             c.close ();
         } catch (IOException e) {

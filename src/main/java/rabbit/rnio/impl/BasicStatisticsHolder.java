@@ -54,12 +54,14 @@ public class BasicStatisticsHolder implements StatisticsHolder {
     private void removeTask (final TaskIdentifier ti,
                              final Map<String, List<TaskIdentifier>> tasks) {
         final List<TaskIdentifier> ls = tasks.get (ti.getGroupId ());
-        if (ls == null)
-            throw new NullPointerException ("No pending taks for group: " +
-                                            ti.getGroupId ());
-        if (!ls.remove (ti))
-            throw new IllegalArgumentException ("Given task was not pending: " +
-                                                ti);
+        if (ls == null) {
+            throw new NullPointerException("No pending taks for group: " +
+                                           ti.getGroupId());
+        }
+        if (!ls.remove (ti)) {
+            throw new IllegalArgumentException("Given task was not pending: " +
+                                               ti);
+        }
     }
 
     public synchronized void addPendingTask (final TaskIdentifier ti) {
@@ -84,8 +86,9 @@ public class BasicStatisticsHolder implements StatisticsHolder {
     private void addToLatest (final CompletionEntry ce) {
         final List<CompletionEntry> ls = getList (ce.ti.getGroupId (), latest);
         ls.add (ce);
-        if (ls.size () > maxLatest)
-            ls.remove (0);
+        if (ls.size () > maxLatest) {
+            ls.remove(0);
+        }
     }
 
     private void addToLongest (final CompletionEntry ce) {
@@ -124,8 +127,9 @@ public class BasicStatisticsHolder implements StatisticsHolder {
 
     private <K, V> Map<K, List<V>> copy (final Map<K, List<V>> m) {
         final Map<K, List<V>> ret = new HashMap<K, List<V>> ();
-        for (Map.Entry<K, List<V>> me : m.entrySet ())
+        for (Map.Entry<K, List<V>> me : m.entrySet ()) {
             ret.put (me.getKey (), new ArrayList<V> (me.getValue ()));
+        }
         return ret;
     }
 
