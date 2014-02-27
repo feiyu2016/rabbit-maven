@@ -21,33 +21,33 @@ class MultiPartTransferHandler extends ResourceHandlerBase
         implements BlockSentListener {
     private MultiPartPipe mpp = null;
 
-    public MultiPartTransferHandler (final Connection con,
-                                     final BufferHandle bufHandle,
-                                     final TrafficLoggerHandler tlh,
-                                     final String ctHeader) {
-        super (con, bufHandle, tlh);
-        mpp = new MultiPartPipe (ctHeader);
+    public MultiPartTransferHandler(final Connection con,
+                                    final BufferHandle bufHandle,
+                                    final TrafficLoggerHandler tlh,
+                                    final String ctHeader) {
+        super(con, bufHandle, tlh);
+        mpp = new MultiPartPipe(ctHeader);
     }
 
     @Override
-    public void modifyRequest (final HttpHeader header) {
+    public void modifyRequest(final HttpHeader header) {
         // nothing.
     }
 
-    @Override void sendBuffer () {
-        final ByteBuffer buffer = bufHandle.getBuffer ();
-        final ByteBuffer sendBuffer = buffer.slice ();
-        final BufferHandle sbh = new SimpleBufferHandle (sendBuffer);
-        mpp.parseBuffer (sendBuffer);
-        fireResouceDataRead (sbh);
+    @Override void sendBuffer() {
+        final ByteBuffer buffer = bufHandle.getBuffer();
+        final ByteBuffer sendBuffer = buffer.slice();
+        final BufferHandle sbh = new SimpleBufferHandle(sendBuffer);
+        mpp.parseBuffer(sendBuffer);
+        fireResouceDataRead(sbh);
         final BlockSender bs =
-                new BlockSender (wc.getChannel (), con.getNioHandler (),
-                                 tlh.getNetwork (), sbh, false, this);
-        bs.write ();
+                new BlockSender(wc.getChannel(), con.getNioHandler(),
+                                tlh.getNetwork(), sbh, false, this);
+        bs.write();
     }
     @Override
-    public void blockSent () {
-        if (!mpp.isFinished ()) {
+    public void blockSent() {
+        if (!mpp.isFinished()) {
             doTransfer();
         } else {
             listener.clientResourceTransferred();

@@ -31,24 +31,24 @@ public class HttpBaseFilter implements HttpFilter {
     private static final BigInteger ONE = BigInteger.ONE;
 
     private final List<String> removes = new ArrayList<>();
-    private static final Logger logger = Logger.getLogger (HttpBaseFilter.class.getName ());
+    private static final Logger logger = Logger.getLogger(HttpBaseFilter.class.getName());
 
     private static final String BASIC = "Basic";
     /** We got a proxy authentication, handle it...
      * @param uap the authentication string.
      * @param con the Connection.
      */
-    private void handleProxyAuthentication (String uap, final Connection con) {
+    private void handleProxyAuthentication(String uap, final Connection con) {
         // guess we should handle digest here also.. :-/
-        if (uap.startsWith (BASIC)) {
-            uap = uap.substring (BASIC.length ());
-            final String userapass = Base64.decode (uap);
+        if (uap.startsWith(BASIC)) {
+            uap = uap.substring(BASIC.length());
+            final String userapass = Base64.decode(uap);
             int i;
-            if ((i = userapass.indexOf (':')) > -1) {
-                final String userid = userapass.substring (0, i);
-                final String pass = userapass.substring (i + 1);
-                con.setUserName (userid);
-                con.setPassword (pass);
+            if ((i = userapass.indexOf(':')) > -1) {
+                final String userid = userapass.substring(0, i);
+                final String pass = userapass.substring(i + 1);
+                con.setUserName(userid);
+                con.setPassword(pass);
             }
         }
     }
@@ -61,8 +61,8 @@ public class HttpBaseFilter implements HttpFilter {
      * @param header the Request.
      * @param con the Connection.
      */
-    private void handleAuthentications (final HttpHeader header, final Connection con) {
-        handleAuthentications (header, con, "Proxy-Authorization");
+    private void handleAuthentications(final HttpHeader header, final Connection con) {
+        handleAuthentications(header, con, "Proxy-Authorization");
     }
 
     /** Handle the authentications.
@@ -75,9 +75,9 @@ public class HttpBaseFilter implements HttpFilter {
      * @param type the authentication type "Proxy-Authentication" or
      *             "Authorization"
      */
-    private void handleAuthentications (final HttpHeader header, final Connection con,
-                                        final String type) {
-        final String uap = header.getHeader (type);
+    private void handleAuthentications(final HttpHeader header, final Connection con,
+                                       final String type) {
+        final String uap = header.getHeader(type);
         if (uap != null) {
             handleProxyAuthentication(uap, con);
         }
@@ -91,10 +91,10 @@ public class HttpBaseFilter implements HttpFilter {
         final String requestURI = header.getRequestURI();
 
         int s3, s4, s5;
-        if ((s3 = requestURI.indexOf("//")) >= 0
-            && (s4 = requestURI.indexOf('/', s3 + 2)) >= 0
-            && (s5 = requestURI.indexOf('@', s3 + 2)) >= 0
-            && s5 < s4) {
+        if ((s3 = requestURI.indexOf("//")) >= 0 &&
+            (s4 = requestURI.indexOf('/', s3 + 2)) >= 0 &&
+            (s5 = requestURI.indexOf('@', s3 + 2)) >= 0 &&
+            s5 < s4) {
 
             final String userPass = requestURI.substring(s3 + 2, s5);
             header.setHeader("Authorization", BASIC + " " +
@@ -110,9 +110,9 @@ public class HttpBaseFilter implements HttpFilter {
      * @param header the actual request.
      * @return the new request URI
      */
-    private String handleNoProxyRequest (String requri, final HttpHeader header) {
-        requri = "http://" + requri.substring (NOPROXY.length ());
-        header.setRequestURI (requri);
+    private String handleNoProxyRequest(String requri, final HttpHeader header) {
+        requri = "http://" + requri.substring(NOPROXY.length());
+        header.setRequestURI(requri);
         return requri;
     }
 
@@ -122,21 +122,20 @@ public class HttpBaseFilter implements HttpFilter {
      * @param con the Connection.
      * @return null if the request is allowed or an error response header
      */
-    private HttpHeader handleURLSetup (final String requri, final HttpHeader header,
-                                       final Connection con) {
+    private HttpHeader handleURLSetup(final String requri, final HttpHeader header,
+                                      final Connection con) {
         try {
             // is this request to our self?
-            if (requri != null && requri.length () > 0
-                && requri.charAt (0) == '/') {
+            if (requri != null && requri.length() > 0 && requri.charAt(0) == '/') {
                 return con.getHttpGenerator().get404(requri);
             }
-            final URL url = new URL (requri);
-            header.setHeader ("Host",
-                              url.getPort () > -1 ?
-                              url.getHost () + ":" + url.getPort () :
-                              url.getHost ());
+            final URL url = new URL(requri);
+            header.setHeader("Host",
+                             url.getPort() > -1 ?
+                             url.getHost() + ":" + url.getPort() :
+                             url.getHost());
         } catch (MalformedURLException e) {
-            return con.getHttpGenerator ().get400 (e);
+            return con.getHttpGenerator().get400(e);
         }
         return null;
     }
@@ -144,24 +143,20 @@ public class HttpBaseFilter implements HttpFilter {
     /** Remove all "Connection" tokens from the header.
      * @param header the HttpHeader that needs to be cleaned.
      */
-    private void removeConnectionTokens (final HttpHeader header) {
-        final List<String> cons = header.getHeaders ("Connection");
+    private void removeConnectionTokens(final HttpHeader header) {
+        final List<String> cons = header.getHeaders("Connection");
         for (final String val : cons) {
             /* ok, split it... */
             int s;
             int start = 0;
             while (start < val.length()) {
-                while (val.length() > start + 1
-                       && (val.charAt(start) == ' '
-                           || val.charAt(start) == ',')) {
+                while (val.length() > start + 1 && (val.charAt(start) == ' ' || val.charAt(start) == ',')) {
                     start++;
                 }
                 if (val.length() > start + 1 && val.charAt(start) == '"') {
                     start++;
                     s = val.indexOf('"', start);
-                    while (s >= -1
-                           && val.charAt(s - 1) == '\\'
-                           && val.length() > s + 1) {
+                    while (s >= -1 && val.charAt(s - 1) == '\\' && val.length() > s + 1) {
                         s = val.indexOf('"', s + 1);
                     }
                     if (s == -1) {
@@ -197,130 +192,127 @@ public class HttpBaseFilter implements HttpFilter {
         }
     }
 
-    private HttpHeader checkMaxForwards (final Connection con, final HttpHeader header,
-                                         final String val) {
+    private HttpHeader checkMaxForwards(final Connection con, final HttpHeader header,
+                                        final String val) {
         try {
-            final BigInteger bi = new BigInteger (val);
-            if (bi.equals (ZERO)) {
-                if (header.getMethod ().equals ("TRACE")) {
-                    final HttpHeader ret = con.getHttpGenerator ().get200 ();
-                    ret.setContent (header.toString (), "UTF-8");
+            final BigInteger bi = new BigInteger(val);
+            if (bi.equals(ZERO)) {
+                if (header.getMethod().equals("TRACE")) {
+                    final HttpHeader ret = con.getHttpGenerator().get200();
+                    ret.setContent(header.toString(), "UTF-8");
                     return ret;
                 }
-                final HttpHeader ret = con.getHttpGenerator ().get200 ();
-                ret.setHeader ("Allow", "GET,HEAD,POST,OPTIONS,TRACE");
-                ret.setHeader ("Content-Length", "0");
+                final HttpHeader ret = con.getHttpGenerator().get200();
+                ret.setHeader("Allow", "GET,HEAD,POST,OPTIONS,TRACE");
+                ret.setHeader("Content-Length", "0");
                 return ret;
             }
-            final BigInteger b3 = bi.subtract (ONE);
-            header.setHeader ("Max-Forwards", b3.toString ());
+            final BigInteger b3 = bi.subtract(ONE);
+            header.setHeader("Max-Forwards", b3.toString());
         } catch (NumberFormatException e) {
-            logger.warning ("Bad number for Max-Forwards: '" + val + "'");
+            logger.warning("Bad number for Max-Forwards: '" + val + "'");
         }
         return null;
     }
 
     @Override
-    public HttpHeader doHttpInFiltering (final SocketChannel socket,
-                                         final HttpHeader header, final Connection con) {
+    public HttpHeader doHttpInFiltering(final SocketChannel socket,
+                                        final HttpHeader header, final Connection con) {
         // ok, no real header then don't do a thing.
-        if (header.isDot9Request ()) {
-            con.setKeepalive (false);
-            con.setChunking (false);
+        if (header.isDot9Request()) {
+            con.setKeepalive(false);
+            con.setChunking(false);
             return null;
         }
 
-        handleAuthentications (header, con);
+        handleAuthentications(header, con);
 
         boolean maychunk;
         boolean mayKeepAlive;
 
-        final String requestVersion = header.getHTTPVersion ().toUpperCase (Locale.US);
-        if (requestVersion.equals ("HTTP/1.1")) {
-            final String host = header.getHeader ("Host");
+        final String requestVersion = header.getHTTPVersion().toUpperCase(Locale.US);
+        if (requestVersion.equals("HTTP/1.1")) {
+            final String host = header.getHeader("Host");
             if (host == null) {
                 final Exception exe =
-                        new Exception ("No host header set in HTTP/1.1 request");
-                return con.getHttpGenerator ().get400 (exe);
+                        new Exception("No host header set in HTTP/1.1 request");
+                return con.getHttpGenerator().get400(exe);
             }
             maychunk = true;
-            String closeit = header.getHeader ("Proxy-Connection");
+            String closeit = header.getHeader("Proxy-Connection");
             if (closeit == null) {
                 closeit = header.getHeader("Connection");
             }
-            mayKeepAlive = (closeit == null
-                            || !closeit.equalsIgnoreCase ("close"));
+            mayKeepAlive = (closeit == null || !closeit.equalsIgnoreCase("close"));
         } else {
-            header.setHTTPVersion ("HTTP/1.1");
+            header.setHTTPVersion("HTTP/1.1");
             maychunk = false;
             // stupid netscape to not follow the standards,
             // only "Connection" should be used...
-            String keepalive = header.getHeader ("Proxy-Connection");
-            mayKeepAlive = (keepalive != null
-                            && keepalive.equalsIgnoreCase ("Keep-Alive"));
+            String keepalive = header.getHeader("Proxy-Connection");
+            mayKeepAlive = (keepalive != null && keepalive.equalsIgnoreCase("Keep-Alive"));
             if (!mayKeepAlive) {
-                keepalive = header.getHeader ("Connection");
-                mayKeepAlive = (keepalive != null
-                                && keepalive.equalsIgnoreCase ("Keep-Alive"));
+                keepalive = header.getHeader("Connection");
+                mayKeepAlive = (keepalive != null && keepalive.equalsIgnoreCase("Keep-Alive"));
             }
         }
 
-        final String method = header.getMethod ().trim ();
-        if (method.equals ("HEAD")) {
+        final String method = header.getMethod().trim();
+        if (method.equals("HEAD")) {
             maychunk = false;
         }
-        con.setChunking (maychunk);
+        con.setChunking(maychunk);
 
-        final String mf = header.getHeader ("Max-Forwards");
+        final String mf = header.getHeader("Max-Forwards");
         if (mf != null) {
-            final HttpHeader ret = checkMaxForwards (con, header, mf);
+            final HttpHeader ret = checkMaxForwards(con, header, mf);
             if (ret != null) {
                 return ret;
             }
         }
 
-        con.setKeepalive (mayKeepAlive);
+        con.setKeepalive(mayKeepAlive);
 
-        String requri = header.getRequestURI ();
-        if (requri.toLowerCase (Locale.US).startsWith (NOPROXY)) {
+        String requri = header.getRequestURI();
+        if (requri.toLowerCase(Locale.US).startsWith(NOPROXY)) {
             requri = handleNoProxyRequest(requri, header);
         }
 
-        final HttpHeader headerr = handleURLSetup (requri, header, con);
+        final HttpHeader headerr = handleURLSetup(requri, header, con);
         if (headerr != null) {
             return headerr;
         }
 
-        removeConnectionTokens (header);
+        removeConnectionTokens(header);
         for (String r : removes) {
-            header.removeHeader (r);
+            header.removeHeader(r);
         }
 
-        final ProxyChain proxyChain = con.getProxy ().getProxyChain ();
-        final Resolver resolver = proxyChain.getResolver (requri);
-        if (resolver.isProxyConnected ()) {
-            final String auth = resolver.getProxyAuthString ();
-            // it should look like this (using RabbIT:RabbIT):
+        final ProxyChain proxyChain = con.getProxy().getProxyChain();
+        final Resolver resolver = proxyChain.getResolver(requri);
+        if (resolver.isProxyConnected()) {
+            final String auth = resolver.getProxyAuthString();
+            // it should look like this(using RabbIT:RabbIT):
             // Proxy-authorization: Basic UmFiYklUOlJhYmJJVA==
-            header.setHeader ("Proxy-authorization",
-                              BASIC + " " + Base64.encode (auth));
+            header.setHeader("Proxy-authorization",
+                             BASIC + " " + Base64.encode(auth));
         }
 
         // try to use keepalive backwards.
         // This is not needed since it is a HTTP/1.1 request.
-        // header.setHeader ("Connection", "Keep-Alive");
+        // header.setHeader("Connection", "Keep-Alive");
 
         return null;
     }
 
-    private boolean checkCacheControl (final String cachecontrol) {
-        final String[] caches = cachecontrol.split (",");
+    private boolean checkCacheControl(final String cachecontrol) {
+        final String[] caches = cachecontrol.split(",");
         for (String cached : caches) {
-            cached = cached.trim ();
-            if (cached.equals ("no-store")) {
+            cached = cached.trim();
+            if (cached.equals("no-store")) {
                 return false;
             }
-            if (cached.equals ("private")) {
+            if (cached.equals("private")) {
                 return false;
             }
         }
@@ -328,30 +320,29 @@ public class HttpBaseFilter implements HttpFilter {
     }
 
     @Override
-    public HttpHeader doHttpOutFiltering (final SocketChannel socket,
-                                          final HttpHeader header, final Connection con) {
+    public HttpHeader doHttpOutFiltering(final SocketChannel socket,
+                                         final HttpHeader header, final Connection con) {
         boolean useCache = true;
-        //String cached = header.getHeader ("Pragma");
-        final List<String> ccs = header.getHeaders ("Cache-Control");
+        //String cached = header.getHeader("Pragma");
+        final List<String> ccs = header.getHeaders("Cache-Control");
         for (String cached : ccs) {
             if (cached != null) {
                 useCache &= checkCacheControl(cached);
             }
         }
 
-        final String status = header.getStatusCode ().trim ();
-        if (!(status.equals ("200") || status.equals ("206")
-              || status.equals ("304"))) {
-            con.setKeepalive (false);
+        final String status = header.getStatusCode().trim();
+        if (!(status.equals("200") || status.equals("206") || status.equals("304"))) {
+            con.setKeepalive(false);
         }
 
-        String age = header.getHeader ("Age");
+        String age = header.getHeader("Age");
         long secs = 0;
         if (age == null) {
             age = "0";
         }
         try {
-            secs = Long.parseLong (age);
+            secs = Long.parseLong(age);
         } catch (NumberFormatException e) {
             // ignore, we already have a warning for this..
         }
@@ -359,23 +350,23 @@ public class HttpBaseFilter implements HttpFilter {
             header.setHeader("Warning", "113 RabbIT \"Heuristic expiration\"");
         }
 
-        header.setResponseHTTPVersion ("HTTP/1.1");
+        header.setResponseHTTPVersion("HTTP/1.1");
 
-        removeConnectionTokens (header);
+        removeConnectionTokens(header);
         for (String r : removes) {
-            header.removeHeader (r);
+            header.removeHeader(r);
         }
 
-        final String d = header.getHeader ("Date");
+        final String d = header.getHeader("Date");
         if (d == null) {
             // ok, maybe we should check if there is an Age set
             // otherwise we can do like this.
-            header.setHeader ("Date",
-                              HttpDateParser.getDateString (new Date ()));
+            header.setHeader("Date",
+                             HttpDateParser.getDateString(new Date()));
         }
 
-        final String cl = header.getHeader ("Content-Length");
-        if (cl == null && !con.getChunking ()) {
+        final String cl = header.getHeader("Content-Length");
+        if (cl == null && !con.getChunking()) {
             con.setKeepalive(false);
         }
 
@@ -383,19 +374,19 @@ public class HttpBaseFilter implements HttpFilter {
     }
 
     @Override
-    public HttpHeader doConnectFiltering (final SocketChannel socket,
-                                          final HttpHeader header, final Connection con) {
+    public HttpHeader doConnectFiltering(final SocketChannel socket,
+                                         final HttpHeader header, final Connection con) {
         return null;
     }
 
     @Override
-    public void setup (final SProperties properties, final HttpProxy proxy) {
-        removes.clear ();
+    public void setup(final SProperties properties, final HttpProxy proxy) {
+        removes.clear();
         final String rs = "Connection,Proxy-Connection,Keep-Alive,Public,Transfer-Encoding,Upgrade," +
                           "Proxy-Authorization,TE,Proxy-Authenticate,Trailer";
-        final String[] sts = rs.split (",");
+        final String[] sts = rs.split(",");
         for (String r : sts) {
-            removes.add (r.trim ());
+            removes.add(r.trim());
         }
     }
 }

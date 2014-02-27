@@ -29,53 +29,53 @@ public class HttpHeaderSender implements BlockSentListener {
      *        been sent (or sending has failed
      * @throws IOException if the header can not be converted to network data
      */
-    public HttpHeaderSender (final SocketChannel channel, final NioHandler nioHandler,
-                             final TrafficLogger tl, final HttpHeader header,
-                             final boolean fullURI, final HttpHeaderSentListener sender)
+    public HttpHeaderSender(final SocketChannel channel, final NioHandler nioHandler,
+                            final TrafficLogger tl, final HttpHeader header,
+                            final boolean fullURI, final HttpHeaderSentListener sender)
             throws IOException {
         this.fullURI = fullURI;
         this.sender = sender;
-        final BufferHandle bh = new SimpleBufferHandle (getBuffer (header));
-        bs = new BlockSender (channel, nioHandler, tl, bh, false, this);
+        final BufferHandle bh = new SimpleBufferHandle(getBuffer(header));
+        bs = new BlockSender(channel, nioHandler, tl, bh, false, this);
     }
 
     /** Send the header
      */
-    public void sendHeader () {
-        bs.write ();
+    public void sendHeader() {
+        bs.write();
     }
 
-    private ByteBuffer getBuffer (final HttpHeader header) throws IOException {
-        final String uri = header.getRequestURI ();
+    private ByteBuffer getBuffer(final HttpHeader header) throws IOException {
+        final String uri = header.getRequestURI();
         try {
-            if (header.isRequest () && !header.isSecure () &&
-                !fullURI && uri.charAt (0) != '/') {
-                final URL url = new URL (uri);
-                String file = url.getFile ();
-                if (file.equals ("")) {
+            if (header.isRequest() && !header.isSecure() &&
+                !fullURI && uri.charAt(0) != '/') {
+                final URL url = new URL(uri);
+                String file = url.getFile();
+                if (file.equals("")) {
                     file = "/";
                 }
-                header.setRequestURI (file);
+                header.setRequestURI(file);
             }
-            final byte[] bytes = header.getBytes ();
-            return ByteBuffer.wrap (bytes);
+            final byte[] bytes = header.getBytes();
+            return ByteBuffer.wrap(bytes);
         } finally {
-            header.setRequestURI (uri);
+            header.setRequestURI(uri);
         }
     }
 
     @Override
-    public void timeout () {
-        sender.timeout ();
+    public void timeout() {
+        sender.timeout();
     }
 
     @Override
-    public void failed (final Exception cause) {
-        sender.failed (cause);
+    public void failed(final Exception cause) {
+        sender.failed(cause);
     }
 
     @Override
-    public void blockSent () {
-        sender.httpHeaderSent ();
+    public void blockSent() {
+        sender.httpHeaderSent();
     }
 }

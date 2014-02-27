@@ -33,146 +33,146 @@ public class HttpHeaderReader extends BaseSocketHandler
      * @param nioHandler the NioHandler to use to wait for more data
      * @param tl the TrafficLogger to update with network read Statistics
      * @param request true if a request is read, false if a response is read.
-     *                Servers may respond without header (HTTP/0.9) so try to 
+     *                Servers may respond without header (HTTP/0.9) so try to
      *                handle that.
      * @param strictHttp if true http headers will be strictly parsed, if false
      *                   http newlines may be single \n
      * @param reader the listener for http headers
      */
-    public HttpHeaderReader (final SocketChannel channel, final BufferHandle bh,
-                             final NioHandler nioHandler, final TrafficLogger tl,
-                             final boolean request, final boolean strictHttp,
-                             final HttpHeaderListener reader) {
-        super (channel, bh, nioHandler);
+    public HttpHeaderReader(final SocketChannel channel, final BufferHandle bh,
+                            final NioHandler nioHandler, final TrafficLogger tl,
+                            final boolean request, final boolean strictHttp,
+                            final HttpHeaderListener reader) {
+        super(channel, bh, nioHandler);
         this.tl = tl;
-        headerParser = new HttpHeaderParser (request, strictHttp);
+        headerParser = new HttpHeaderParser(request, strictHttp);
         this.reader = reader;
     }
 
     /** Try to read a http header
      * @throws IOException if a header can not be parsed
      */
-    public void readHeader () throws IOException {
-        if (!getBufferHandle ().isEmpty ()) {
-            final ByteBuffer buffer = getBuffer ();
-            startParseAt = buffer.position ();
-            parseBuffer (buffer);
+    public void readHeader() throws IOException {
+        if (!getBufferHandle().isEmpty()) {
+            final ByteBuffer buffer = getBuffer();
+            startParseAt = buffer.position();
+            parseBuffer(buffer);
         } else {
-            releaseBuffer ();
-            waitForRead (this);
+            releaseBuffer();
+            waitForRead(this);
         }
     }
 
-    @Override public String getDescription () {
-        final HttpHeader header = headerParser.getHeader ();
-        return "HttpHeaderReader: channel: " + getChannel () +
+    @Override public String getDescription() {
+        final HttpHeader header = headerParser.getHeader();
+        return "HttpHeaderReader: channel: " + getChannel() +
                ", current header lines: " +
-               (header == null ? 0 : header.size ());
+               (header == null ? 0 : header.size());
     }
 
-    @Override public void closed () {
-        releaseBuffer ();
-        reader.closed ();
+    @Override public void closed() {
+        releaseBuffer();
+        reader.closed();
     }
 
-    @Override public void timeout () {
+    @Override public void timeout() {
         // If buffer exists it only holds a partial http header.
         // We relase the buffer and discard that partial header.
-        releaseBuffer ();
-        reader.timeout ();
+        releaseBuffer();
+        reader.timeout();
     }
 
     @Override
-    public void read () {
-        logger.finest ("HttpHeaderReader reading data");
+    public void read() {
+        logger.finest("HttpHeaderReader reading data");
         try {
             // read http request
             // make sure we have room for reading.
-            final ByteBuffer buffer = getBuffer ();
-            final int pos = buffer.position ();
-            buffer.limit (buffer.capacity ());
-            final int read = getChannel ().read (buffer);
+            final ByteBuffer buffer = getBuffer();
+            final int pos = buffer.position();
+            buffer.limit(buffer.capacity());
+            final int read = getChannel().read(buffer);
             if (read == -1) {
-                buffer.position (buffer.limit ());
-                closeDown ();
-                reader.closed ();
+                buffer.position(buffer.limit());
+                closeDown();
+                reader.closed();
                 return;
             }
             if (read == 0) {
-                closeDown ();
-                reader.failed (new IOException ("read 0 bytes, shutting " +
-                                                "down connection"));
+                closeDown();
+                reader.failed(new IOException("read 0 bytes, shutting " +
+                                              "down connection"));
                 return;
             }
-            tl.read (read);
-            buffer.position (startParseAt);
-            buffer.limit (read + pos);
-            parseBuffer (buffer);
+            tl.read(read);
+            buffer.position(startParseAt);
+            buffer.limit(read + pos);
+            parseBuffer(buffer);
         } catch (BadHttpHeaderException | IOException e) {
-            closeDown ();
-            reader.failed (e);
+            closeDown();
+            reader.failed(e);
         }
     }
 
-    private void parseBuffer (ByteBuffer buffer) throws IOException {
-        buffer.mark ();
-        final boolean done = headerParser.handleBuffer (buffer);
-        if (logger.isLoggable (Level.FINEST)) {
+    private void parseBuffer(ByteBuffer buffer) throws IOException {
+        buffer.mark();
+        final boolean done = headerParser.handleBuffer(buffer);
+        if (logger.isLoggable(Level.FINEST)) {
             logger.finest("HttpHeaderReader.parseBuffer: done " + done);
         }
         if (!done) {
-            buffer.reset ();
-            if (buffer.position () > 0) {
+            buffer.reset();
+            if (buffer.position() > 0) {
                 // ok, some data handled, make space for more.
-                buffer.compact ();
+                buffer.compact();
                 startParseAt = 0;
             } else {
                 // ok, we did not make any progress, did we only read
                 // a partial long line (cookie or whatever).
-                if (buffer.limit () >= buffer.capacity ()) {
-                    releaseBuffer ();
+                if (buffer.limit() >= buffer.capacity()) {
+                    releaseBuffer();
                     // ok, we did no progress, abort, client is sending
                     // too long lines.
-                    throw new RequestLineTooLongException ();
+                    throw new RequestLineTooLongException();
                 }
             }
-            waitForRead (this);
+            waitForRead(this);
         } else {
-            final HttpHeader header = headerParser.getHeader ();
-            setState (header);
-            releaseBuffer ();
-            reader.httpHeaderRead (header, getBufferHandle (),
-                                   keepalive, ischunked, dataSize);
+            final HttpHeader header = headerParser.getHeader();
+            setState(header);
+            releaseBuffer();
+            reader.httpHeaderRead(header, getBufferHandle(),
+                                  keepalive, ischunked, dataSize);
         }
     }
 
-    private void setState (final HttpHeader header) {
+    private void setState(final HttpHeader header) {
         dataSize = -1;
-        final String cl = header.getHeader ("Content-Length");
+        final String cl = header.getHeader("Content-Length");
         if (cl != null) {
             try {
-                dataSize = Long.parseLong (cl);
+                dataSize = Long.parseLong(cl);
             } catch (NumberFormatException e) {
                 dataSize = -1;
             }
         }
-        final String con = header.getHeader ("Connection");
+        final String con = header.getHeader("Connection");
         // Netscape specific header...
-        final String pcon = header.getHeader ("Proxy-Connection");
-        if (con != null && con.equalsIgnoreCase ("close")) {
+        final String pcon = header.getHeader("Proxy-Connection");
+        if (con != null && con.equalsIgnoreCase("close")) {
             setKeepAlive(false);
         }
-        if (keepalive && pcon != null && pcon.equalsIgnoreCase ("close")) {
+        if (keepalive && pcon != null && pcon.equalsIgnoreCase("close")) {
             setKeepAlive(false);
         }
 
-        if (header.isResponse ()) {
-            if (header.getResponseHTTPVersion ().equals ("HTTP/1.1")) {
-                final String chunked = header.getHeader ("Transfer-Encoding");
-                setKeepAlive (true);
+        if (header.isResponse()) {
+            if (header.getResponseHTTPVersion().equals("HTTP/1.1")) {
+                final String chunked = header.getHeader("Transfer-Encoding");
+                setKeepAlive(true);
                 ischunked = false;
 
-                if (chunked != null && chunked.equalsIgnoreCase ("chunked")) {
+                if (chunked != null && chunked.equalsIgnoreCase("chunked")) {
             /* If we handle chunked data we must read the whole page
              * before continuing, since the chunk footer must be
              * appended to the header (read the RFC)...
@@ -181,29 +181,29 @@ public class HttpHeaderReader extends BaseSocketHandler
              * this means that we throw away footers and it is legal.
              */
                     ischunked = true;
-                    header.removeHeader ("Content-Length");
+                    header.removeHeader("Content-Length");
                     dataSize = -1;
                 }
             } else {
-                setKeepAlive (false);
+                setKeepAlive(false);
             }
 
             if (!(dataSize > -1 || ischunked)) {
                 setKeepAlive(false);
             }
         } else {
-            final String httpVersion = header.getHTTPVersion ();
+            final String httpVersion = header.getHTTPVersion();
             if (httpVersion != null) {
-                if (httpVersion.equals ("HTTP/1.1")) {
-                    final String chunked = header.getHeader ("Transfer-Encoding");
-                    if (chunked != null && chunked.equalsIgnoreCase ("chunked")) {
+                if (httpVersion.equals("HTTP/1.1")) {
+                    final String chunked = header.getHeader("Transfer-Encoding");
+                    if (chunked != null && chunked.equalsIgnoreCase("chunked")) {
                         ischunked = true;
-                        header.removeHeader ("Content-Length");
+                        header.removeHeader("Content-Length");
                         dataSize = -1;
                     }
-                } else if (httpVersion.equals ("HTTP/1.0")) {
-                    final String ka = header.getHeader ("Connection");
-                    if (ka == null || !ka.equalsIgnoreCase ("Keep-Alive")) {
+                } else if (httpVersion.equals("HTTP/1.0")) {
+                    final String ka = header.getHeader("Connection");
+                    if (ka == null || !ka.equalsIgnoreCase("Keep-Alive")) {
                         setKeepAlive(false);
                     }
                 }
@@ -214,7 +214,7 @@ public class HttpHeaderReader extends BaseSocketHandler
     /** Set the keep alive value to currentkeepalive & keepalive
      * @param keepalive the new keepalive value.
      */
-    private void setKeepAlive (final boolean keepalive) {
+    private void setKeepAlive(final boolean keepalive) {
         this.keepalive = (this.keepalive && keepalive);
     }
 }

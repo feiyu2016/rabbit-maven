@@ -16,32 +16,32 @@ import rabbit.rnio.impl.AcceptorListener;
 public class ProxyConnectionAcceptor implements AcceptorListener {
     private final int id;
     private final HttpProxy proxy;
-    private static final Logger logger = Logger.getLogger (ProxyConnectionAcceptor.class.getName ());
-    private final AtomicLong counter = new AtomicLong ();
+    private static final Logger logger = Logger.getLogger(ProxyConnectionAcceptor.class.getName());
+    private final AtomicLong counter = new AtomicLong();
 
     /** Create a new ProxyConnectionAcceptor.
      * @param id the connection group id
      * @param proxy the HttpProxy to accept connections for
      */
-    public ProxyConnectionAcceptor (final int id, final HttpProxy proxy) {
-        logger.fine ("ProxyConnectionAcceptor created: " + id);
+    public ProxyConnectionAcceptor(final int id, final HttpProxy proxy) {
+        logger.fine("ProxyConnectionAcceptor created: " + id);
         this.id = id;
         this.proxy = proxy;
     }
 
     @Override
-    public void connectionAccepted (final SocketChannel sc)
+    public void connectionAccepted(final SocketChannel sc)
             throws IOException {
-        proxy.getCounter ().inc ("Socket accepts");
-        if (logger.isLoggable (Level.FINE)) {
+        proxy.getCounter().inc("Socket accepts");
+        if (logger.isLoggable(Level.FINE)) {
             logger.fine("Accepted connection from: " + sc);
         }
-        final BufferHandler bh = proxy.getBufferHandler ();
-        final Connection c = new Connection (getId (), sc, proxy, bh);
-        c.readRequest ();
+        final BufferHandler bh = proxy.getBufferHandler();
+        final Connection c = new Connection(getId(), sc, proxy, bh);
+        c.readRequest();
     }
 
-    private ConnectionId getId () {
-        return new ConnectionId (id, counter.incrementAndGet ());
+    private ConnectionId getId() {
+        return new ConnectionId(id, counter.incrementAndGet());
     }
 }

@@ -8,5 +8,5 @@ public interface LineListener {
     /** Event sent when a line of text have been read.
      * @param line the line of text that have been read.
      */
-    void lineRead (String line);
+    void lineRead(String line);
 }

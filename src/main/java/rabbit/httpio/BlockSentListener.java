@@ -6,5 +6,5 @@ package rabbit.httpio;
  */
 public interface BlockSentListener extends AsyncListener {
     /** The http header has been sent. */
-    void blockSent ();
+    void blockSent();
 }

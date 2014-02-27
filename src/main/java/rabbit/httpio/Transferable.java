@@ -12,7 +12,7 @@ public interface Transferable {
     /** Get the length of the resource in bytes. 
      * @return the size of the resource or -1 if unknown.
      */
-    long length ();
+    long length();
 
     /** Transfers bytes from this channel's file to the given 
      *  writable byte channel.
@@ -30,6 +30,6 @@ public interface Transferable {
      *         transferred
      * @throws IOException if data transfer fails
      */
-    long transferTo (long position, long count, WritableByteChannel target)
+    long transferTo(long position, long count, WritableByteChannel target)
             throws IOException;
 }

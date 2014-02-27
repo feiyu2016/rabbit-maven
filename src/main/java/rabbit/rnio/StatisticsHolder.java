@@ -14,44 +14,44 @@ public interface StatisticsHolder {
     /** A new task is put in the queue, waiting to be handled.
      * @param ti the identifier of the new task.
      */
-    void addPendingTask (TaskIdentifier ti);
+    void addPendingTask(TaskIdentifier ti);
 
     /** A pending task is about to be run.
      * @param ti the identifier of the task that will start to run.
      */
-    void changeTaskStatusToRunning (TaskIdentifier ti);
+    void changeTaskStatusToRunning(TaskIdentifier ti);
 
     /** A task has been completed.
      * @param ti the identifier of the task that has completed.
      * @param wasOk true if the task completed without errors, false otherwise.
      * @param timeSpent wall clock time spent on the task.
      */
-    void changeTaskStatusToFinished (TaskIdentifier ti,
-                                     boolean wasOk,
-                                     long timeSpent);
+    void changeTaskStatusToFinished(TaskIdentifier ti,
+                                    boolean wasOk,
+                                    long timeSpent);
 
     /** Get information about the currently pending tasks.
      * @return a mapping from group ids to the task identifiers
      */
-    Map<String, List<TaskIdentifier>> getPendingTasks ();
+    Map<String, List<TaskIdentifier>> getPendingTasks();
 
     /** Get information about the currently running tasks.
      * @return a mapping from group ids to the task identifiers
      */
-    Map<String, List<TaskIdentifier>> getRunningTasks ();
+    Map<String, List<TaskIdentifier>> getRunningTasks();
 
     /** Get information about the most recent completed tasks
      * @return a mapping from group ids to the task identifiers
      */
-    Map<String, List<CompletionEntry>> getLatest ();
+    Map<String, List<CompletionEntry>> getLatest();
 
     /** Get information about the longest running task.
      * @return a mapping from group ids to the task identifiers
      */
-    Map<String, List<CompletionEntry>> getLongest ();
+    Map<String, List<CompletionEntry>> getLongest();
 
     /** Get the total time spent for each task.
      * @return a mapping from group ids to the task identifiers
      */
-    Map<String, TotalTimeSpent> getTotalTimeSpent ();
+    Map<String, TotalTimeSpent> getTotalTimeSpent();
 }

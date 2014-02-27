@@ -13,5 +13,5 @@ public interface ProxyChain {
      * @param url the address to connect to.
      * @return the Resolver to use
      */
-    Resolver getResolver (String url);
+    Resolver getResolver(String url);
 }

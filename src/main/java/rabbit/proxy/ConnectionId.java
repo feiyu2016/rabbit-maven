@@ -12,12 +12,12 @@ public class ConnectionId {
      * @param group the grup id
      * @param id the id in the group
      */
-    public ConnectionId (final int group, final long id) {
+    public ConnectionId(final int group, final long id) {
         this.group = group;
         this.id = id;
     }
 
-    @Override public String toString () {
+    @Override public String toString() {
         return "[" + group + ", " + id + "]";
     }
 }

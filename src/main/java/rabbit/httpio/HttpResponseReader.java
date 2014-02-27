@@ -38,11 +38,11 @@ public class HttpResponseReader
      *        been read.
      * @throws IOException if the request can not be sent
      */
-    public HttpResponseReader (final SocketChannel channel, final NioHandler nioHandler,
-                               final TrafficLogger tl, final BufferHandler bufHandler,
-                               final HttpHeader header, final boolean fullURI,
-                               final boolean strictHttp,
-                               final HttpResponseListener listener)
+    public HttpResponseReader(final SocketChannel channel, final NioHandler nioHandler,
+                              final TrafficLogger tl, final BufferHandler bufHandler,
+                              final HttpHeader header, final boolean fullURI,
+                              final boolean strictHttp,
+                              final HttpResponseListener listener)
             throws IOException {
         this.channel = channel;
         this.nioHandler = nioHandler;
@@ -50,48 +50,48 @@ public class HttpResponseReader
         this.bufHandler = bufHandler;
         this.strictHttp = strictHttp;
         this.listener = listener;
-        sender = new HttpHeaderSender (channel, nioHandler, tl,
-                                       header, fullURI, this);
+        sender = new HttpHeaderSender(channel, nioHandler, tl,
+                                      header, fullURI, this);
     }
 
     /** Start the process of sending the header and reading the response.
      */
-    public void sendRequestAndWaitForResponse () {
-        sender.sendHeader ();
+    public void sendRequestAndWaitForResponse() {
+        sender.sendHeader();
     }
 
     @Override
-    public void httpHeaderSent () {
+    public void httpHeaderSent() {
         try {
-            final BufferHandle bh = new CacheBufferHandle (bufHandler);
+            final BufferHandle bh = new CacheBufferHandle(bufHandler);
             final HttpHeaderReader reader =
-                    new HttpHeaderReader (channel, bh, nioHandler,
-                                          tl, false, strictHttp, this);
-            reader.readHeader ();
+                    new HttpHeaderReader(channel, bh, nioHandler,
+                                         tl, false, strictHttp, this);
+            reader.readHeader();
         } catch (IOException e) {
-            failed (e);
+            failed(e);
         }
     }
 
     @Override
-    public void httpHeaderRead (final HttpHeader header, final BufferHandle bh,
-                                final boolean keepalive, final boolean isChunked,
-                                final long dataSize) {
-        listener.httpResponse (header, bh, keepalive, isChunked, dataSize);
+    public void httpHeaderRead(final HttpHeader header, final BufferHandle bh,
+                               final boolean keepalive, final boolean isChunked,
+                               final long dataSize) {
+        listener.httpResponse(header, bh, keepalive, isChunked, dataSize);
     }
 
     @Override
-    public void closed () {
-        listener.failed (new IOException ("Connection closed"));
+    public void closed() {
+        listener.failed(new IOException("Connection closed"));
     }
 
     @Override
-    public void failed (final Exception cause) {
-        listener.failed (cause);
+    public void failed(final Exception cause) {
+        listener.failed(cause);
     }
 
     @Override
-    public void timeout () {
-        listener.timeout ();
+    public void timeout() {
+        listener.timeout();
     }
 }

@@ -17,16 +17,16 @@ public class Closer {
      * @param c the object to close
      * @param logger the Logger to use if the close fails
      */
-    public static void close (final Closeable c, final Logger logger) {
+    public static void close(final Closeable c, final Logger logger) {
         if (c == null) {
             return;
         }
         try {
-            c.close ();
+            c.close();
         } catch (IOException e) {
-            logger.log (Level.WARNING,
-                        "Failed to close connection: " + c,
-                        e);
+            logger.log(Level.WARNING,
+                       "Failed to close connection: " + c,
+                       e);
         }
     }
 }

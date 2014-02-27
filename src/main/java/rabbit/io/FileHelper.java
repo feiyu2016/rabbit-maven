@@ -13,11 +13,11 @@ public class FileHelper {
      * @throws NullPointerException if toDelete is null
      * @throws IOException if file deletion failed
      */
-    public static void delete (final File toDelete) throws IOException {
+    public static void delete(final File toDelete) throws IOException {
         if (toDelete == null) {
             throw new NullPointerException("Can not delete null file");
         }
-        final boolean ok = toDelete.delete ();
+        final boolean ok = toDelete.delete();
         if (!ok) {
             throw new IOException("Failed to delete file: " +
                                   toDelete.getAbsolutePath());
@@ -29,11 +29,11 @@ public class FileHelper {
      * @param newDir the directory to create
      * @throws IOException if directory could not be created
      */
-    public static void mkdirs (final File newDir) throws IOException {
+    public static void mkdirs(final File newDir) throws IOException {
         if (newDir == null) {
             throw new NullPointerException("can not create null directory");
         }
-        final boolean ok = newDir.mkdirs ();
+        final boolean ok = newDir.mkdirs();
         if (!ok) {
             throw new IOException("Failed to create directory: " +
                                   newDir.getAbsolutePath());

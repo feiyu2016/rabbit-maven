@@ -10,9 +10,9 @@ public interface SelectorVisitor {
     /** Visit one selector.
      * @param selector one of the Selector:s handled by the NioHandler
      */
-    void selector (Selector selector);
+    void selector(Selector selector);
 
     /** Indicates that all selectors have been visited
      */
-    void  end ();
+    void  end();
 }

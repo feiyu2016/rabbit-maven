@@ -6,5 +6,5 @@ package rabbit.httpio;
  */
 public interface HttpHeaderSentListener extends AsyncListener {
     /** The http header has been sent. */
-    void httpHeaderSent ();
+    void httpHeaderSent();
 }

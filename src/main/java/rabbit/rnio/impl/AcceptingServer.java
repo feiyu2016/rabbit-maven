@@ -33,42 +33,42 @@ public class AcceptingServer {
      * @param defaultTimeout the default timeout value for the NioHandler
      * @throws IOException if network setup fails
      */
-    public AcceptingServer (final InetAddress addr,
-                            final int port,
-                            final AcceptorListener listener,
-                            final ExecutorService es,
-                            final int selectorThreads,
-                            final Long defaultTimeout)
+    public AcceptingServer(final InetAddress addr,
+                           final int port,
+                           final AcceptorListener listener,
+                           final ExecutorService es,
+                           final int selectorThreads,
+                           final Long defaultTimeout)
             throws IOException {
-        ssc = ServerSocketChannel.open ();
-        ssc.configureBlocking (false);
-        final ServerSocket ss = ssc.socket ();
-        ss.bind (new InetSocketAddress (addr, port));
+        ssc = ServerSocketChannel.open();
+        ssc.configureBlocking(false);
+        final ServerSocket ss = ssc.socket();
+        ss.bind(new InetSocketAddress(addr, port));
         this.listener = listener;
-        final StatisticsHolder stats = new BasicStatisticsHolder ();
+        final StatisticsHolder stats = new BasicStatisticsHolder();
         nioHandler =
-                new MultiSelectorNioHandler (es, stats, selectorThreads,
-                                             defaultTimeout);
+                new MultiSelectorNioHandler(es, stats, selectorThreads,
+                                            defaultTimeout);
     }
 
     /** Start the NioHandler and register to accept new socket connections.
      */
-    public void start () {
-        nioHandler.start (new SimpleThreadFactory ());
-        final Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
-        acceptor.register ();
+    public void start() {
+        nioHandler.start(new SimpleThreadFactory());
+        final Acceptor acceptor = new Acceptor(ssc, nioHandler, listener);
+        acceptor.register();
     }
 
     /** Shutdown the NioHandler.
      */
-    public void shutdown () {
-        nioHandler.shutdown ();
+    public void shutdown() {
+        nioHandler.shutdown();
     }
 
     /** Get the NioHandler in use by this server.
      * @return the NioHandler used by this server
      */
-    public NioHandler getNioHandler () {
+    public NioHandler getNioHandler() {
         return nioHandler;
     }
 }

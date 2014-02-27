@@ -19,9 +19,9 @@ public final class CompletionEntry {
      * @param wasOk true if the task completed without errors, false otherwise
      * @param timeSpent the wall clock time for the task
      */
-    public CompletionEntry (final TaskIdentifier ti,
-                            final boolean wasOk,
-                            final long timeSpent) {
+    public CompletionEntry(final TaskIdentifier ti,
+                           final boolean wasOk,
+                           final long timeSpent) {
         this.ti = ti;
         this.wasOk = wasOk;
         this.timeSpent = timeSpent;

@@ -10,10 +10,10 @@ public interface InetAddressListener {
     /** An dns lookup has completed.
      * @param ia the InetAddress requested.
      */
-    void lookupDone (InetAddress ia);
+    void lookupDone(InetAddress ia);
 
     /** Lookup failed.
      * @param e the cause of the problem
      */
-    void unknownHost (Exception e);
+    void unknownHost(Exception e);
 }

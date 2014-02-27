@@ -24,26 +24,26 @@ public class WebConnection implements Closeable {
     private SocketChannel channel;
     private long releasedAt = -1;
     private boolean keepalive = true;
-    private static final Logger logger = Logger.getLogger (WebConnection.class.getName ());
+    private static final Logger logger = Logger.getLogger(WebConnection.class.getName());
 
-    private static final AtomicInteger idCounter = new AtomicInteger (0);
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
 
     /** Create a new WebConnection to the given InetAddress and port.
      * @param address the computer to connect to.
      * @param binder the SocketBinder to use when creating the network socket
      * @param counter the Counter to used to collect statistics
      */
-    public WebConnection (final Address address, final SocketBinder binder,
-                          final Counter counter) {
-        this.id = idCounter.getAndIncrement ();
+    public WebConnection(final Address address, final SocketBinder binder,
+                         final Counter counter) {
+        this.id = idCounter.getAndIncrement();
         this.address = address;
         this.binder = binder;
         this.counter = counter;
-        counter.inc ("WebConnections created");
+        counter.inc("WebConnections created");
     }
 
-    @Override public String toString () {
-        final int port = channel != null ? channel.socket ().getLocalPort () : -1;
+    @Override public String toString() {
+        final int port = channel != null ? channel.socket().getLocalPort() : -1;
         return "WebConnection(id: " + id +
                ", address: "  + address +
                ", keepalive: " + keepalive +
@@ -54,21 +54,21 @@ public class WebConnection implements Closeable {
     /** Get the address that this connection is connected to
      * @return the network address that the underlying socket is connected to
      */
-    public Address getAddress () {
+    public Address getAddress() {
         return address;
     }
 
     /** Get the actual SocketChannel that is used
      * @return the network channel
      */
-    public SocketChannel getChannel () {
+    public SocketChannel getChannel() {
         return channel;
     }
 
     @Override
-    public void close () throws IOException {
-        counter.inc ("WebConnections closed");
-        channel.close ();
+    public void close() throws IOException {
+        counter.inc("WebConnections closed");
+        channel.close();
     }
 
     /** Try to establish the network connection.
@@ -77,25 +77,25 @@ public class WebConnection implements Closeable {
      *        has been extablished.
      * @throws IOException if the network operations fail
      */
-    public void connect (final NioHandler nioHandler, final WebConnectionListener wcl)
+    public void connect(final NioHandler nioHandler, final WebConnectionListener wcl)
             throws IOException {
         // if we are a keepalive connection then just say so..
-        if (channel != null && channel.isConnected ()) {
-            wcl.connectionEstablished (this);
+        if (channel != null && channel.isConnected()) {
+            wcl.connectionEstablished(this);
         } else {
             // ok, open the connection....
-            channel = SocketChannel.open ();
-            channel.socket ().bind (new InetSocketAddress (binder.getInetAddress (),
-                                                           binder.getPort ()));
-            channel.configureBlocking (false);
+            channel = SocketChannel.open();
+            channel.socket().bind(new InetSocketAddress(binder.getInetAddress(),
+                                                        binder.getPort()));
+            channel.configureBlocking(false);
             final SocketAddress addr =
-                    new InetSocketAddress (address.getInetAddress (),
-                                           address.getPort ());
-            final boolean connected = channel.connect (addr);
+                    new InetSocketAddress(address.getInetAddress(),
+                                          address.getPort());
+            final boolean connected = channel.connect(addr);
             if (connected) {
-                wcl.connectionEstablished (this);
+                wcl.connectionEstablished(this);
             } else {
-                new ConnectListener (wcl).waitForConnection (nioHandler);
+                new ConnectListener(wcl).waitForConnection(nioHandler);
             }
         }
     }
@@ -105,67 +105,67 @@ public class WebConnection implements Closeable {
         private final WebConnectionListener wcl;
         private Long timeout;
 
-        public ConnectListener (final WebConnectionListener wcl) {
+        public ConnectListener(final WebConnectionListener wcl) {
             this.wcl = wcl;
         }
 
-        public void waitForConnection (final NioHandler nioHandler) {
+        public void waitForConnection(final NioHandler nioHandler) {
             this.nioHandler = nioHandler;
-            timeout = nioHandler.getDefaultTimeout ();
-            nioHandler.waitForConnect (channel, this);
+            timeout = nioHandler.getDefaultTimeout();
+            nioHandler.waitForConnect(channel, this);
         }
 
         @Override
-        public void closed () {
-            wcl.failed (new IOException ("channel closed before connect"));
+        public void closed() {
+            wcl.failed(new IOException("channel closed before connect"));
         }
 
         @Override
-        public void timeout () {
-            closeDown ();
-            wcl.timeout ();
+        public void timeout() {
+            closeDown();
+            wcl.timeout();
         }
 
         @Override
-        public boolean useSeparateThread () {
+        public boolean useSeparateThread() {
             return false;
         }
 
         @Override
-        public String getDescription () {
+        public String getDescription() {
             return "WebConnection$ConnectListener: address: " + address;
         }
 
         @Override
-        public Long getTimeout () {
+        public Long getTimeout() {
             return timeout;
         }
 
         @Override
-        public void connect () {
+        public void connect() {
             try {
-                channel.finishConnect ();
-                wcl.connectionEstablished (WebConnection.this);
+                channel.finishConnect();
+                wcl.connectionEstablished(WebConnection.this);
             } catch (IOException e) {
-                closeDown ();
-                wcl.failed (e);
+                closeDown();
+                wcl.failed(e);
             }
         }
 
-        private void closeDown () {
+        private void closeDown() {
             try {
-                close ();
-                nioHandler.close (channel);
+                close();
+                nioHandler.close(channel);
             } catch (IOException e) {
-                logger.log (Level.WARNING,
-                            "Failed to close down WebConnection",
-                            e);
+                logger.log(Level.WARNING,
+                           "Failed to close down WebConnection",
+                           e);
             }
         }
 
-        @Override public String toString () {
-            return getClass ().getSimpleName () + "{" + address + "}@" +
-                   Integer.toString (hashCode (), 16);
+        @Override public String toString() {
+            return getClass().getSimpleName() + "{" + address + "}@" +
+                   Integer.toString(hashCode(), 16);
         }
     }
 
@@ -173,27 +173,27 @@ public class WebConnection implements Closeable {
      *  Can only be turned off.
      * @param b the new keepalive value.
      */
-    public void setKeepalive (final boolean b) {
+    public void setKeepalive(final boolean b) {
         keepalive &= b;
     }
 
     /** Get the keepalive value of this WebConnection.
      * @return true if this WebConnection may be reused.
      */
-    public boolean getKeepalive () {
+    public boolean getKeepalive() {
         return keepalive;
     }
 
     /** Mark this WebConnection as released at current time.
      */
-    public void setReleased () {
-        releasedAt = System.currentTimeMillis ();
+    public void setReleased() {
+        releasedAt = System.currentTimeMillis();
     }
 
     /** Get the time that this WebConnection was released.
      * @return the time this WebConnection was last released.
      */
-    public long getReleasedAt () {
+    public long getReleasedAt() {
         return releasedAt;
     }
 }

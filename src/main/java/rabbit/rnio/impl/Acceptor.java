@@ -21,36 +21,36 @@ public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
      * @param nioHandler the NioHandler to use for waiting
      * @param listener the listener waiting for connections
      */
-    public Acceptor (final ServerSocketChannel ssc,
-                     final NioHandler nioHandler,
-                     final AcceptorListener listener) {
-        super (ssc, nioHandler, null);
+    public Acceptor(final ServerSocketChannel ssc,
+                    final NioHandler nioHandler,
+                    final AcceptorListener listener) {
+        super(ssc, nioHandler, null);
         this.listener = listener;
     }
 
     /** Returns the class name and the channel we are using.
      */
-    @Override public String getDescription () {
-        return getClass ().getSimpleName () + ": channel: " + sc;
+    @Override public String getDescription() {
+        return getClass().getSimpleName() + ": channel: " + sc;
     }
 
     /** Accept a SocketChannel.
      */
     @Override
-    public void accept () {
+    public void accept() {
         try {
-            final SocketChannel s = sc.accept ();
-            s.configureBlocking (false);
-            listener.connectionAccepted (s);
-            register ();
+            final SocketChannel s = sc.accept();
+            s.configureBlocking(false);
+            listener.connectionAccepted(s);
+            register();
         } catch (IOException e) {
-            throw new RuntimeException ("Got some IOException", e);
+            throw new RuntimeException("Got some IOException", e);
         }
     }
 
     /** Register OP_ACCEPT with the selector. 
      */
-    public void register () {
-        nioHandler.waitForAccept (sc, this);
+    public void register() {
+        nioHandler.waitForAccept(sc, this);
     }
 }

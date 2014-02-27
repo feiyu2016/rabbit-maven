@@ -9,12 +9,12 @@ import rabbit.util.SProperties;
  */
 public class StandardHttpGeneratorFactory implements HttpGeneratorFactory {
     @Override
-    public HttpGenerator create (final String identity, final Connection con) {
-        return new StandardResponseHeaders (identity, con);
+    public HttpGenerator create(final String identity, final Connection con) {
+        return new StandardResponseHeaders(identity, con);
     }
 
     @Override
-    public void setup (final SProperties props) {
+    public void setup(final SProperties props) {
         // nothing to do
     }
 }

@@ -11,10 +11,10 @@ public interface ClientResourceTransferredListener extends AsyncListener {
 
     /** The client resource have been successfully transferred.
      */
-    void clientResourceTransferred ();
+    void clientResourceTransferred();
 
     /** The transfer of the client resource has been aborted.
      * @param error the failure code. 
      */
-    void clientResourceAborted (HttpHeader error);
+    void clientResourceAborted(HttpHeader error);
 }

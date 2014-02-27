@@ -30,7 +30,7 @@ public class FileResourceSource implements ResourceSource {
     private NioHandler nioHandler;
     protected BufferHandle bufHandle;
 
-    private static final Logger logger = Logger.getLogger (FileResourceSource.class.getName ());
+    private static final Logger logger = Logger.getLogger(FileResourceSource.class.getName());
 
     /** Create a new FileResourceSource using the given filename
      * @param filename the file for this resource
@@ -38,10 +38,10 @@ public class FileResourceSource implements ResourceSource {
      * @param bufHandler the BufferHandler to use when reading and writing
      * @throws IOException if the file is a valid file
      */
-    public FileResourceSource (final String filename, final NioHandler nioHandler,
-                               final BufferHandler bufHandler)
+    public FileResourceSource(final String filename, final NioHandler nioHandler,
+                              final BufferHandler bufHandler)
             throws IOException {
-        this (new File (filename), nioHandler, bufHandler);
+        this(new File(filename), nioHandler, bufHandler);
     }
 
     /** Create a new FileResourceSource using the given filename
@@ -50,35 +50,35 @@ public class FileResourceSource implements ResourceSource {
      * @param bufHandler the BufferHandler to use when reading and writing
      * @throws IOException if the file is a valid file
      */
-    public FileResourceSource (final File f, final NioHandler nioHandler,
-                               final BufferHandler bufHandler)
+    public FileResourceSource(final File f, final NioHandler nioHandler,
+                              final BufferHandler bufHandler)
             throws IOException {
-        if (!f.exists ()) {
+        if (!f.exists()) {
             throw new FileNotFoundException("File: " + f.getName() +
                                             " not found");
         }
-        if (!f.isFile ()) {
+        if (!f.isFile()) {
             throw new FileNotFoundException("File: " + f.getName() +
                                             " is not a regular file");
         }
-        final FileInputStream fis = new FileInputStream (f);
-        fc = fis.getChannel ();
+        final FileInputStream fis = new FileInputStream(f);
+        fc = fis.getChannel();
         this.nioHandler = nioHandler;
-        this.bufHandle = new CacheBufferHandle (bufHandler);
+        this.bufHandle = new CacheBufferHandle(bufHandler);
     }
 
     /** FileChannels can be used, will always return true.
      * @return true
      */
     @Override
-    public boolean supportsTransfer () {
+    public boolean supportsTransfer() {
         return true;
     }
 
     @Override
-    public long length () {
+    public long length() {
         try {
-            return fc.size ();
+            return fc.size();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error getting length", e);
             return -1;
@@ -86,13 +86,13 @@ public class FileResourceSource implements ResourceSource {
     }
 
     @Override
-    public long transferTo (final long position, final long count,
-                            final WritableByteChannel target)
+    public long transferTo(final long position, final long count,
+                           final WritableByteChannel target)
             throws IOException {
         try {
-            return fc.transferTo (position, count, target);
+            return fc.transferTo(position, count, target);
         } catch (IOException e) {
-            if ("Resource temporarily unavailable".equals (e.getMessage ())) {
+            if ("Resource temporarily unavailable".equals(e.getMessage())) {
                 // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
                 // transferTo on linux throws IOException on full buffer.
                 return 0;
@@ -104,54 +104,54 @@ public class FileResourceSource implements ResourceSource {
     /** Generally we do not come into this method, but it can happen..
      */
     @Override
-    public void addBlockListener (final BlockListener listener) {
+    public void addBlockListener(final BlockListener listener) {
         this.listener = listener;
         // Get buffer on selector thread.
-        bufHandle.getBuffer ();
+        bufHandle.getBuffer();
         final TaskIdentifier ti =
-                new DefaultTaskIdentifier (getClass ().getSimpleName (),
-                                           "addBlockListener: channel: " + fc);
-        nioHandler.runThreadTask (new ReadBlock (), ti);
+                new DefaultTaskIdentifier(getClass().getSimpleName(),
+                                          "addBlockListener: channel: " + fc);
+        nioHandler.runThreadTask(new ReadBlock(), ti);
     }
 
     private class ReadBlock implements Runnable {
         @Override
-        public void run () {
+        public void run() {
             try {
-                final ByteBuffer buffer = bufHandle.getBuffer ();
-                final int read = fc.read (buffer);
+                final ByteBuffer buffer = bufHandle.getBuffer();
+                final int read = fc.read(buffer);
                 if (read == -1) {
-                    returnFinished ();
+                    returnFinished();
                 } else {
-                    buffer.flip ();
-                    returnBlockRead ();
+                    buffer.flip();
+                    returnBlockRead();
                 }
             } catch (IOException e) {
-                returnWithFailure (e);
+                returnWithFailure(e);
             }
         }
     }
 
-    private void returnWithFailure (final Exception e) {
-        bufHandle.possiblyFlush ();
-        listener.failed (e);
+    private void returnWithFailure(final Exception e) {
+        bufHandle.possiblyFlush();
+        listener.failed(e);
     }
 
-    private void returnFinished () {
-        bufHandle.possiblyFlush ();
-        listener.finishedRead ();
+    private void returnFinished() {
+        bufHandle.possiblyFlush();
+        listener.finishedRead();
     }
 
-    private void returnBlockRead () {
-        listener.bufferRead (bufHandle);
+    private void returnBlockRead() {
+        listener.bufferRead(bufHandle);
     }
 
     @Override
-    public void release () {
-        Closer.close (fc, logger);
+    public void release() {
+        Closer.close(fc, logger);
         listener = null;
         nioHandler = null;
-        bufHandle.possiblyFlush ();
+        bufHandle.possiblyFlush();
         bufHandle = null;
     }
 }

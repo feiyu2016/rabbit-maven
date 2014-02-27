@@ -10,18 +10,18 @@ public class DefaultTaskIdentifier implements TaskIdentifier {
     private final String groupId;
     private final String description;
 
-    public DefaultTaskIdentifier (final String groupId, final String description) {
+    public DefaultTaskIdentifier(final String groupId, final String description) {
         this.groupId = groupId;
         this.description = description;
     }
 
     @Override
-    public String getGroupId () {
+    public String getGroupId() {
         return groupId;
     }
 
     @Override
-    public String getDescription () {
+    public String getDescription() {
         return description;
     }
 }

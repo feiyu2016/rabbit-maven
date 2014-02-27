@@ -33,87 +33,87 @@ public class TransferHandler implements Runnable {
      * @param listener the listener that will be notified when the transfer has
      *        completed
      */
-    public TransferHandler (final NioHandler nioHandler, final Transferable t,
-                            final SocketChannel channel,
-                            final TrafficLogger tlFrom, final TrafficLogger tlTo,
-                            final TransferListener listener) {
+    public TransferHandler(final NioHandler nioHandler, final Transferable t,
+                           final SocketChannel channel,
+                           final TrafficLogger tlFrom, final TrafficLogger tlTo,
+                           final TransferListener listener) {
         this.nioHandler = nioHandler;
         this.t = t;
         this.channel = channel;
         this.tlFrom = tlFrom;
         this.tlTo = tlTo;
         this.listener = listener;
-        count = t.length ();
+        count = t.length();
     }
 
     /** Start the data transfer. 
      */
-    public void transfer () {
-        final String groupId = getClass ().getSimpleName ();
+    public void transfer() {
+        final String groupId = getClass().getSimpleName();
         final String desc = "Transferable: " + t + ", chanel: " + channel +
                             ", listener: " + listener;
-        nioHandler.runThreadTask (this,
-                                  new DefaultTaskIdentifier (groupId, desc));
+        nioHandler.runThreadTask(this,
+                                 new DefaultTaskIdentifier(groupId, desc));
     }
 
     @Override
-    public void run () {
+    public void run() {
         try {
             while (count > 0) {
                 final long written =
-                        t.transferTo (pos, count, channel);
+                        t.transferTo(pos, count, channel);
                 pos += written;
                 count -= written;
-                tlFrom.transferFrom (written);
-                tlTo.transferTo (written);
+                tlFrom.transferFrom(written);
+                tlTo.transferTo(written);
                 if (count > 0 && written == 0) {
-                    setupWaitForWrite ();
+                    setupWaitForWrite();
                     return;
                 }
             }
-            listener.transferOk ();
+            listener.transferOk();
         } catch (IOException e) {
-            listener.failed (e);
+            listener.failed(e);
         }
     }
 
-    private void setupWaitForWrite () {
-        nioHandler.waitForWrite (channel, new WriteWaiter ());
+    private void setupWaitForWrite() {
+        nioHandler.waitForWrite(channel, new WriteWaiter());
     }
 
     private class WriteWaiter implements WriteHandler {
-        private final Long timeout = nioHandler.getDefaultTimeout ();
+        private final Long timeout = nioHandler.getDefaultTimeout();
 
         @Override
-        public void closed () {
-            listener.failed (new IOException ("channel closed"));
+        public void closed() {
+            listener.failed(new IOException("channel closed"));
         }
 
         @Override
-        public void timeout () {
-            listener.failed (new IOException ("write timed out"));
+        public void timeout() {
+            listener.failed(new IOException("write timed out"));
         }
 
         @Override
-        public boolean useSeparateThread () {
+        public boolean useSeparateThread() {
             return true;
         }
 
         @Override
-        public String getDescription () {
-            final Socket s = channel.socket ();
-            final Address a = new Address (s.getInetAddress (), s.getPort ());
+        public String getDescription() {
+            final Socket s = channel.socket();
+            final Address a = new Address(s.getInetAddress(), s.getPort());
             return "TransferHandler$WriteWaiter: address: " + a;
         }
 
         @Override
-        public Long getTimeout () {
+        public Long getTimeout() {
             return timeout;
         }
 
         @Override
-        public void write () {
-            TransferHandler.this.run ();
+        public void write() {
+            TransferHandler.this.run();
         }
     }
 }

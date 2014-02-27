@@ -22,12 +22,12 @@ public class ChunkEnder {
      * @param bsl the listener that will be notified when the sending is
      *        complete
      */
-    public void sendChunkEnding (final SocketChannel channel, final NioHandler nioHandler,
-                                 final TrafficLogger tl, final BlockSentListener bsl) {
-        final ByteBuffer bb = ByteBuffer.wrap (CHUNK_ENDING);
-        final BufferHandle bh = new SimpleBufferHandle (bb);
+    public void sendChunkEnding(final SocketChannel channel, final NioHandler nioHandler,
+                                final TrafficLogger tl, final BlockSentListener bsl) {
+        final ByteBuffer bb = ByteBuffer.wrap(CHUNK_ENDING);
+        final BufferHandle bh = new SimpleBufferHandle(bb);
         final BlockSender bs =
-                new BlockSender (channel, nioHandler, tl, bh, false, bsl);
-        bs.write ();
+                new BlockSender(channel, nioHandler, tl, bh, false, bsl);
+        bs.write();
     }
 }

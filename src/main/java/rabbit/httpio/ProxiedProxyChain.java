@@ -17,12 +17,12 @@ public class ProxiedProxyChain implements ProxyChain {
      * @param port the port to connect to
      * @param proxyAuth the http basic proxy authentication token
      */
-    public ProxiedProxyChain (final InetAddress proxy, final int port, final String proxyAuth) {
-        resolver = new ProxyResolver (proxy, port, proxyAuth);
+    public ProxiedProxyChain(final InetAddress proxy, final int port, final String proxyAuth) {
+        resolver = new ProxyResolver(proxy, port, proxyAuth);
     }
 
     @Override
-    public Resolver getResolver (final String url) {
+    public Resolver getResolver(final String url) {
         return resolver;
     }
 }

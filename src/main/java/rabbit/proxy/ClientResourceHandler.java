@@ -12,18 +12,18 @@ public interface ClientResourceHandler {
      *  "Expect: 100 Continue" and similar. 
      * @param header the HttpHeader to be modified by this client request. 
      */
-    void modifyRequest (HttpHeader header);
+    void modifyRequest(HttpHeader header);
 
     /** Transfer the resouce data
      * @param wc the web connection to send the resource to
      * @param crtl the listener that want to know when the resource
      *             have been sent or when a failure have occurred.
      */
-    void transfer (WebConnection wc,
-                   ClientResourceTransferredListener crtl);
+    void transfer(WebConnection wc,
+                  ClientResourceTransferredListener crtl);
 
     /** Add a listener for the client resource data.
      * @param crl the listener
      */
-    void addContentListener (ClientResourceListener crl);
+    void addContentListener(ClientResourceListener crl);
 }

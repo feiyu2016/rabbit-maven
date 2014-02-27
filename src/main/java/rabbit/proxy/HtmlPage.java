@@ -11,23 +11,23 @@ import rabbit.util.SProperties;
  */
 public class HtmlPage {
 
-    private static SProperties config = setup ();
+    private static SProperties config = setup();
 
     // No dont instanciate this.
-    private HtmlPage () {
+    private HtmlPage() {
         // empty
     }
 
     /** Return a simple HTMLheader.
      * @return a HTMLHeader.
      */
-    public static String getPageHeader () {
+    public static String getPageHeader() {
         return ("<html><head><title>?</title></head>\n" +
-                "<body bgcolor=\"" + config.getProperty ("bodybgcolor") +
-                "\" text=\"" + config.getProperty ("bodytext") +
-                "\" link=\"" + config.getProperty ("bodylink") +
-                "\" alink=\"" + config.getProperty ("bodyalink") +
-                "\" vlink=\"" + config.getProperty ("bodyvlink") + "\">\n");
+                "<body bgcolor=\"" + config.getProperty("bodybgcolor") +
+                "\" text=\"" + config.getProperty("bodytext") +
+                "\" link=\"" + config.getProperty("bodylink") +
+                "\" alink=\"" + config.getProperty("bodyalink") +
+                "\" vlink=\"" + config.getProperty("bodyvlink") + "\">\n");
     }
 
     /** Return a HTMLheader.
@@ -35,8 +35,8 @@ public class HtmlPage {
      * @param type the StatusCode of the request
      * @return a HTMLHeader.
      */
-    public static String getPageHeader (final Connection con, final StatusCode type) {
-        return getPageHeader (con, type.getDescription ());
+    public static String getPageHeader(final Connection con, final StatusCode type) {
+        return getPageHeader(con, type.getDescription());
     }
 
     /** Return a HTMLheader.
@@ -44,13 +44,13 @@ public class HtmlPage {
      * @param title the title of this page.
      * @return a HTMLHeader.
      */
-    public static String getPageHeader (final Connection con, final String title) {
+    public static String getPageHeader(final Connection con, final String title) {
         return ("<html><head><title>" + title + "</title></head>\n" +
-                "<body bgcolor=\"" + config.getProperty ("bodybgcolor") +
-                "\" text=\"" + config.getProperty ("bodytext") +
-                "\" link=\"" + config.getProperty ("bodylink") +
-                "\" alink=\"" + config.getProperty ("bodyalink") +
-                "\" vlink=\"" + config.getProperty ("bodyvlink") + "\">\n" +
+                "<body bgcolor=\"" + config.getProperty("bodybgcolor") +
+                "\" text=\"" + config.getProperty("bodytext") +
+                "\" link=\"" + config.getProperty("bodylink") +
+                "\" alink=\"" + config.getProperty("bodyalink") +
+                "\" vlink=\"" + config.getProperty("bodyvlink") + "\">\n" +
                 "<h1>" + title + "</h1>\n");
     }
 
@@ -60,31 +60,31 @@ public class HtmlPage {
      * @param border the width of the border in pixels
      * @return a html table header
      */
-    public static String getTableHeader (final int width, final int border) {
+    public static String getTableHeader(final int width, final int border) {
         return ("<table border=\"" + border + "\" " +
                 "width=\"" + width + "%\" " +
-                "bgcolor=\"" + config.getProperty ("tablebgcolor") + "\">\n");
+                "bgcolor=\"" + config.getProperty("tablebgcolor") + "\">\n");
     }
 
     /** Return a table topic row
      * @return a html table topic row
      */
-    public static String getTableTopicRow () {
-        return "<tr bgcolor=\"" + config.getProperty ("tabletopicrow") + "\">";
+    public static String getTableTopicRow() {
+        return "<tr bgcolor=\"" + config.getProperty("tabletopicrow") + "\">";
     }
 
     /** Setup this class for usage
      * @return some default properties with color codes
      */
-    public static SProperties setup () {
-        config = new SProperties ();
-        config.put ("bodybgcolor", "WHITE");
-        config.put ("bodytext", "BLACK");
-        config.put ("bodylink", "BLUE");
-        config.put ("bodyalink", "RED");
-        config.put ("bodyvlink", "#AA00AA");
-        config.put ("tablebgcolor", "#DDDDFF");
-        config.put ("tabletopicrow", "#DD6666");
+    public static SProperties setup() {
+        config = new SProperties();
+        config.put("bodybgcolor", "WHITE");
+        config.put("bodytext", "BLACK");
+        config.put("bodylink", "BLUE");
+        config.put("bodyalink", "RED");
+        config.put("bodyvlink", "#AA00AA");
+        config.put("tablebgcolor", "#DDDDFF");
+        config.put("tabletopicrow", "#DD6666");
         return config;
     }
 }

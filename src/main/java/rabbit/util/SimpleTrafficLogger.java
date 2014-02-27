@@ -11,47 +11,47 @@ public class SimpleTrafficLogger implements TrafficLogger {
     private long transferTo;
 
     @Override
-    public void read (final long read) {
+    public void read(final long read) {
         this.read += read;
     }
 
     @Override
-    public long read () {
+    public long read() {
         return read;
     }
 
     @Override
-    public void write (final long written) {
+    public void write(final long written) {
         this.written += written;
     }
 
     @Override
-    public long write () {
+    public long write() {
         return written;
     }
 
     @Override
-    public void transferFrom (final long transferred) {
+    public void transferFrom(final long transferred) {
         this.transferFrom += transferred;
     }
 
     @Override
-    public long transferFrom () {
+    public long transferFrom() {
         return transferFrom;
     }
 
     @Override
-    public void transferTo (final long transferred) {
+    public void transferTo(final long transferred) {
         this.transferTo += transferred;
     }
 
     @Override
-    public long transferTo () {
+    public long transferTo() {
         return transferTo;
     }
 
     @Override
-    public void clear () {
+    public void clear() {
         read = 0;
         written = 0;
         transferFrom = 0;
@@ -59,10 +59,10 @@ public class SimpleTrafficLogger implements TrafficLogger {
     }
 
     @Override
-    public void addTo (final TrafficLogger other) {
-        other.read (read);
-        other.write (written);
-        other.transferFrom (transferFrom);
-        other.transferTo (transferTo);
+    public void addTo(final TrafficLogger other) {
+        other.read(read);
+        other.write(written);
+        other.transferFrom(transferFrom);
+        other.transferTo(transferTo);
     }
 }

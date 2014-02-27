@@ -9,14 +9,14 @@ public interface WebConnectionListener {
     /** A connection has been made. 
      * @param wc the now open connection
      */
-    void connectionEstablished (WebConnection wc);
+    void connectionEstablished(WebConnection wc);
 
     /** Creating the connection timed out.
      */
-    void timeout ();
+    void timeout();
 
     /** Creating the connection failed. 
      * @param e the cause of the failure
      */
-    void failed (Exception e);
+    void failed(Exception e);
 }

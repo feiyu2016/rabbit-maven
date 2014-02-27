@@ -12,5 +12,5 @@ public interface AcceptorListener {
      * @param sc the new socket channel, will already be set to non blocking mode
      * @throws IOException if the accept fails
      */
-    void connectionAccepted (SocketChannel sc) throws IOException;
+    void connectionAccepted(SocketChannel sc) throws IOException;
 }

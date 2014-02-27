@@ -21,31 +21,31 @@ public class HttpHeaderParser implements LineListener {
     private boolean append = false;
     private boolean headerRead = false;
 
-    private static final Logger logger = Logger.getLogger (HttpHeaderParser.class.getName ());
+    private static final Logger logger = Logger.getLogger(HttpHeaderParser.class.getName());
 
     private static final ByteBuffer HTTP_IDENTIFIER =
-            ByteBuffer.wrap (new byte[]{(byte)'H', (byte)'T', (byte)'T',
-                                        (byte)'P', (byte)'/'});
+            ByteBuffer.wrap(new byte[]{(byte) 'H', (byte) 'T', (byte) 'T',
+                                       (byte) 'P', (byte) '/'});
 
     private static final ByteBuffer EXTRA_LAST_CHUNK =
-            ByteBuffer.wrap (new byte[]{(byte)'0', (byte)'\r', (byte)'\n',
-                                        (byte)'\r', (byte)'\n'});
+            ByteBuffer.wrap(new byte[]{(byte) '0', (byte) '\r', (byte) '\n',
+                                       (byte) '\r', (byte) '\n'});
 
     /** Create a new HttpHeaderParser
      * @param request if true try to read a request, if false try to read a response
      * @param strictHttp if true http headers will be strictly parsed, if false
      *                   http newlines may be single \n
      */
-    public HttpHeaderParser (final boolean request, final boolean strictHttp) {
+    public HttpHeaderParser(final boolean request, final boolean strictHttp) {
         this.request = request;
         this.strictHttp = strictHttp;
-        lr = new LineReader (strictHttp);
+        lr = new LineReader(strictHttp);
     }
 
     /** Get the current header
      * @return the header as it looks at this moment
      */
-    public HttpHeader getHeader () {
+    public HttpHeader getHeader() {
         return header;
     }
 
@@ -54,11 +54,11 @@ public class HttpHeaderParser implements LineListener {
      * @param buffer the ByteBuffer to parse
      * @return true if a full header was read, false if more data is needed.
      */
-    public boolean handleBuffer (final ByteBuffer buffer) {
-        if (!request && header == null && !verifyResponse (buffer)) {
+    public boolean handleBuffer(final ByteBuffer buffer) {
+        if (!request && header == null && !verifyResponse(buffer)) {
             return true;
         }
-        while (!headerRead && buffer.hasRemaining ()) {
+        while (!headerRead && buffer.hasRemaining()) {
             lr.readLine(buffer, this);
         }
         return headerRead;
@@ -71,108 +71,107 @@ public class HttpHeaderParser implements LineListener {
      * @param buffer the ByteBuffer to parse 
      * @return true if the response starts correctly
      */
-    private boolean verifyResponse (final ByteBuffer buffer) {
+    private boolean verifyResponse(final ByteBuffer buffer) {
         // some broken web servers (apache/2.0.4x) send multiple last-chunks
-        if (buffer.remaining () > 4 &&
-            matchBuffer (buffer, EXTRA_LAST_CHUNK)) {
-            logger.warning ("Found a last-chunk, trying to ignore it.");
-            buffer.position (buffer.position () + EXTRA_LAST_CHUNK.capacity ());
-            return verifyResponse (buffer);
+        if (buffer.remaining() > 4 &&
+            matchBuffer(buffer, EXTRA_LAST_CHUNK)) {
+            logger.warning("Found a last-chunk, trying to ignore it.");
+            buffer.position(buffer.position() + EXTRA_LAST_CHUNK.capacity());
+            return verifyResponse(buffer);
         }
 
-        if (buffer.remaining () > 4
-            && !matchBuffer (buffer, HTTP_IDENTIFIER)) {
-            logger.warning ("http response header with odd start:" +
-                            getBufferStartString (buffer, 5));
+        if (buffer.remaining() > 4 && !matchBuffer(buffer, HTTP_IDENTIFIER)) {
+            logger.warning("http response header with odd start:" +
+                           getBufferStartString(buffer, 5));
             // Create a http/0.9 response...
-            header = new HttpHeader ();
+            header = new HttpHeader();
             return true;
         }
 
         return true;
     }
 
-    private boolean matchBuffer (final ByteBuffer buffer, final ByteBuffer test) {
-        final int len = test.remaining ();
-        if (buffer.remaining () < len) {
+    private boolean matchBuffer(final ByteBuffer buffer, final ByteBuffer test) {
+        final int len = test.remaining();
+        if (buffer.remaining() < len) {
             return false;
         }
-        final int pos = buffer.position ();
+        final int pos = buffer.position();
         for (int i = 0; i < len; i++) {
-            if (buffer.get (pos + i) != test.get (i)) {
+            if (buffer.get(pos + i) != test.get(i)) {
                 return false;
             }
         }
         return true;
     }
 
-    private String getBufferStartString (final ByteBuffer buffer, final int size) {
+    private String getBufferStartString(final ByteBuffer buffer, final int size) {
         try {
-            final int pos = buffer.position ();
+            final int pos = buffer.position();
             final byte[] arr = new byte[size];
-            buffer.get (arr);
-            buffer.position (pos);
-            return new String (arr, "ASCII");
+            buffer.get(arr);
+            buffer.position(pos);
+            return new String(arr, "ASCII");
         } catch (UnsupportedEncodingException e) {
-            return "unable to get ASCII: " + e.toString ();
+            return "unable to get ASCII: " + e.toString();
         }
     }
 
     /** Handle a newly read line. */
     @Override
-    public void lineRead (final String line) {
-        if (line.length () == 0) {
+    public void lineRead(final String line) {
+        if (line.length() == 0) {
             headerRead = header != null;
             return;
         }
 
         if (header == null) {
-            header = new HttpHeader ();
-            header.setRequestLine (line);
+            header = new HttpHeader();
+            header.setRequestLine(line);
             headerRead = false;
             return;
         }
 
-        if (header.isDot9Request ()) {
+        if (header.isDot9Request()) {
             headerRead = true;
             return;
         }
 
         char c;
-        if (header.size () == 0 &&
-            line.length () > 0 &&
-            ((c = line.charAt (0)) == ' ' || c == '\t')) {
-            header.setReasonPhrase (header.getReasonPhrase () + line);
+        if (header.size() == 0 &&
+            line.length() > 0 &&
+            ((c = line.charAt(0)) == ' ' || c == '\t')) {
+            header.setReasonPhrase(header.getReasonPhrase() + line);
             headerRead = false;
             return;
         }
 
-        readHeader (line);
+        readHeader(line);
         headerRead = false;
     }
 
-    private void readHeader (final String msg) {
+    private void readHeader(final String msg) {
         if (msg == null) {
             final String err = "Couldnt read headers, connection must be closed";
-            throw (new BadHttpHeaderException (err));
+            throw(new BadHttpHeaderException(err));
         }
-        char c = msg.charAt (0);
+        char c = msg.charAt(0);
         if (c == ' ' || c == '\t' || append) {
             if (head != null) {
-                head.append (msg);
-                append = checkQuotes (head.getValue ());
+                head.append(msg);
+                append = checkQuotes(head.getValue());
             } else {
                 final String ex = "Malformed header: msg: " + msg;
-                throw (new BadHttpHeaderException (ex));
+                throw(new BadHttpHeaderException(ex));
             }
             return;
         }
-        final int i = msg.indexOf (':');
+        final int i = msg.indexOf(':');
         if (i < 0) {
-            switch (msg.charAt (0)) {
+            switch(msg.charAt(0)) {
                 case 'h':
                 case 'H':
-                    if (msg.toLowerCase (Locale.US).startsWith ("http/")) {
+                    if (msg.toLowerCase(Locale.US).startsWith("http/")) {
             /* ignoring header since it looks
              * like a duplicate responseline
              */
@@ -180,15 +179,15 @@ public class HttpHeaderParser implements LineListener {
                     }
                     // fallthrough
                 default:
-                    throw (new BadHttpHeaderException ("Malformed header:" + msg));
+                    throw(new BadHttpHeaderException("Malformed header:" + msg));
             }
         }
         int j = i;
-        while (j > 0 && ((c = msg.charAt (j - 1)) == ' ' || c == '\t')) {
+        while (j > 0 && ((c = msg.charAt(j - 1)) == ' ' || c == '\t')) {
             j--;
         }
         // ok, the header may be empty, so trim away whites.
-        String value = msg.substring (i + 1);
+        String value = msg.substring(i + 1);
 
     /* there are some sites with broken headers
      * like http://docs1.excite.com/functions.js
@@ -202,19 +201,19 @@ public class HttpHeaderParser implements LineListener {
         if (!append) {
             value = value.trim();
         }
-        head = new Header (msg.substring (0, j), value);
-        header.addHeader (head);
+        head = new Header(msg.substring(0, j), value);
+        header.addHeader(head);
     }
 
-    private boolean checkQuotes (final String v) {
-        int q = v.indexOf ('"');
+    private boolean checkQuotes(final String v) {
+        int q = v.indexOf('"');
         if (q == -1) {
             return false;
         }
         boolean halfquote = false;
-        final int l = v.length ();
+        final int l = v.length();
         for (; q < l; q++) {
-            final char c = v.charAt (q);
+            final char c = v.charAt(q);
             if (c == '\\') {
                 q++;    // skip one...
             } else if (c == '"') {

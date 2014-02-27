@@ -10,5 +10,5 @@ public interface ClientResourceListener {
     /** Some parts of the resource has been read.
      * @param bufHandle the holder of the read data
      */
-    void resourceDataRead (BufferHandle bufHandle);
+    void resourceDataRead(BufferHandle bufHandle);
 }

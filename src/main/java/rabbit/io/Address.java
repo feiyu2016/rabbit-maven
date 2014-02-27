@@ -19,17 +19,17 @@ public class Address {
      * @param ia the InetAddress this Address is connected to.
      * @param port the port number this Address is connected to.
      */
-    public Address (final InetAddress ia, final int port) {
+    public Address(final InetAddress ia, final int port) {
         this.ia = ia;
         this.port = port;
-        final String s = ia.getHostAddress () + ":" + port;
-        hash = s.hashCode ();
+        final String s = ia.getHostAddress() + ":" + port;
+        hash = s.hashCode();
     }
 
     /** Get the hash code for this object.
      * @return the hash code.
      */
-    @Override public int hashCode () {
+    @Override public int hashCode() {
         return hash;
     }
 
@@ -38,30 +38,30 @@ public class Address {
      * @return true if the other Object is an Address connected to 
      *  the same InetAddress and port, false otherwise.
      */
-    @Override public boolean equals (final Object o) {
+    @Override public boolean equals(final Object o) {
         if (o instanceof Address) {
-            final Address a = (Address)o;
-            return (port == a.port && ia.equals (a.ia));
+            final Address a = (Address) o;
+            return (port == a.port && ia.equals(a.ia));
         }
         return false;
     }
 
     /** Get a String representation of this Address */
-    @Override public String toString () {
+    @Override public String toString() {
         return ia + ":" + port;
     }
 
     /** Get the internet address.
      * @return the InetAddress for this Address
      */
-    public InetAddress getInetAddress () {
+    public InetAddress getInetAddress() {
         return ia;
     }
 
     /** Get the port number.
      * @return the port number for this Address
      */
-    public int getPort () {
+    public int getPort() {
         return port;
     }
 }

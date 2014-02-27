@@ -14,27 +14,27 @@ import rabbit.util.SProperties;
  */
 public class InOutProxyChainFactory implements ProxyChainFactory {
     @Override
-    public ProxyChain getProxyChain (final SProperties props,
-                                     final NioHandler nio,
-                                     final Logger logger) {
-        final String insideMatch = props.getProperty ("inside_match");
-        final String pname = props.getProperty ("proxyhost", "").trim ();
-        final String pport = props.getProperty ("proxyport", "").trim ();
-        final String pauth = props.getProperty ("proxyauth");
+    public ProxyChain getProxyChain(final SProperties props,
+                                    final NioHandler nio,
+                                    final Logger logger) {
+        final String insideMatch = props.getProperty("inside_match");
+        final String pname = props.getProperty("proxyhost", "").trim();
+        final String pport = props.getProperty("proxyport", "").trim();
+        final String pauth = props.getProperty("proxyauth");
 
         try {
             final InetAddress proxy = InetAddress.getByName(pname);
             try {
-                final int port = Integer.parseInt (pport);
-                return new InOutProxyChain (insideMatch, nio,
-                                            proxy, port, pauth);
+                final int port = Integer.parseInt(pport);
+                return new InOutProxyChain(insideMatch, nio,
+                                           proxy, port, pauth);
             } catch (NumberFormatException e) {
-                logger.severe ("Strange proxyport: '" + pport +
-                               "', will not chain");
+                logger.severe("Strange proxyport: '" + pport +
+                              "', will not chain");
             }
         } catch (UnknownHostException e) {
-            logger.severe ("Unknown proxyhost: '" + pname +
-                           "', will not chain");
+            logger.severe("Unknown proxyhost: '" + pname +
+                          "', will not chain");
         }
         return null;
     }

@@ -12,8 +12,8 @@ public class BadHttpHeaderException extends RuntimeException {
     /** Create a new BadHttpHeaderException.
      * @param msg a descriptive error message
      */
-    public BadHttpHeaderException (final String msg) {
-        super (msg);
+    public BadHttpHeaderException(final String msg) {
+        super(msg);
     }
 }
 

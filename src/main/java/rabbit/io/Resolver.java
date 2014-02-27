@@ -13,7 +13,7 @@ public interface Resolver {
      * @param url the URL to lookup.
      * @param listener the InetAddressListener to notify when lookup is done.
      */
-    void getInetAddress (URL url, InetAddressListener listener);
+    void getInetAddress(URL url, InetAddressListener listener);
 
     /** Get the port to use for connecting to a given port.
      *  Normally port is returned, but if there is a chained proxy, 
@@ -21,16 +21,16 @@ public interface Resolver {
      * @param port the port number we are trying to use
      * @return the tcp port number to use
      */
-    int getConnectPort (int port);
+    int getConnectPort(int port);
 
     /** Check if the resolver is using a proxy or not. 
      * @return true if there is an upstream proxy
      */
-    boolean isProxyConnected ();
+    boolean isProxyConnected();
 
     /** Get the currently set proxy authentication. 
      * @return the upstream proxy basic identification header
      */
-    String getProxyAuthString ();
+    String getProxyAuthString();
 }
 

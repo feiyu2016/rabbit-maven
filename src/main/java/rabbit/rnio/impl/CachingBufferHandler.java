@@ -19,46 +19,46 @@ public class CachingBufferHandler implements BufferHandler {
     private final Queue<BufferHolder> largeCache =
             new ConcurrentLinkedQueue<>();
 
-    private ByteBuffer getBuffer (final Queue<BufferHolder> bufs, final int size) {
-        final BufferHolder r = bufs.poll ();
+    private ByteBuffer getBuffer(final Queue<BufferHolder> bufs, final int size) {
+        final BufferHolder r = bufs.poll();
         ByteBuffer b;
         if (r != null) {
-            b = r.getBuffer ();
+            b = r.getBuffer();
         } else {
-            b = ByteBuffer.allocateDirect (size);
+            b = ByteBuffer.allocateDirect(size);
         }
-        b.clear ();
+        b.clear();
         return b;
     }
 
     @Override
-    public ByteBuffer getBuffer () {
-        return getBuffer (cache, 4096);
+    public ByteBuffer getBuffer() {
+        return getBuffer(cache, 4096);
     }
 
-    private void addCache (final Queue<BufferHolder> bufs, final BufferHolder bh) {
-        bufs.add (bh);
+    private void addCache(final Queue<BufferHolder> bufs, final BufferHolder bh) {
+        bufs.add(bh);
     }
 
     @Override
-    public void putBuffer (final ByteBuffer buffer) {
+    public void putBuffer(final ByteBuffer buffer) {
         if (buffer == null) {
             throw new IllegalArgumentException("null buffer not allowed");
         }
-        final BufferHolder bh = new BufferHolder (buffer);
-        if (buffer.capacity () == 4096) {
-            addCache (cache, bh);
+        final BufferHolder bh = new BufferHolder(buffer);
+        if (buffer.capacity() == 4096) {
+            addCache(cache, bh);
         } else {
-            addCache (largeCache, bh);
+            addCache(largeCache, bh);
         }
     }
 
     @Override
-    public ByteBuffer growBuffer (final ByteBuffer buffer) {
-        final ByteBuffer lb = getBuffer (largeCache, 128 * 1024);
+    public ByteBuffer growBuffer(final ByteBuffer buffer) {
+        final ByteBuffer lb = getBuffer(largeCache, 128 * 1024);
         if (buffer != null) {
-            lb.put (buffer);
-            putBuffer (buffer);
+            lb.put(buffer);
+            putBuffer(buffer);
         }
         return lb;
     }
@@ -66,12 +66,12 @@ public class CachingBufferHandler implements BufferHandler {
     private static final class BufferHolder {
         private final ByteBuffer buffer;
 
-        public BufferHolder (final ByteBuffer buffer) {
+        public BufferHolder(final ByteBuffer buffer) {
             this.buffer = buffer;
         }
 
         // Two holders are equal if they hold the same buffer
-        @Override public boolean equals (final Object o) {
+        @Override public boolean equals(final Object o) {
             if (o == null) {
                 return false;
             }
@@ -83,12 +83,12 @@ public class CachingBufferHandler implements BufferHandler {
             return o instanceof BufferHolder && ((BufferHolder) o).buffer == buffer;
         }
 
-        @Override public int hashCode () {
+        @Override public int hashCode() {
             // ByteBuffer.hashCode depends on its contents.
-            return System.identityHashCode (buffer);
+            return System.identityHashCode(buffer);
         }
 
-        public ByteBuffer getBuffer () {
+        public ByteBuffer getBuffer() {
             return buffer;
         }
     }

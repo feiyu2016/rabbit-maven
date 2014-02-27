@@ -11,7 +11,7 @@ public class RequestLineTooLongException extends IOException {
 
     /** Create a new RequestLineTooLongException
      */
-    public RequestLineTooLongException () {
-        super ("Request line too long");
+    public RequestLineTooLongException() {
+        super("Request line too long");
     }
 }

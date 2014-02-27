@@ -8,9 +8,9 @@ public interface AsyncListener {
     /** Reading failed 
      * @param cause the real reason the operation failed.
      */
-    void failed (Exception cause);
+    void failed(Exception cause);
 
     /** The operation timed out 
      */
-    void timeout ();
+    void timeout();
 }

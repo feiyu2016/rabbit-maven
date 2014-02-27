@@ -17,17 +17,17 @@ public class CacheBufferHandle implements BufferHandle {
      *  for the caching of the ByteBuffer:s
      * @param bh the BufferHandler that is the actual cache
      */
-    public CacheBufferHandle (final BufferHandler bh) {
+    public CacheBufferHandle(final BufferHandler bh) {
         this.bh = bh;
     }
 
     @Override
-    public synchronized boolean isEmpty () {
-        return buffer == null || !buffer.hasRemaining ();
+    public synchronized boolean isEmpty() {
+        return buffer == null || !buffer.hasRemaining();
     }
 
     @Override
-    public synchronized ByteBuffer getBuffer () {
+    public synchronized ByteBuffer getBuffer() {
         if (buffer == null) {
             buffer = bh.getBuffer();
         }
@@ -35,7 +35,7 @@ public class CacheBufferHandle implements BufferHandle {
     }
 
     @Override
-    public synchronized void possiblyFlush () {
+    public synchronized void possiblyFlush() {
         if (!mayBeFlushed) {
             throw new IllegalStateException("buffer may not be flushed!: " +
                                             System.identityHashCode(buffer));
@@ -43,19 +43,19 @@ public class CacheBufferHandle implements BufferHandle {
         if (buffer == null) {
             return;
         }
-        if (!buffer.hasRemaining ()) {
-            bh.putBuffer (buffer);
+        if (!buffer.hasRemaining()) {
+            bh.putBuffer(buffer);
             buffer = null;
         }
     }
 
     @Override
-    public synchronized void setMayBeFlushed (final boolean mayBeFlushed) {
+    public synchronized void setMayBeFlushed(final boolean mayBeFlushed) {
         this.mayBeFlushed = mayBeFlushed;
     }
 
-    @Override public String toString () {
-        return getClass ().getName () + "[buffer: " + buffer +
+    @Override public String toString() {
+        return getClass().getName() + "[buffer: " + buffer +
                ", bh: " + bh + "}";
     }
 }

@@ -22,16 +22,16 @@ public interface HandlerFactory {
      * @param size the Size of the data beeing handled (-1 = unknown length).
      * @return the new Handler
      */
-    Handler getNewInstance (Connection connection,
-                            TrafficLoggerHandler tlh,
-                            HttpHeader header,
-                            HttpHeader webheader,
-                            ResourceSource content,
-                            long size);
+    Handler getNewInstance(Connection connection,
+                           TrafficLoggerHandler tlh,
+                           HttpHeader header,
+                           HttpHeader webheader,
+                           ResourceSource content,
+                           long size);
 
     /** setup the handler factory. 
      * @param properties the properties for this factory
      * @param proxy the HttpProxy using this HandlerFactory
      */
-    void setup (SProperties properties, HttpProxy proxy);
+    void setup(SProperties properties, HttpProxy proxy);
 }

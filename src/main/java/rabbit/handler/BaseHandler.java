@@ -52,11 +52,11 @@ public class BaseHandler
     /** The flag for the last empty chunk */
     private boolean emptyChunkSent = false;
 
-    private static final Logger logger = Logger.getLogger (BaseHandler.class.getName ());
+    private static final Logger logger = Logger.getLogger(BaseHandler.class.getName());
 
     /** For creating the factory.
      */
-    public BaseHandler () {
+    public BaseHandler() {
         // empty
     }
 
@@ -68,14 +68,14 @@ public class BaseHandler
      * @param content the resource.
      * @param size the size of the data being handled.
      */
-    public BaseHandler (final Connection con, final TrafficLoggerHandler tlh,
-                        final HttpHeader request, final HttpHeader response,
-                        final ResourceSource content, final long size) {
+    public BaseHandler(final Connection con, final TrafficLoggerHandler tlh,
+                       final HttpHeader request, final HttpHeader response,
+                       final ResourceSource content, final long size) {
         this.con = con;
         this.tlh = tlh;
         this.request = request;
         this.response = response;
-        if (!request.isDot9Request () && response == null) {
+        if (!request.isDot9Request() && response == null) {
             throw new IllegalArgumentException("response may not be null");
         }
         this.content = content;
@@ -83,36 +83,36 @@ public class BaseHandler
     }
 
     @Override
-    public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh,
-                                   final HttpHeader header, final HttpHeader webHeader,
-                                   final ResourceSource content, final long size) {
-        return new BaseHandler (con, tlh, header, webHeader, content, size);
+    public Handler getNewInstance(final Connection con, final TrafficLoggerHandler tlh,
+                                  final HttpHeader header, final HttpHeader webHeader,
+                                  final ResourceSource content, final long size) {
+        return new BaseHandler(con, tlh, header, webHeader, content, size);
     }
 
-    protected Logger getLogger () {
+    protected Logger getLogger() {
         return logger;
     }
 
     /** Handle the request.
      * A request is made in these steps:
      * <xmp>
-     * sendHeader ();
-     * addCache ();
-     * prepare ();
-     * send ();
-     * finishData ();
-     * finish ();
+     * sendHeader();
+     * addCache();
+     * prepare();
+     * send();
+     * finishData();
+     * finish();
      * </xmp>
      * Note that finish is always called, no matter what exceptions are thrown.
      * The middle steps are most probably only performed if the previous steps
      * have all succeeded
      */
     @Override
-    public void handle () {
-        if (request.isDot9Request ()) {
-            send ();
+    public void handle() {
+        if (request.isDot9Request()) {
+            send();
         } else {
-            sendHeader ();
+            sendHeader();
         }
     }
 
@@ -120,67 +120,66 @@ public class BaseHandler
      * ®return false if this handler never modifies the content.
      */
     @Override
-    public boolean changesContentSize () {
+    public boolean changesContentSize() {
         return false;
     }
 
-    protected void sendHeader () {
+    protected void sendHeader() {
         try {
             final HttpHeaderSender hhs =
-                    new HttpHeaderSender (con.getChannel (), con.getNioHandler (),
-                                          tlh.getClient (), response, false, this);
-            hhs.sendHeader ();
+                    new HttpHeaderSender(con.getChannel(), con.getNioHandler(),
+                                         tlh.getClient(), response, false, this);
+            hhs.sendHeader();
         } catch (IOException e) {
-            failed (e);
+            failed(e);
         }
     }
 
     @Override
-    public void httpHeaderSent () {
-        prepare ();
+    public void httpHeaderSent() {
+        prepare();
     }
 
     /** This method is used to prepare the data for the resource being sent.
      *  This method does nothing here.
      */
-    protected void prepare () {
-        send ();
+    protected void prepare() {
+        send();
     }
 
     /** This method is used to finish the data for the resource being sent.
      *  This method will send an end chunk if needed and then call finish
      */
-    protected void finishData () {
-        if (con.getChunking () && !emptyChunkSent) {
+    protected void finishData() {
+        if (con.getChunking() && !emptyChunkSent) {
             emptyChunkSent = true;
-            final BlockSentListener bsl = new Finisher ();
-            final ChunkEnder ce = new ChunkEnder ();
-            ce.sendChunkEnding (con.getChannel (), con.getNioHandler (),
-                                tlh.getClient (), bsl);
+            final BlockSentListener bsl = new Finisher();
+            final ChunkEnder ce = new ChunkEnder();
+            ce.sendChunkEnding(con.getChannel(), con.getNioHandler(),
+                               tlh.getClient(), bsl);
         } else {
-            finish (true);
+            finish(true);
         }
     }
 
     /** Mark the current response as a partial response.
      * @param shouldbe the number of byte that the resource ought to be
      */
-    protected void setPartialContent (final long shouldbe) {
-        response.setHeader ("RabbIT-Partial", Long.toString(shouldbe));
+    protected void setPartialContent(final long shouldbe) {
+        response.setHeader("RabbIT-Partial", Long.toString(shouldbe));
     }
 
     /** Close nesseccary channels and adjust the cached files.
-     *  If you override this one, remember to call super.finish ()!
+     *  If you override this one, remember to call super.finish()!
      * @param good if true then the connection may be restarted,
      *             if false then the connection may not be restared
      */
-    protected void finish (final boolean good) {
+    protected void finish(final boolean good) {
         try {
             if (content != null) {
                 content.release();
             }
-            if (response != null
-                && response.getHeader ("Content-Length") != null) {
+            if (response != null && response.getHeader("Content-Length") != null) {
                 con.setContentLength(response.getHeader("Content-length"));
             }
         } finally {
@@ -192,9 +191,9 @@ public class BaseHandler
         // Not sure why we need this, seems to call finish multiple times.
         if (con != null) {
             if (good) {
-                con.logAndRestart ();
+                con.logAndRestart();
             } else {
-                con.logAndClose (null);
+                con.logAndClose(null);
             }
         }
         tlh = null;
@@ -204,106 +203,104 @@ public class BaseHandler
     /** Check if this handler supports direct transfers.
      * @return this handler always return true.
      */
-    protected boolean mayTransfer () {
+    protected boolean mayTransfer() {
         return true;
     }
 
-    protected void send () {
-        if (mayTransfer ()
-            && content.length () > 0
-            && content.supportsTransfer ()) {
-            final TransferListener tl = new ContentTransferListener ();
+    protected void send() {
+        if (mayTransfer() && content.length() > 0 && content.supportsTransfer()) {
+            final TransferListener tl = new ContentTransferListener();
             final TransferHandler th =
-                    new TransferHandler (con.getNioHandler (), content,
-                                         con.getChannel (),
-                                         tlh.getCache (), tlh.getClient (), tl);
-            th.transfer ();
+                    new TransferHandler(con.getNioHandler(), content,
+                                        con.getChannel(),
+                                        tlh.getCache(), tlh.getClient(), tl);
+            th.transfer();
         } else {
-            content.addBlockListener (this);
+            content.addBlockListener(this);
         }
     }
 
     private class ContentTransferListener implements TransferListener {
         @Override
-        public void transferOk () {
-            finishData ();
+        public void transferOk() {
+            finishData();
         }
 
         @Override
-        public void failed (final Exception cause) {
-            BaseHandler.this.failed (cause);
+        public void failed(final Exception cause) {
+            BaseHandler.this.failed(cause);
         }
     }
 
     @Override
-    public void bufferRead (final BufferHandle bufHandle) {
+    public void bufferRead(final BufferHandle bufHandle) {
         if (con == null) {
             // not sure why this can happen, client has closed connection.
             return;
         }
         // TODO: do this in another thread?
-        final ByteBuffer buffer = bufHandle.getBuffer ();
-        totalRead += buffer.remaining ();
+        final ByteBuffer buffer = bufHandle.getBuffer();
+        totalRead += buffer.remaining();
         final BlockSender bs =
-                new BlockSender (con.getChannel (), con.getNioHandler (),
-                                 tlh.getClient (), bufHandle,
-                                 con.getChunking (), this);
-        bs.write ();
+                new BlockSender(con.getChannel(), con.getNioHandler(),
+                                tlh.getClient(), bufHandle,
+                                con.getChunking(), this);
+        bs.write();
     }
 
     @Override
-    public void blockSent () {
-        content.addBlockListener (BaseHandler.this);
+    public void blockSent() {
+        content.addBlockListener(BaseHandler.this);
     }
 
     @Override
-    public void finishedRead () {
+    public void finishedRead() {
         if (size > 0 && totalRead != size) {
             setPartialContent(size);
         }
-        finishData ();
+        finishData();
     }
 
     private class Finisher implements BlockSentListener {
         @Override
-        public void blockSent () {
-            finish (true);
+        public void blockSent() {
+            finish(true);
         }
         @Override
-        public void failed (final Exception cause) {
-            BaseHandler.this.failed (cause);
+        public void failed(final Exception cause) {
+            BaseHandler.this.failed(cause);
         }
         @Override
-        public void timeout () {
-            BaseHandler.this.timeout ();
+        public void timeout() {
+            BaseHandler.this.timeout();
         }
     }
 
-    String getStackTrace (final Exception cause) {
-        final StringWriter sw = new StringWriter ();
-        final PrintWriter ps = new PrintWriter (sw);
-        cause.printStackTrace (ps);
-        return sw.toString ();
+    String getStackTrace(final Exception cause) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter ps = new PrintWriter(sw);
+        cause.printStackTrace(ps);
+        return sw.toString();
     }
 
-    protected void deleteFile (final File f) {
+    protected void deleteFile(final File f) {
         try {
-            FileHelper.delete (f);
+            FileHelper.delete(f);
         } catch (IOException e) {
-            getLogger ().log (Level.WARNING,
-                              "Failed to delete file",
-                              e);
+            getLogger().log(Level.WARNING,
+                            "Failed to delete file",
+                            e);
         }
     }
 
     @Override
-    public void failed (final Exception cause) {
+    public void failed(final Exception cause) {
         if (con != null) {
             String st;
             if (cause instanceof IOException) {
-                final IOException ioe = (IOException)cause;
-                final String msg = ioe.getMessage ();
-                switch (msg) {
+                final IOException ioe = (IOException) cause;
+                final String msg = ioe.getMessage();
+                switch(msg) {
                     case "Broken pipe":
                         st = ioe.toString() + ", probably cancelled pipeline";
                         break;
@@ -315,30 +312,30 @@ public class BaseHandler
                         break;
                 }
             } else {
-                st = getStackTrace (cause);
+                st = getStackTrace(cause);
             }
-            getLogger ().warning("BaseHandler: error handling request: " +
-                                 request.getRequestURI() + ": " +
-                                 st);
-            con.setStatusCode ("500");
-            String ei = con.getExtraInfo ();
-            ei = ei == null ? cause.toString () : (ei + ", " + cause);
-            con.setExtraInfo (ei);
+            getLogger().warning("BaseHandler: error handling request: " +
+                                request.getRequestURI() + ": " +
+                                st);
+            con.setStatusCode("500");
+            String ei = con.getExtraInfo();
+            ei = ei == null ? cause.toString() : (ei + ", " + cause);
+            con.setExtraInfo(ei);
         }
-        finish (false);
+        finish(false);
     }
 
     @Override
-    public void timeout () {
+    public void timeout() {
         if (con != null) {
             getLogger().warning("BaseHandler: timeout: uri: " +
                                 request.getRequestURI());
         }
-        finish (false);
+        finish(false);
     }
 
     @Override
-    public void setup (final SProperties properties, final HttpProxy proxy) {
+    public void setup(final SProperties properties, final HttpProxy proxy) {
         // nothing to do.
     }
 }

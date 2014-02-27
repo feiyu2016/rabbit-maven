@@ -21,7 +21,7 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
     private final NioHandler nioHandler;
 
     /** The logger to use. */
-    protected static final Logger logger = Logger.getLogger (BaseSocketHandler.class.getName ());
+    protected static final Logger logger = Logger.getLogger(BaseSocketHandler.class.getName());
 
     /** The buffer handle. */
     private final BufferHandle bh;
@@ -35,69 +35,69 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
      * @param bh the BufferHandle to use for the io operation
      * @param nioHandler the NioHandler to use to wait for operations on
      */
-    public BaseSocketHandler (final SocketChannel channel, final BufferHandle bh,
-                              final NioHandler nioHandler) {
+    public BaseSocketHandler(final SocketChannel channel, final BufferHandle bh,
+                             final NioHandler nioHandler) {
         this.channel = channel;
         this.bh = bh;
         this.nioHandler = nioHandler;
     }
 
-    protected ByteBuffer getBuffer () {
-        return bh.getBuffer ();
+    protected ByteBuffer getBuffer() {
+        return bh.getBuffer();
     }
 
-    protected void releaseBuffer () {
-        bh.possiblyFlush ();
+    protected void releaseBuffer() {
+        bh.possiblyFlush();
     }
 
     /** Does nothing by default */
     @Override
-    public void closed () {
+    public void closed() {
         // empty
     }
 
     /** Does nothing by default */
     @Override
-    public void timeout () {
+    public void timeout() {
         // empty
     }
 
     /** Runs on the selector thread by default */
     @Override
-    public boolean useSeparateThread () {
+    public boolean useSeparateThread() {
         return false;
     }
 
     @Override
-    public String getDescription () {
-        return getClass ().getName () + ":" + channel;
+    public String getDescription() {
+        return getClass().getName() + ":" + channel;
     }
 
     @Override
-    public Long getTimeout () {
+    public Long getTimeout() {
         return timeout;
     }
 
-    protected Logger getLogger () {
+    protected Logger getLogger() {
         return     logger;
     }
 
-    protected void closeDown () {
-        releaseBuffer ();
-        nioHandler.close (channel);
+    protected void closeDown() {
+        releaseBuffer();
+        nioHandler.close(channel);
     }
 
     /** Get the channel this BaseSocketHandler is using
      * @return the SocketChannel being used 
      */
-    public SocketChannel getChannel () {
+    public SocketChannel getChannel() {
         return channel;
     }
 
     /** Get the BufferHandle this BaseSocketHandler is using
      * @return the BufferHandle used for io operations
      */
-    public BufferHandle getBufferHandle () {
+    public BufferHandle getBufferHandle() {
         return bh;
     }
 
@@ -105,17 +105,17 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
      * @param rh the handler that will be notified when more data is
      *        ready to be read
      */
-    public void waitForRead (final ReadHandler rh) {
-        this.timeout = nioHandler.getDefaultTimeout ();
-        nioHandler.waitForRead (channel, rh);
+    public void waitForRead(final ReadHandler rh) {
+        this.timeout = nioHandler.getDefaultTimeout();
+        nioHandler.waitForRead(channel, rh);
     }
 
     /** Wait for more data to be writable on the channel
      * @param rh the handler that will be notified when more data is
      *        ready to be written
      */
-    public void waitForWrite (final WriteHandler rh) {
-        this.timeout = nioHandler.getDefaultTimeout ();
-        nioHandler.waitForWrite (channel, rh);
+    public void waitForWrite(final WriteHandler rh) {
+        this.timeout = nioHandler.getDefaultTimeout();
+        nioHandler.waitForWrite(channel, rh);
     }
 }

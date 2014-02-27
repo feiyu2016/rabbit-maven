@@ -17,18 +17,18 @@ public class InOutProxyChain implements ProxyChain {
     private final Resolver directResolver;
     private final Resolver proxiedResolver;
 
-    public InOutProxyChain (final String insideMatch,
-                            final NioHandler nio,
-                            final InetAddress proxy, final int port, final String proxyAuth) {
-        insidePattern = Pattern.compile (insideMatch);
-        directResolver = new SimpleResolver (nio);
-        proxiedResolver = new ProxyResolver (proxy, port, proxyAuth);
+    public InOutProxyChain(final String insideMatch,
+                           final NioHandler nio,
+                           final InetAddress proxy, final int port, final String proxyAuth) {
+        insidePattern = Pattern.compile(insideMatch);
+        directResolver = new SimpleResolver(nio);
+        proxiedResolver = new ProxyResolver(proxy, port, proxyAuth);
     }
 
     @Override
-    public Resolver getResolver (final String url) {
-        final Matcher m = insidePattern.matcher (url);
-        if (m.find ()) {
+    public Resolver getResolver(final String url) {
+        final Matcher m = insidePattern.matcher(url);
+        if (m.find()) {
             return directResolver;
         }
         return proxiedResolver;

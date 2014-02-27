@@ -32,7 +32,7 @@ public class SSLHandler implements TunnelDoneListener {
     private BufferHandle bh;
     private BufferHandle sbh;
     private WebConnection wc;
-    private static final Logger logger = Logger.getLogger (SSLHandler.class.getName ());
+    private static final Logger logger = Logger.getLogger(SSLHandler.class.getName());
 
     /** Create a new SSLHandler
      * @param proxy the HttpProxy this SSL connection is serving
@@ -40,28 +40,28 @@ public class SSLHandler implements TunnelDoneListener {
      * @param request the CONNECT header
      * @param tlh the traffic statistics gatherer
      */
-    public SSLHandler (final HttpProxy proxy, final Connection con,
-                       final HttpHeader request, final TrafficLoggerHandler tlh) {
+    public SSLHandler(final HttpProxy proxy, final Connection con,
+                      final HttpHeader request, final TrafficLoggerHandler tlh) {
         this.proxy = proxy;
         this.con = con;
         this.request = request;
         this.tlh = tlh;
-        final ProxyChain pc = con.getProxy ().getProxyChain ();
-        resolver = pc.getResolver (request.getRequestURI ());
+        final ProxyChain pc = con.getProxy().getProxyChain();
+        resolver = pc.getResolver(request.getRequestURI());
     }
 
     /** Are we allowed to proxy ssl-type connections ?
      * @return true if we allow the CONNECT &lt;port&gt; command.
      */
-    public boolean isAllowed () {
-        final String hp = request.getRequestURI ();
-        final int c = hp.indexOf (':');
+    public boolean isAllowed() {
+        final String hp = request.getRequestURI();
+        final int c = hp.indexOf(':');
         Integer port = 443;
         if (c >= 0) {
             try {
-                port = Integer.valueOf(hp.substring (c + 1));
+                port = Integer.valueOf(hp.substring(c + 1));
             } catch (NumberFormatException e) {
-                logger.warning ("Connect to odd port: " + e);
+                logger.warning("Connect to odd port: " + e);
                 return false;
             }
         }
@@ -71,8 +71,8 @@ public class SSLHandler implements TunnelDoneListener {
         if (proxy.sslports == null) {
             return true;
         }
-        for (int i = 0; i < proxy.sslports.size (); i++) {
-            if (port.equals (proxy.sslports.get (i))) {
+        for (int i = 0; i < proxy.sslports.size(); i++) {
+            if (port.equals(proxy.sslports.get(i))) {
                 return true;
             }
         }
@@ -83,180 +83,180 @@ public class SSLHandler implements TunnelDoneListener {
      * @param channel the client channel
      * @param bh the buffer handle used, may contain data from client.
      */
-    public void handle (final SocketChannel channel, final BufferHandle bh) {
+    public void handle(final SocketChannel channel, final BufferHandle bh) {
         this.channel = channel;
         this.bh = bh;
-        if (resolver.isProxyConnected ()) {
-            final String auth = resolver.getProxyAuthString ();
+        if (resolver.isProxyConnected()) {
+            final String auth = resolver.getProxyAuthString();
             // it should look like this (using RabbIT:RabbIT):
             // Proxy-authorization: Basic UmFiYklUOlJhYmJJVA==
-            if (auth != null && !auth.equals ("")) {
+            if (auth != null && !auth.equals("")) {
                 request.setHeader("Proxy-authorization",
                                   "Basic " + Base64.encode(auth));
             }
         }
-        final WebConnectionListener wcl = new WebConnector ();
-        proxy.getWebConnection (request, wcl);
+        final WebConnectionListener wcl = new WebConnector();
+        proxy.getWebConnection(request, wcl);
     }
 
     private class WebConnector implements WebConnectionListener {
         private final String uri;
 
-        public WebConnector () {
-            uri = request.getRequestURI ();
+        public WebConnector() {
+            uri = request.getRequestURI();
             // java needs protocoll to build URL
-            request.setRequestURI ("http://" + uri);
+            request.setRequestURI("http://" + uri);
         }
 
         @Override
-        public void connectionEstablished (final WebConnection wce) {
+        public void connectionEstablished(final WebConnection wce) {
             wc = wce;
-            if (resolver.isProxyConnected ()) {
-                request.setRequestURI (uri); // send correct connect to next proxy.
-                setupChain ();
+            if (resolver.isProxyConnected()) {
+                request.setRequestURI(uri); // send correct connect to next proxy.
+                setupChain();
             } else {
-                final BufferHandle bh = new CacheBufferHandle (con.getBufferHandler ());
-                sendOkReplyAndTunnel (bh);
+                final BufferHandle bh = new CacheBufferHandle(con.getBufferHandler());
+                sendOkReplyAndTunnel(bh);
             }
         }
 
         @Override
-        public void timeout () {
+        public void timeout() {
             final String err =
                     "SSLHandler: Timeout waiting for web connection: " + uri;
-            logger.warning (err);
-            closeDown ();
+            logger.warning(err);
+            closeDown();
         }
 
         @Override
-        public void failed (final Exception e) {
-            warn ("SSLHandler: failed to get web connection to: " + uri, e);
-            closeDown ();
+        public void failed(final Exception e) {
+            warn("SSLHandler: failed to get web connection to: " + uri, e);
+            closeDown();
         }
     }
 
-    private void closeDown () {
+    private void closeDown() {
         if (bh != null) {
             bh.possiblyFlush();
         }
         if (sbh != null) {
             sbh.possiblyFlush();
         }
-        Closer.close (wc, logger);
+        Closer.close(wc, logger);
         wc = null;
-        con.logAndClose (null);
+        con.logAndClose(null);
     }
 
-    private void warn (final String err, final Exception e) {
-        logger.log (Level.WARNING, err, e);
+    private void warn(final String err, final Exception e) {
+        logger.log(Level.WARNING, err, e);
     }
 
-    private void setupChain () {
-        final HttpResponseListener cr = new ChainResponseHandler ();
+    private void setupChain() {
+        final HttpResponseListener cr = new ChainResponseHandler();
         try {
             final HttpResponseReader hrr =
-                    new HttpResponseReader (wc.getChannel (),
-                                            proxy.getNioHandler (),
-                                            tlh.getNetwork (),
-                                            con.getBufferHandler (), request,
-                                            proxy.getStrictHttp (),
-                                            resolver.isProxyConnected (), cr);
-            hrr.sendRequestAndWaitForResponse ();
+                    new HttpResponseReader(wc.getChannel(),
+                                           proxy.getNioHandler(),
+                                           tlh.getNetwork(),
+                                           con.getBufferHandler(), request,
+                                           proxy.getStrictHttp(),
+                                           resolver.isProxyConnected(), cr);
+            hrr.sendRequestAndWaitForResponse();
         } catch (IOException e) {
-            warn ("IOException when waiting for chained response: " +
-                  request.getRequestURI (), e);
-            closeDown ();
+            warn("IOException when waiting for chained response: " +
+                 request.getRequestURI(), e);
+            closeDown();
         }
     }
 
     private class ChainResponseHandler implements HttpResponseListener {
         @Override
-        public void httpResponse (final HttpHeader response, final BufferHandle rbh,
-                                  final boolean keepalive, final boolean isChunked,
-                                  final long dataSize) {
-            final String status = response.getStatusCode ();
-            if (!"200".equals (status)) {
-                closeDown ();
+        public void httpResponse(final HttpHeader response, final BufferHandle rbh,
+                                 final boolean keepalive, final boolean isChunked,
+                                 final long dataSize) {
+            final String status = response.getStatusCode();
+            if (!"200".equals(status)) {
+                closeDown();
             } else {
-                sendOkReplyAndTunnel (rbh);
+                sendOkReplyAndTunnel(rbh);
             }
         }
 
         @Override
-        public void failed (final Exception cause) {
-            warn ("SSLHandler: failed to get chained response: " +
-                  request.getRequestURI (), cause);
-            closeDown ();
+        public void failed(final Exception cause) {
+            warn("SSLHandler: failed to get chained response: " +
+                 request.getRequestURI(), cause);
+            closeDown();
         }
 
         @Override
-        public void timeout () {
+        public void timeout() {
             final String err = "SSLHandler: Timeout waiting for chained response: " +
-                               request.getRequestURI ();
-            logger.warning (err);
-            closeDown ();
+                               request.getRequestURI();
+            logger.warning(err);
+            closeDown();
         }
     }
 
-    private void sendOkReplyAndTunnel (final BufferHandle server2client) {
-        final HttpHeader reply = new HttpHeader ();
-        reply.setStatusLine ("HTTP/1.0 200 Connection established");
-        reply.setHeader ("Proxy-agent", proxy.getServerIdentity ());
+    private void sendOkReplyAndTunnel(final BufferHandle server2client) {
+        final HttpHeader reply = new HttpHeader();
+        reply.setStatusLine("HTTP/1.0 200 Connection established");
+        reply.setHeader("Proxy-agent", proxy.getServerIdentity());
 
-        final HttpHeaderSentListener tc = new TunnelConnected (server2client);
+        final HttpHeaderSentListener tc = new TunnelConnected(server2client);
         try {
             final HttpHeaderSender hhs =
-                    new HttpHeaderSender (channel, proxy.getNioHandler (),
-                                          tlh.getClient (), reply, false, tc);
-            hhs.sendHeader ();
+                    new HttpHeaderSender(channel, proxy.getNioHandler(),
+                                         tlh.getClient(), reply, false, tc);
+            hhs.sendHeader();
         } catch (IOException e) {
-            warn ("IOException when sending header", e);
-            closeDown ();
+            warn("IOException when sending header", e);
+            closeDown();
         }
     }
 
     private class TunnelConnected implements HttpHeaderSentListener {
         private final BufferHandle server2client;
 
-        public TunnelConnected (final BufferHandle server2client) {
+        public TunnelConnected(final BufferHandle server2client) {
             this.server2client = server2client;
         }
 
         @Override
-        public void httpHeaderSent () {
-            tunnelData (server2client);
+        public void httpHeaderSent() {
+            tunnelData(server2client);
         }
 
         @Override
-        public void timeout () {
-            logger.warning ("SSLHandler: Timeout when sending http header: " +
-                            request.getRequestURI ());
-            closeDown ();
+        public void timeout() {
+            logger.warning("SSLHandler: Timeout when sending http header: " +
+                           request.getRequestURI());
+            closeDown();
         }
 
         @Override
-        public void failed (final Exception e) {
-            warn ("SSLHandler: Exception when sending http header: " +
-                  request.getRequestURI (), e);
-            closeDown ();
+        public void failed(final Exception e) {
+            warn("SSLHandler: Exception when sending http header: " +
+                 request.getRequestURI(), e);
+            closeDown();
         }
     }
 
-    private void tunnelData (final BufferHandle server2client) {
+    private void tunnelData(final BufferHandle server2client) {
         sbh = server2client;
-        final SocketChannel sc = wc.getChannel ();
+        final SocketChannel sc = wc.getChannel();
         final Tunnel tunnel =
-                new Tunnel (proxy.getNioHandler (), channel, bh,
-                            tlh.getClient (), sc, server2client,
-                            tlh.getNetwork (), this);
-        tunnel.start ();
+                new Tunnel(proxy.getNioHandler(), channel, bh,
+                           tlh.getClient(), sc, server2client,
+                           tlh.getNetwork(), this);
+        tunnel.start();
     }
 
     @Override
-    public void tunnelClosed () {
+    public void tunnelClosed() {
         if (wc != null) {
-            con.logAndClose (null);
-            Closer.close (wc, logger);
+            con.logAndClose(null);
+            Closer.close(wc, logger);
         }
         wc = null;
     }

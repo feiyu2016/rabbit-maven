@@ -12,11 +12,11 @@ public interface Storable {
      * @param out the output to write to
      * @throws IOException if writing fails
      */
-    void write (DataOutput out) throws IOException;
+    void write(DataOutput out) throws IOException;
 
     /** Fill in this object with data from the given input.
      * @param in the input to read from
      * @throws IOException if reading fails
      */
-    void read (DataInput in) throws IOException;
+    void read(DataInput in) throws IOException;
 }

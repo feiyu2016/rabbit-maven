@@ -12,9 +12,9 @@ public interface BlockListener extends AsyncListener {
      *  before this call is made so position and remaining are valid.
      * @param bufHandle the data that was read
      */
-    void bufferRead (BufferHandle bufHandle);
+    void bufferRead(BufferHandle bufHandle);
 
     /** The resource have been fully transferred 
      */
-    void finishedRead ();
+    void finishedRead();
 }

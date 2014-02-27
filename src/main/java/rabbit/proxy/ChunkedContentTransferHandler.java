@@ -25,55 +25,55 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
     private boolean sentEndChunk = false;
     private final ChunkHandler chunkHandler;
 
-    public ChunkedContentTransferHandler (final Connection con,
-                                          final BufferHandle bufHandle,
-                                          final TrafficLoggerHandler tlh) {
-        super (con, bufHandle, tlh);
-        chunkHandler = new ChunkHandler (this, con.getProxy ().getStrictHttp ());
-        chunkHandler.setBlockListener (this);
+    public ChunkedContentTransferHandler(final Connection con,
+                                         final BufferHandle bufHandle,
+                                         final TrafficLoggerHandler tlh) {
+        super(con, bufHandle, tlh);
+        chunkHandler = new ChunkHandler(this, con.getProxy().getStrictHttp());
+        chunkHandler.setBlockListener(this);
     }
 
     @Override
-    public void modifyRequest (final HttpHeader header) {
-        header.setHeader ("Transfer-Encoding", "chunked");
+    public void modifyRequest(final HttpHeader header) {
+        header.setHeader("Transfer-Encoding", "chunked");
     }
 
-    @Override void sendBuffer () {
-        chunkHandler.handleData (bufHandle);
+    @Override void sendBuffer() {
+        chunkHandler.handleData(bufHandle);
     }
 
     @Override
-    public void bufferRead (final BufferHandle bufHandle) {
-        fireResouceDataRead (bufHandle);
+    public void bufferRead(final BufferHandle bufHandle) {
+        fireResouceDataRead(bufHandle);
         final BlockSender bs =
-                new BlockSender (wc.getChannel (), con.getNioHandler (),
-                                 tlh.getNetwork (), bufHandle, true, this);
-        bs.write ();
+                new BlockSender(wc.getChannel(), con.getNioHandler(),
+                                tlh.getNetwork(), bufHandle, true, this);
+        bs.write();
     }
 
     @Override
-    public void finishedRead () {
-        final ChunkEnder ce = new ChunkEnder ();
+    public void finishedRead() {
+        final ChunkEnder ce = new ChunkEnder();
         sentEndChunk = true;
-        ce.sendChunkEnding (wc.getChannel (), con.getNioHandler (),
-                            tlh.getNetwork (), this);
+        ce.sendChunkEnding(wc.getChannel(), con.getNioHandler(),
+                           tlh.getNetwork(), this);
     }
 
     @Override
-    public void register () {
-        waitForRead ();
+    public void register() {
+        waitForRead();
     }
 
     @Override
-    public void readMore () {
-        if (!bufHandle.isEmpty ()) {
+    public void readMore() {
+        if (!bufHandle.isEmpty()) {
             bufHandle.getBuffer().compact();
         }
-        register ();
+        register();
     }
 
     @Override
-    public void blockSent () {
+    public void blockSent() {
         if (sentEndChunk) {
             listener.clientResourceTransferred();
         } else {

@@ -11,27 +11,25 @@ import rabbit.http.HttpHeader;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 class WarningsHandler {
-    private int nextNonBlank (final String s, int start) {
+    private int nextNonBlank(final String s, int start) {
         char c;
-        final int len = s.length ();
-        while (start < len && ((c = s.charAt (start)) == ' '
-                               || c == '\n' || c == '\r' || c == '\t')) {
+        final int len = s.length();
+        while (start < len && ((c = s.charAt(start)) == ' ' || c == '\n' || c == '\r' || c == '\t')) {
             start++;
         }
         return start;
     }
 
-    private int nextBlank (final String s, int start) {
+    private int nextBlank(final String s, int start) {
         char c;
-        final int len = s.length ();
-        while (start < len && !((c = s.charAt (start)) == ' '
-                                || c == '\n' || c == '\r' || c == '\t')) {
+        final int len = s.length();
+        while (start < len && !((c = s.charAt(start)) == ' ' || c == '\n' || c == '\r' || c == '\t')) {
             start++;
         }
         return start;
     }
 
-    public void removeWarnings (final HttpHeader header, final boolean remove1xx) {
+    public void removeWarnings(final HttpHeader header, final boolean remove1xx) {
         final String rdate = header.getHeader("Date");
         final List<String> ws = header.getHeaders("Warning");
         for (final String val : ws) {
@@ -66,8 +64,7 @@ class WarningsHandler {
                         }
                     }
                     char s;
-                    while (start < val.length()
-                           && ((s = val.charAt(start)) == ' ' || s == ',')) {
+                    while (start < val.length() && ((s = val.charAt(start)) == ' ' || s == ',')) {
                         start++;
                     }
 
@@ -78,9 +75,9 @@ class WarningsHandler {
                     if (rdate != null) {
                         d2 = HttpDateParser.getDate(rdate);
                     }
-                    if (!((d1 != null && !d1.equals(d2))
-                          || (remove1xx && code.charAt(0) == '1')
-                             && !"RabbIT".equals(agent))) {
+                    if (!((d1 != null && !d1.equals(d2)) ||
+                          (remove1xx && code.charAt(0) == '1') &&
+                          !"RabbIT".equals(agent))) {
                         if (!first) {
                             sb.append(", ");
                         }
@@ -101,9 +98,9 @@ class WarningsHandler {
         }
     }
 
-    public void updateWarnings (final HttpHeader header, final HttpHeader webheader) {
-        for (String warn : webheader.getHeaders ("Warning")) {
-            header.addHeader ("Warning", warn);
+    public void updateWarnings(final HttpHeader header, final HttpHeader webheader) {
+        for (String warn : webheader.getHeaders("Warning")) {
+            header.addHeader("Warning", warn);
         }
     }
 }

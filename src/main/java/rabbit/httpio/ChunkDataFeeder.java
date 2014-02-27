@@ -7,14 +7,14 @@ package rabbit.httpio;
 public interface ChunkDataFeeder {
     /** The chunk reader needs more data.
      */
-    void register ();
+    void register();
 
     /** The chunk reader needs to read more data, 
      *  compact buffer before registering.
      */
-    void readMore ();
+    void readMore();
 
     /** Chunk reading has been completed. 
      */
-    void finishedRead ();
+    void finishedRead();
 }

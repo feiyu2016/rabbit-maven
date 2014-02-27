@@ -5,5 +5,5 @@ package rabbit.rnio;
 public interface WriteHandler extends SocketChannelHandler {
 
     /** The channel is ready for read. */
-    void write ();
+    void write();
 }

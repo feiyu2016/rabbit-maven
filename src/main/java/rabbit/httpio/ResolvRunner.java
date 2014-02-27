@@ -18,7 +18,7 @@ public class ResolvRunner implements Runnable {
      * @param ial the listener that will get the callback when the dns lookup
      *        is done
      */
-    public ResolvRunner (final URL url, final InetAddressListener ial) {
+    public ResolvRunner(final URL url, final InetAddressListener ial) {
         this.url = url;
         this.ial = ial;
     }
@@ -26,12 +26,12 @@ public class ResolvRunner implements Runnable {
     /** Run a dns lookup and then notifies the listener on the selector thread.
      */
     @Override
-    public void run () {
+    public void run() {
         try {
             final InetAddress ia = InetAddress.getByName(url.getHost());
-            ial.lookupDone (ia);
+            ial.lookupDone(ia);
         } catch (final UnknownHostException e) {
-            ial.unknownHost (e);
+            ial.unknownHost(e);
         }
     }
 }

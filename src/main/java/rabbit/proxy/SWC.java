@@ -39,7 +39,7 @@ public class SWC implements HttpHeaderSentListener,
     private char status = '0';
 
     private Exception lastException;
-    private static final Logger logger = Logger.getLogger (SWC.class.getName ());
+    private static final Logger logger = Logger.getLogger(SWC.class.getName());
 
     /** Create a new connection establisher.
      * @param con the Connection handling the request
@@ -49,41 +49,41 @@ public class SWC implements HttpHeaderSentListener,
      * @param crh the handler for client data
      * @param rh the RequestHandler to use
      */
-    public SWC (final Connection con, final Resolver resolver, final HttpHeader header,
-                final TrafficLoggerHandler tlh, final ClientResourceHandler crh,
-                final RequestHandler rh) {
+    public SWC(final Connection con, final Resolver resolver, final HttpHeader header,
+               final TrafficLoggerHandler tlh, final ClientResourceHandler crh,
+               final RequestHandler rh) {
         this.con = con;
         this.resolver = resolver;
         this.header = header;
         this.tlh = tlh;
         this.crh = crh;
         this.rh = rh;
-        method = header.getMethod ().trim ();
+        method = header.getMethod().trim();
     }
 
     /** Try to establish a web connection.
      */
-    public void establish () {
+    public void establish() {
         attempts++;
-        con.getCounter ().inc ("Trying to establish a WebConnection: " +
-                               attempts);
+        con.getCounter().inc("Trying to establish a WebConnection: " +
+                             attempts);
 
         // if we cant get a connection in five cancel..
         if (!safe || attempts > 5) {
-            con.webConnectionSetupFailed (rh, lastException);
+            con.webConnectionSetupFailed(rh, lastException);
         } else {
-            con.getProxy ().getWebConnection (header, this);
+            con.getProxy().getWebConnection(header, this);
         }
     }
 
     @Override
-    public void connectionEstablished (final WebConnection wc) {
-        con.getCounter ().inc ("WebConnection established: " +
-                               attempts);
-        rh.setWebConnection (wc);
+    public void connectionEstablished(final WebConnection wc) {
+        con.getCounter().inc("WebConnection established: " +
+                             attempts);
+        rh.setWebConnection(wc);
     /* TODO: handle this
-     if (header.getContentStream () != null)
-        header.setHeader ("Transfer-Encoding", "chunked");
+     if (header.getContentStream() != null)
+        header.setHeader("Transfer-Encoding", "chunked");
     */
 
         // we cant retry if we sent the header...
@@ -95,24 +95,24 @@ public class SWC implements HttpHeaderSentListener,
             }
 
             final HttpHeaderSender hhs =
-                    new HttpHeaderSender (wc.getChannel (), con.getNioHandler (),
-                                          tlh.getNetwork (), header,
-                                          useFullURI (), this);
-            hhs.sendHeader ();
+                    new HttpHeaderSender(wc.getChannel(), con.getNioHandler(),
+                                         tlh.getNetwork(), header,
+                                         useFullURI(), this);
+            hhs.sendHeader();
         } catch (IOException e) {
-            failed (e);
+            failed(e);
         }
     }
 
     /** Check if the full uri should be included in the request.
      * @return true if the upstream server need the full uri in the request
      */
-    public boolean useFullURI () {
-        return resolver.isProxyConnected ();
+    public boolean useFullURI() {
+        return resolver.isProxyConnected();
     }
 
     @Override
-    public void httpHeaderSent () {
+    public void httpHeaderSent() {
         if (crh != null) {
             crh.transfer(rh.getWebConnection(), this);
         } else {
@@ -121,118 +121,118 @@ public class SWC implements HttpHeaderSentListener,
     }
 
     @Override
-    public void clientResourceTransferred () {
-        httpHeaderSentTransferDone ();
+    public void clientResourceTransferred() {
+        httpHeaderSentTransferDone();
     }
 
     @Override
-    public void clientResourceAborted (final HttpHeader reason) {
-        if (rh != null && rh.getWebConnection () != null) {
-            rh.getWebConnection ().setKeepalive (false);
-            con.getProxy ().releaseWebConnection (rh.getWebConnection ());
+    public void clientResourceAborted(final HttpHeader reason) {
+        if (rh != null && rh.getWebConnection() != null) {
+            rh.getWebConnection().setKeepalive(false);
+            con.getProxy().releaseWebConnection(rh.getWebConnection());
         }
-        con.sendAndClose (reason);
+        con.sendAndClose(reason);
     }
 
-    private void httpHeaderSentTransferDone () {
-        if (!header.isDot9Request ()) {
-            readRequest ();
+    private void httpHeaderSentTransferDone() {
+        if (!header.isDot9Request()) {
+            readRequest();
         } else {
             // HTTP/0.9 close after resource..
-            rh.getWebConnection ().setKeepalive (false);
-            setupResource (rh.getWebHandle (), false, -1);
-            con.webConnectionEstablished (rh);
+            rh.getWebConnection().setKeepalive(false);
+            setupResource(rh.getWebHandle(), false, -1);
+            con.webConnectionEstablished(rh);
         }
     }
 
-    private void readRequest () {
-        con.getCounter ().inc ("Trying read response from WebConnection: " +
-                               attempts);
+    private void readRequest() {
+        con.getCounter().inc("Trying read response from WebConnection: " +
+                             attempts);
         try {
             final HttpHeaderReader hhr =
-                    new HttpHeaderReader (rh.getWebConnection ().getChannel (),
-                                          rh.getWebHandle (), con.getNioHandler (),
-                                          tlh.getNetwork (), false,
-                                          con.getProxy ().getStrictHttp (), this);
-            hhr.readHeader ();
+                    new HttpHeaderReader(rh.getWebConnection().getChannel(),
+                                         rh.getWebHandle(), con.getNioHandler(),
+                                         tlh.getNetwork(), false,
+                                         con.getProxy().getStrictHttp(), this);
+            hhr.readHeader();
         } catch (IOException e) {
-            failed (e);
+            failed(e);
         }
     }
 
     @Override
-    public void httpHeaderRead (final HttpHeader header, final BufferHandle wbh,
-                                final boolean keepalive, final boolean isChunked,
-                                final long dataSize) {
-        con.getCounter ().inc ("Read response from WebConnection: " +
-                               attempts);
-        rh.setWebHeader (header);
-        rh.setWebHandle (wbh);
-        rh.getWebConnection ().setKeepalive (keepalive);
+    public void httpHeaderRead(final HttpHeader header, final BufferHandle wbh,
+                               final boolean keepalive, final boolean isChunked,
+                               final long dataSize) {
+        con.getCounter().inc("Read response from WebConnection: " +
+                             attempts);
+        rh.setWebHeader(header);
+        rh.setWebHandle(wbh);
+        rh.getWebConnection().setKeepalive(keepalive);
 
-        final String sc = rh.getWebHeader ().getStatusCode ();
+        final String sc = rh.getWebHeader().getStatusCode();
         //if client is using http/1.1
-        if (sc.length () > 0 && (status = sc.charAt (0)) == '1' &&
-            con.getRequestVersion ().endsWith ("1.1")) {
+        if (sc.length() > 0 && (status = sc.charAt(0)) == '1' &&
+            con.getRequestVersion().endsWith("1.1")) {
             // tell client
-            final Looper l = new Looper ();
-            con.getCounter ().inc ("WebConnection got 1xx reply " +
-                                   attempts);
+            final Looper l = new Looper();
+            con.getCounter().inc("WebConnection got 1xx reply " +
+                                 attempts);
             try {
                 final HttpHeaderSender hhs =
-                        new HttpHeaderSender (con.getChannel (),
-                                              con.getNioHandler (),
-                                              tlh.getClient (), header, false, l);
-                hhs.sendHeader ();
+                        new HttpHeaderSender(con.getChannel(),
+                                             con.getNioHandler(),
+                                             tlh.getClient(), header, false, l);
+                hhs.sendHeader();
                 return;
             } catch (IOException e) {
-                failed (e);
+                failed(e);
             }
         }
 
         // since we have posted the full request we
         // loop while we get 100 (continue) response.
         if (status == '1') {
-            readRequest ();
+            readRequest();
         } else {
-            setAge (rh);
-            final WarningsHandler wh = new WarningsHandler ();
-            wh.removeWarnings (rh.getWebHeader (), false);
-            rh.setSize (dataSize);
-            setupResource (wbh, isChunked, dataSize);
-            con.webConnectionEstablished (rh);
+            setAge(rh);
+            final WarningsHandler wh = new WarningsHandler();
+            wh.removeWarnings(rh.getWebHeader(), false);
+            rh.setSize(dataSize);
+            setupResource(wbh, isChunked, dataSize);
+            con.webConnectionEstablished(rh);
         }
     }
 
-    private void setupResource (final BufferHandle wbh, final boolean isChunked, final long dataSize) {
-        final HttpProxy proxy = con.getProxy ();
-        final ConnectionHandler ch = con.getProxy ().getConnectionHandler ();
+    private void setupResource(final BufferHandle wbh, final boolean isChunked, final long dataSize) {
+        final HttpProxy proxy = con.getProxy();
+        final ConnectionHandler ch = con.getProxy().getConnectionHandler();
         final WebConnectionResourceSource rs =
-                new WebConnectionResourceSource (ch, con.getNioHandler (),
-                                                 rh.getWebConnection (),
-                                                 wbh, tlh.getNetwork (),
-                                                 isChunked, dataSize,
-                                                 proxy.getStrictHttp ());
-        rh.setContent (rs);
+                new WebConnectionResourceSource(ch, con.getNioHandler(),
+                                                rh.getWebConnection(),
+                                                wbh, tlh.getNetwork(),
+                                                isChunked, dataSize,
+                                                proxy.getStrictHttp());
+        rh.setContent(rs);
     }
 
     @Override
-    public void closed () {
-        if (rh.getWebConnection () != null) {
-            closeDownWebConnection ();
-            lastException = new IOException ("closed");
-            establish ();
+    public void closed() {
+        if (rh.getWebConnection() != null) {
+            closeDownWebConnection();
+            lastException = new IOException("closed");
+            establish();
         }
     }
 
     /** Calculate the age of the resource, needs ntp to be accurate.
      * @param rh the RequestHandler holding the headers
      */
-    private void setAge (final RequestHandler rh) {
-        final long now = System.currentTimeMillis ();
-        final String age = rh.getWebHeader ().getHeader ("Age");
-        final String date = rh.getWebHeader ().getHeader ("Date");
-        final Date dd = HttpDateParser.getDate (date);
+    private void setAge(final RequestHandler rh) {
+        final long now = System.currentTimeMillis();
+        final String age = rh.getWebHeader().getHeader("Age");
+        final String date = rh.getWebHeader().getHeader("Date");
+        final Date dd = HttpDateParser.getDate(date);
         long ddt = now;
         if (dd != null) {
             ddt = dd.getTime();
@@ -242,64 +242,64 @@ public class SWC implements HttpHeaderSentListener,
             if (age != null) {
                 lage = Long.parseLong(age);
             }
-            final long dt = Math.max ((now - ddt) / 1000, 0);
+            final long dt = Math.max((now - ddt) / 1000, 0);
             // correct_age is found in spec, but is not actually used
             //long correct_age = lage + dt;
-            final long correct_recieved_age = Math.max (dt, lage);
+            final long correct_recieved_age = Math.max(dt, lage);
             final long corrected_initial_age = correct_recieved_age + dt;
             if (corrected_initial_age > 0) {
-                rh.getWebHeader ().setHeader ("Age",
-                                              Long.toString(corrected_initial_age));
+                rh.getWebHeader().setHeader("Age",
+                                            Long.toString(corrected_initial_age));
             }
         } catch (NumberFormatException e) {
             // if we cant parse it, we leave the Age header..
-            logger.warning ("Bad age: " + age);
+            logger.warning("Bad age: " + age);
         }
     }
 
     private class Looper implements HttpHeaderSentListener {
 
         @Override
-        public void httpHeaderSent () {
+        public void httpHeaderSent() {
             // read the next request...
-            readRequest ();
+            readRequest();
         }
 
         @Override
-        public void timeout () {
-            SWC.this.timeout ();
+        public void timeout() {
+            SWC.this.timeout();
         }
 
         @Override
-        public void failed (final Exception e) {
-            SWC.this.failed (e);
+        public void failed(final Exception e) {
+            SWC.this.failed(e);
         }
     }
 
-    private void closeDownWebConnection () {
-        final WebConnection wc = rh.getWebConnection ();
-        rh.setWebConnection (null);
+    private void closeDownWebConnection() {
+        final WebConnection wc = rh.getWebConnection();
+        rh.setWebConnection(null);
         if (wc != null) {
-            con.getNioHandler ().close (wc.getChannel ());
-            Closer.close (wc, logger);
+            con.getNioHandler().close(wc.getChannel());
+            Closer.close(wc, logger);
         }
     }
 
     @Override
-    public void timeout () {
+    public void timeout() {
         // retry
-        lastException = new IOException ("timeout");
-        closeDownWebConnection ();
-        establish ();
+        lastException = new IOException("timeout");
+        closeDownWebConnection();
+        establish();
     }
 
     @Override
-    public void failed (final Exception e) {
+    public void failed(final Exception e) {
         lastException = e;
-        con.getCounter ().inc ("WebConnections failed: " +
-                               attempts + ": " + e);
-        closeDownWebConnection ();
+        con.getCounter().inc("WebConnections failed: " +
+                             attempts + ": " + e);
+        closeDownWebConnection();
         // retry
-        establish ();
+        establish();
     }
 }

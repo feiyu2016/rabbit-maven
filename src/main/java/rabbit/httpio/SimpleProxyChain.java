@@ -15,12 +15,12 @@ public class SimpleProxyChain implements ProxyChain {
     /** Create a new Proxy chain that always uses direct connections.
      * @param nio the NioHandler to use for running background tasks
      */
-    public SimpleProxyChain (final NioHandler nio) {
-        resolver = new SimpleResolver (nio);
+    public SimpleProxyChain(final NioHandler nio) {
+        resolver = new SimpleResolver(nio);
     }
 
     @Override
-    public Resolver getResolver (final String url) {
+    public Resolver getResolver(final String url) {
         return resolver;
     }
 }

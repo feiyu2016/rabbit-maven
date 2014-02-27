@@ -12,7 +12,7 @@ public class Range {
      * @param start the lower value of the range
      * @param end the upper value of the range 
      */
-    public Range (final long start, final long end) {
+    public Range(final long start, final long end) {
         this.start = start;
         this.end = end;
     }
@@ -20,21 +20,21 @@ public class Range {
     /**
      * @return the lower bound of this range 
      */
-    public long getStart () {
+    public long getStart() {
         return start;
     }
 
     /**
      * @return the upper bound of this range 
      */
-    public long getEnd () {
+    public long getEnd() {
         return end;
     }
 
     /**
      * @return the number of bytes in this range
      */
-    public long size () {
+    public long size() {
         // range is inclusive 1-5 has 5 bytes.
         return end - start + 1;
     }

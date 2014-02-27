@@ -12,10 +12,10 @@ public class StackTraceUtil {
      * @param t the Throwable to get the stack trace for
      * @return the formatted stack trace
      */
-    public static String getStackTrace (final Throwable t) {
-        final StringWriter sw = new StringWriter ();
-        final PrintWriter sos = new PrintWriter (sw);
-        t.printStackTrace (sos);
-        return sw.toString ();
+    public static String getStackTrace(final Throwable t) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter sos = new PrintWriter(sw);
+        t.printStackTrace(sos);
+        return sw.toString();
     }
 }

@@ -7,10 +7,10 @@ package rabbit.httpio;
 public interface TransferListener {
     /** The transfer completed successfully.
      */
-    void transferOk ();
+    void transferOk();
 
     /** Reading failed 
      * @param cause the real reason the operation failed.
      */
-    void failed (Exception cause);
+    void failed(Exception cause);
 }

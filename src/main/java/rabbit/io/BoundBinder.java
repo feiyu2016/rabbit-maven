@@ -13,17 +13,17 @@ public class BoundBinder implements SocketBinder {
      *  InetAddress.
      * @param ia the InetAddress to use
      */
-    public BoundBinder (final InetAddress ia) {
+    public BoundBinder(final InetAddress ia) {
         this.ia = ia;
     }
 
     @Override
-    public int getPort () {
+    public int getPort() {
         return 0;
     }
 
     @Override
-    public InetAddress getInetAddress () {
+    public InetAddress getInetAddress() {
         return ia;
     }
 }

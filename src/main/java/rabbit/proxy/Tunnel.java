@@ -18,7 +18,7 @@ import rabbit.util.TrafficLogger;
  */
 public class Tunnel {
     private final NioHandler nioHandler;
-    private static final Logger logger = Logger.getLogger (Tunnel.class.getName ());
+    private static final Logger logger = Logger.getLogger(Tunnel.class.getName());
     private final OneWayTunnel fromToTo;
     private final OneWayTunnel toToFrom;
     private final TunnelDoneListener listener;
@@ -36,29 +36,29 @@ public class Tunnel {
      * @param listener the listener that will be notified when the tunnel
      *        is closed
      */
-    public Tunnel (final NioHandler nioHandler, final SocketChannel from,
-                   final BufferHandle fromHandle,
-                   final TrafficLogger fromLogger,
-                   final SocketChannel to, final BufferHandle toHandle,
-                   final TrafficLogger toLogger,
-                   final TunnelDoneListener listener) {
-        if (logger.isLoggable (Level.FINEST)) {
+    public Tunnel(final NioHandler nioHandler, final SocketChannel from,
+                  final BufferHandle fromHandle,
+                  final TrafficLogger fromLogger,
+                  final SocketChannel to, final BufferHandle toHandle,
+                  final TrafficLogger toLogger,
+                  final TunnelDoneListener listener) {
+        if (logger.isLoggable(Level.FINEST)) {
             logger.finest("Tunnel created from: " + from + " to: " + to);
         }
         this.nioHandler = nioHandler;
-        fromToTo = new OneWayTunnel (from, to, fromHandle, fromLogger);
-        toToFrom = new OneWayTunnel (to, from, toHandle, toLogger);
+        fromToTo = new OneWayTunnel(from, to, fromHandle, fromLogger);
+        toToFrom = new OneWayTunnel(to, from, toHandle, toLogger);
         this.listener = listener;
     }
 
     /** Start tunneling data in both directions.
      */
-    public void start () {
-        if (logger.isLoggable (Level.FINEST)) {
+    public void start() {
+        if (logger.isLoggable(Level.FINEST)) {
             logger.finest("Tunnel started");
         }
-        fromToTo.start ();
-        toToFrom.start ();
+        fromToTo.start();
+        toToFrom.start();
     }
 
     private class OneWayTunnel implements ReadHandler, WriteHandler {
@@ -67,147 +67,147 @@ public class Tunnel {
         private final BufferHandle bh;
         private final TrafficLogger tl;
 
-        public OneWayTunnel (final SocketChannel from, final SocketChannel to,
-                             final BufferHandle bh, final TrafficLogger tl) {
+        public OneWayTunnel(final SocketChannel from, final SocketChannel to,
+                            final BufferHandle bh, final TrafficLogger tl) {
             this.from = from;
             this.to = to;
             this.bh = bh;
             this.tl = tl;
         }
 
-        public void start () {
-            if (logger.isLoggable (Level.FINEST)) {
+        public void start() {
+            if (logger.isLoggable(Level.FINEST)) {
                 logger.finest("OneWayTunnel started: bh.isEmpty: " +
                               bh.isEmpty());
             }
-            if (bh.isEmpty ()) {
+            if (bh.isEmpty()) {
                 waitForRead();
             } else {
                 writeData();
             }
         }
 
-        private void waitForRead () {
-            bh.possiblyFlush ();
-            nioHandler.waitForRead (from, this);
+        private void waitForRead() {
+            bh.possiblyFlush();
+            nioHandler.waitForRead(from, this);
         }
 
-        private void waitForWrite () {
-            bh.possiblyFlush ();
-            nioHandler.waitForWrite (to, this);
+        private void waitForWrite() {
+            bh.possiblyFlush();
+            nioHandler.waitForWrite(to, this);
         }
 
-        public void unregister () {
-            nioHandler.cancel (from, this);
-            nioHandler.cancel (to, this);
+        public void unregister() {
+            nioHandler.cancel(from, this);
+            nioHandler.cancel(to, this);
 
             // clear buffer and return it.
-            final ByteBuffer buf = bh.getBuffer ();
-            buf.position (buf.limit ());
-            bh.possiblyFlush ();
+            final ByteBuffer buf = bh.getBuffer();
+            buf.position(buf.limit());
+            bh.possiblyFlush();
         }
 
-        private void writeData () {
+        private void writeData() {
             try {
-                if (!to.isOpen ()) {
-                    logger.warning ("Tunnel to is closed, not writing data");
-                    closeDown ();
+                if (!to.isOpen()) {
+                    logger.warning("Tunnel to is closed, not writing data");
+                    closeDown();
                     return;
                 }
-                final ByteBuffer buf = bh.getBuffer ();
-                if (buf.hasRemaining ()) {
+                final ByteBuffer buf = bh.getBuffer();
+                if (buf.hasRemaining()) {
                     int written;
                     do {
-                        written = to.write (buf);
-                        if (logger.isLoggable (Level.FINEST)) {
+                        written = to.write(buf);
+                        if (logger.isLoggable(Level.FINEST)) {
                             logger.finest("OneWayTunnel wrote: " + written);
                         }
-                        tl.write (written);
-                    } while (written > 0 && buf.hasRemaining ());
+                        tl.write(written);
+                    } while (written > 0 && buf.hasRemaining());
                 }
 
-                if (buf.hasRemaining ()) {
+                if (buf.hasRemaining()) {
                     waitForWrite();
                 } else {
                     waitForRead();
                 }
             } catch (IOException e) {
-                logger.warning ("Got exception writing to tunnel: " + e);
-                closeDown ();
+                logger.warning("Got exception writing to tunnel: " + e);
+                closeDown();
             }
         }
 
         @Override
-        public void closed () {
-            logger.info ("Tunnel closed");
-            closeDown ();
+        public void closed() {
+            logger.info("Tunnel closed");
+            closeDown();
         }
 
         @Override
-        public void timeout () {
-            logger.warning ("Tunnel got timeout");
-            closeDown ();
+        public void timeout() {
+            logger.warning("Tunnel got timeout");
+            closeDown();
         }
 
         @Override
-        public boolean useSeparateThread () {
+        public boolean useSeparateThread() {
             return false;
         }
 
         @Override
-        public String getDescription () {
+        public String getDescription() {
             return "Tunnel part from: " + from + " to: " + to;
         }
 
         @Override
-        public Long getTimeout () {
+        public Long getTimeout() {
             return null;
         }
 
         @Override
-        public void read () {
+        public void read() {
             try {
-                if (!from.isOpen ()) {
-                    logger.warning ("Tunnel to is closed, not reading data");
+                if (!from.isOpen()) {
+                    logger.warning("Tunnel to is closed, not reading data");
                     return;
                 }
-                final ByteBuffer buffer = bh.getBuffer ();
-                buffer.clear ();
-                final int read = from.read (buffer);
-                if (logger.isLoggable (Level.FINEST)) {
+                final ByteBuffer buffer = bh.getBuffer();
+                buffer.clear();
+                final int read = from.read(buffer);
+                if (logger.isLoggable(Level.FINEST)) {
                     logger.finest("OneWayTunnel read: " + read);
                 }
                 if (read == -1) {
-                    buffer.position (buffer.limit ());
-                    closeDown ();
+                    buffer.position(buffer.limit());
+                    closeDown();
                 } else {
-                    buffer.flip ();
-                    tl.read (read);
-                    writeData ();
+                    buffer.flip();
+                    tl.read(read);
+                    writeData();
                 }
             } catch (IOException e) {
-                logger.warning ("Got exception reading from tunnel: " + e);
-                closeDown ();
+                logger.warning("Got exception reading from tunnel: " + e);
+                closeDown();
             }
         }
 
         @Override
-        public void write () {
-            writeData ();
+        public void write() {
+            writeData();
         }
     }
 
-    private void closeDown () {
-        fromToTo.unregister ();
-        toToFrom.unregister ();
+    private void closeDown() {
+        fromToTo.unregister();
+        toToFrom.unregister();
         // we do not want to close the channels,
         // it is up to the listener to do that.
         if (listener != null) {
-            listener.tunnelClosed ();
+            listener.tunnelClosed();
         } else {
             // hmm? no listeners, then close down
-            Closer.close (fromToTo.from, logger);
-            Closer.close (toToFrom.from, logger);
+            Closer.close(fromToTo.from, logger);
+            Closer.close(toToFrom.from, logger);
         }
     }
 }

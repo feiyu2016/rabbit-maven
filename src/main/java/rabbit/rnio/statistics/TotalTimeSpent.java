@@ -15,7 +15,7 @@ public class TotalTimeSpent {
      * @param ce the CompletionEntry that we want to update our information 
      *        with
      */
-    public void update (final CompletionEntry ce) {
+    public void update(final CompletionEntry ce) {
         if (ce.wasOk) {
             successful++;
         } else {
@@ -27,21 +27,21 @@ public class TotalTimeSpent {
     /** Get the number of successfully completed jobs.
      * @return the number of successful jobs
      */
-    public long getSuccessful () {
+    public long getSuccessful() {
         return successful;
     }
 
     /** Get the number of failed jobs.
      * @return the number of unsuccessful jobs
      */
-    public long getFailures () {
+    public long getFailures() {
         return failures;
     }
 
     /** Get the total time spent doing this kind of task.
      * @return the total time take for all jobs
      */
-    public long getTotalMillis () {
+    public long getTotalMillis() {
         return totalMillis;
     }
 }

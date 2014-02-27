@@ -19,9 +19,9 @@ class StatisticsCollector implements Runnable {
      * @param realTask the task to run
      * @param ti the identifier of the task 
      */
-    public StatisticsCollector (final StatisticsHolder stats,
-                                final Runnable realTask,
-                                final TaskIdentifier ti) {
+    public StatisticsCollector(final StatisticsHolder stats,
+                               final Runnable realTask,
+                               final TaskIdentifier ti) {
         this.stats = stats;
         this.realTask = realTask;
         this.ti = ti;
@@ -30,17 +30,17 @@ class StatisticsCollector implements Runnable {
     /** Run the task.
      */
     @Override
-    public void run () {
-        stats.changeTaskStatusToRunning (ti);
-        final long started = System.currentTimeMillis ();
+    public void run() {
+        stats.changeTaskStatusToRunning(ti);
+        final long started = System.currentTimeMillis();
         boolean wasOk = false;
         try {
-            realTask.run ();
+            realTask.run();
             wasOk = true;
         } finally {
-            final long ended = System.currentTimeMillis ();
+            final long ended = System.currentTimeMillis();
             final long diff = ended - started;
-            stats.changeTaskStatusToFinished (ti, wasOk, diff);
+            stats.changeTaskStatusToFinished(ti, wasOk, diff);
         }
     }
 }
