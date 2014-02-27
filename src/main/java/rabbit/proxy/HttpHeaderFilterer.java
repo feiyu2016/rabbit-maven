@@ -39,7 +39,6 @@ class HttpHeaderFilterer {
     private HttpHeader filter (final Connection con, final SocketChannel channel,
                                final HttpHeader in, final List<HttpFilter> filters,
                                final FilterHandler fh) {
-        final int s = filters.size();
         for (final HttpFilter hf : filters) {
             final HttpHeader badresponse = fh.filter(hf, channel, in, con);
             if (badresponse != null) {

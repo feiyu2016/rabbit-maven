@@ -121,7 +121,6 @@ public class HttpHeaderReader extends BaseSocketHandler
             logger.finest("HttpHeaderReader.parseBuffer: done " + done);
         }
         if (!done) {
-            final int pos = buffer.position ();
             buffer.reset ();
             if (buffer.position () > 0) {
                 // ok, some data handled, make space for more.
@@ -130,9 +129,7 @@ public class HttpHeaderReader extends BaseSocketHandler
             } else {
                 // ok, we did not make any progress, did we only read
                 // a partial long line (cookie or whatever).
-                if (buffer.limit () < buffer.capacity ()) {
-                    // try to read some more
-                } else {
+                if (buffer.limit () >= buffer.capacity ()) {
                     releaseBuffer ();
                     // ok, we did no progress, abort, client is sending
                     // too long lines.

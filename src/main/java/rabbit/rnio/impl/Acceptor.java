@@ -14,7 +14,7 @@ import rabbit.rnio.NioHandler;
  */
 public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
         implements AcceptHandler {
-    private AcceptorListener listener;
+    private final AcceptorListener listener;
 
     /** Create a new Acceptor that will wait for accepts on the given channel.
      * @param ssc the channel to accept connections from

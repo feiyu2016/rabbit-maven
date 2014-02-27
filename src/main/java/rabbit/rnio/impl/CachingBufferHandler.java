@@ -14,14 +14,14 @@ import rabbit.rnio.BufferHandler;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class CachingBufferHandler implements BufferHandler {
-    private Queue<BufferHolder> cache =
+    private final Queue<BufferHolder> cache =
             new ConcurrentLinkedQueue<>();
-    private Queue<BufferHolder> largeCache =
+    private final Queue<BufferHolder> largeCache =
             new ConcurrentLinkedQueue<>();
 
     private ByteBuffer getBuffer (final Queue<BufferHolder> bufs, final int size) {
         final BufferHolder r = bufs.poll ();
-        ByteBuffer b = null;
+        ByteBuffer b;
         if (r != null) {
             b = r.getBuffer ();
         } else {
@@ -64,7 +64,7 @@ public class CachingBufferHandler implements BufferHandler {
     }
 
     private static final class BufferHolder {
-        private ByteBuffer buffer;
+        private final ByteBuffer buffer;
 
         public BufferHolder (final ByteBuffer buffer) {
             this.buffer = buffer;
@@ -80,10 +80,7 @@ public class CachingBufferHandler implements BufferHandler {
             }
 
             // ByteBuffer.equals depends on content, not what I want.
-            if (o instanceof BufferHolder) {
-                return ((BufferHolder) o).buffer == buffer;
-            }
-            return false;
+            return o instanceof BufferHolder && ((BufferHolder) o).buffer == buffer;
         }
 
         @Override public int hashCode () {

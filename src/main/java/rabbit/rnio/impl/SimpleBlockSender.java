@@ -46,7 +46,7 @@ public abstract class SimpleBlockSender
     @Override
     public void write () {
         try {
-            int written = 0;
+            int written;
             do {
                 written = sc.write (buf);
             } while (buf.hasRemaining () && written > 0);

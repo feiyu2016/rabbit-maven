@@ -44,7 +44,6 @@ public class GeneralHeader implements Storable {
      * @param sb the StringBuilder this header is written to
      */
     protected void fillBuffer (final StringBuilder sb) {
-        final int hsize = headers.size ();
         for (final Header h : headers) {
             sb.append(h.getType());
             sb.append(": ");
@@ -59,7 +58,6 @@ public class GeneralHeader implements Storable {
      * @return the value of type or null if no value is set.
      */
     public String getHeader (final String type) {
-        final int s = headers.size ();
         for (final Header h : headers) {
             if (h.getType().equalsIgnoreCase(type)) {
                 return h.getValue();
@@ -72,7 +70,6 @@ public class GeneralHeader implements Storable {
      * @param value the value we want to set
      */
     public void setHeader (final String type, final String value) {
-        final int s = headers.size ();
         for (final Header h : headers) {
             if (h.getType().equalsIgnoreCase(type)) {
                 h.setValue(value);
@@ -88,7 +85,6 @@ public class GeneralHeader implements Storable {
      * @param newValue the value we want to set
      */
     public void setExistingValue (final String current, final String newValue) {
-        final int s = headers.size ();
         for (final Header h : headers) {
             if (h.getValue().equals(current)) {
                 h.setValue(newValue);
@@ -150,7 +146,6 @@ public class GeneralHeader implements Storable {
      */
     public List<String> getHeaders (final String type) {
         List<String> ret = null;
-        final int s = headers.size ();
         for (final Header h : headers) {
             if (h.getType().equalsIgnoreCase(type)) {
                 if (ret == null) {

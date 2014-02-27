@@ -146,7 +146,6 @@ public class HttpBaseFilter implements HttpFilter {
      */
     private void removeConnectionTokens (final HttpHeader header) {
         final List<String> cons = header.getHeaders ("Connection");
-        final int l = cons.size ();
         for (final String val : cons) {
             /* ok, split it... */
             int s;
@@ -344,7 +343,6 @@ public class HttpBaseFilter implements HttpFilter {
         if (!(status.equals ("200") || status.equals ("206")
               || status.equals ("304"))) {
             con.setKeepalive (false);
-            useCache = false;
         }
 
         String age = header.getHeader ("Age");

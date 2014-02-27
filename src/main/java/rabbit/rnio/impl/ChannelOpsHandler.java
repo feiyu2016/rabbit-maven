@@ -220,8 +220,8 @@ class ChannelOpsHandler {
     }
 
     public boolean doTimeouts (final long now) {
-        boolean ret = false;
-        if (ret |= doTimeout (now, readHandler)) {
+        boolean ret;
+        if (ret = doTimeout(now, readHandler)) {
             readHandler = NULL_HANDLER;
         }
         if (ret |= doTimeout (now, writeHandler)) {

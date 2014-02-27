@@ -126,10 +126,7 @@ public class Connection {
     }
 
     private boolean connectionReset (final Throwable t) {
-        if (t instanceof IOException) {
-            return "Connection reset by peer".equals(t.getMessage());
-        }
-        return false;
+        return t instanceof IOException && "Connection reset by peer".equals(t.getMessage());
     }
 
     private void handleFailedRequestRead (final Throwable t) {
@@ -241,13 +238,7 @@ public class Connection {
 
     private boolean hasRegularContent (final HttpHeader request, final String ct,
                                        final long dataSize) {
-        if (request.getContent () != null) {
-            return true;
-        }
-        if (ct != null && ct.startsWith ("multipart/byteranges")) {
-            return false;
-        }
-        return dataSize > -1;
+        return request.getContent() != null || !(ct != null && ct.startsWith("multipart/byteranges")) && dataSize > -1;
     }
 
     /** Filter the request and handle it.
@@ -469,7 +460,7 @@ public class Connection {
      * @param message the error message to tell the client.
      */
     public void doError (final int status, final String message) {
-        this.statusCode = Integer.toString (status);
+        this.statusCode = Integer.toString (500);
         final HttpHeader header =
                 responseHandler.get400 (new IOException (message));
         sendAndClose (header);

@@ -24,10 +24,7 @@ public class MultipartHeader extends GeneralHeader {
     }
 
     @Override public String toString () {
-        final StringBuilder ret = new StringBuilder (header);
-        ret.append (Header.CRLF);
-        ret.append (super.toString ());
-        return ret.toString ();
+        return header + Header.CRLF + super.toString();
     }
 
     /** Write this MultipartHeader to the given output.

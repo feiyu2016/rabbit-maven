@@ -16,24 +16,24 @@ import rabbit.rnio.statistics.TotalTimeSpent;
  */
 public class BasicStatisticsHolder implements StatisticsHolder {
     // Map is group id to TaskIdentifier
-    private Map<String, List<TaskIdentifier>> pendingTasks =
+    private final Map<String, List<TaskIdentifier>> pendingTasks =
             new HashMap<>();
 
     // Map is group id to TaskIdentifier
-    private Map<String, List<TaskIdentifier>> runningTasks =
+    private final Map<String, List<TaskIdentifier>> runningTasks =
             new HashMap<>();
 
-    private int maxLatest = 10;
+    private static final int MAX_LATEST = 10;
     // Map is group id to CompletionEntry
-    private Map<String, List<CompletionEntry>> latest =
+    private final Map<String, List<CompletionEntry>> latest =
             new HashMap<>();
 
-    private int maxLongest = 10;
+    private static final int MAX_LONGEST = 10;
     // Map is group id to CompletionEntry
-    private Map<String, List<CompletionEntry>> longest =
+    private final Map<String, List<CompletionEntry>> longest =
             new HashMap<>();
 
-    private Map<String, TotalTimeSpent> total =
+    private final Map<String, TotalTimeSpent> total =
             new HashMap<>();
 
     private <T> List<T> getList (final String id,
@@ -89,7 +89,7 @@ public class BasicStatisticsHolder implements StatisticsHolder {
     private void addToLatest (final CompletionEntry ce) {
         final List<CompletionEntry> ls = getList (ce.ti.getGroupId (), latest);
         ls.add (ce);
-        if (ls.size () > maxLatest) {
+        if (ls.size () > MAX_LATEST) {
             ls.remove(0);
         }
     }
@@ -98,7 +98,7 @@ public class BasicStatisticsHolder implements StatisticsHolder {
         final List<CompletionEntry> ls = getList (ce.ti.getGroupId (), longest);
         if (ls.isEmpty ()) {
             ls.add (ce);
-        } else if (addSorted (ce, ls) && (ls.size () > maxLongest)){
+        } else if (addSorted (ce, ls) && (ls.size () > MAX_LONGEST)){
             ls.remove (ls.size () - 1);
         }
     }
@@ -112,7 +112,7 @@ public class BasicStatisticsHolder implements StatisticsHolder {
                 return true;
             }
         }
-        if (s < maxLongest) {
+        if (s < MAX_LONGEST) {
             ls.add (ce);
             return true;
         }

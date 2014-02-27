@@ -206,7 +206,7 @@ class SingleSelectorRunner implements Runnable {
                 }
                 cancelTimeouts (now);
                 int num = handleSelects ();
-                int rt = 0;
+                int rt;
                 do {
                     rt = runReturnedTasks ();
                     num += rt;
@@ -378,11 +378,10 @@ class SingleSelectorRunner implements Runnable {
         }
         for (SelectorRunnable aReturnedTasks2 : returnedTasks2) {
             try {
-                final SelectorRunnable sr = aReturnedTasks2;
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest(id + ": Selector running task " + sr);
+                    logger.finest(id + ": Selector running task " + aReturnedTasks2);
                 }
-                sr.run(this);
+                aReturnedTasks2.run(this);
             } catch (IOException e) {
                 logger.log(Level.WARNING,
                            "Got exception when running returned task",

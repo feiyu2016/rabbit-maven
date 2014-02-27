@@ -276,7 +276,7 @@ public class HttpHeader extends GeneralHeader {
         if(content == null){
             this.content = null;
         }else{
-            this.content = (byte[])content.clone();
+            this.content = content.clone();
             setHeader ("Content-Length", Integer.toString(content.length));
         }
     }
@@ -305,7 +305,7 @@ public class HttpHeader extends GeneralHeader {
         if(content == null){
             return null;
         }
-        return (byte[])content.clone();
+        return content.clone();
     }
 
     @Override public void read (final DataInput in) throws IOException {

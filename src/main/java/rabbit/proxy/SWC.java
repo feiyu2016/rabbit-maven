@@ -87,9 +87,7 @@ public class SWC implements HttpHeaderSentListener,
 	*/
 
         // we cant retry if we sent the header...
-        safe = wc.getReleasedAt () > 0
-               || (method != null
-                   && (method.equals ("GET") || method.equals ("HEAD")));
+        safe = wc.getReleasedAt() > 0 || ((method.equals("GET") || method.equals("HEAD")));
 
         try {
             if (crh != null) {

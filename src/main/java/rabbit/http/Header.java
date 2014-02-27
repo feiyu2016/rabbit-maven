@@ -62,10 +62,7 @@ public class Header implements Storable {
     }
 
     @Override public boolean equals (final Object o) {
-        if (o instanceof Header) {
-            return (((Header)o).type.equalsIgnoreCase (type));
-        }
-        return false;
+        return o instanceof Header && (((Header) o).type.equalsIgnoreCase(type));
     }
 
     @Override public int hashCode() {

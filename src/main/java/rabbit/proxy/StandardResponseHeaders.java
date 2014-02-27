@@ -185,8 +185,7 @@ class StandardResponseHeaders implements HttpGenerator {
                 content.append("Unable to handle request");
             }
 
-            content.append (":<br><b>" +
-                            StringEscapeUtils.escapeHtml (e.getMessage ()));
+            content.append(":<br><b>").append(StringEscapeUtils.escapeHtml(e.getMessage()));
 
             content.append ("\n\n<br>Did you mean to go to: ");
             content.append (getPlaces (u));
@@ -194,7 +193,7 @@ class StandardResponseHeaders implements HttpGenerator {
             if (!dnsError) {
                 message = "<xmp>" + StackTraceUtil.getStackTrace(e) + "</xmp>";
             }
-            content.append ("</b><br>" + message + "</body></html>\n");
+            content.append("</b><br>").append(message).append("</body></html>\n");
 
             header.setContent (content.toString (), UTF8);
         } catch (MalformedURLException ex) {
@@ -213,11 +212,8 @@ class StandardResponseHeaders implements HttpGenerator {
             final String suf = placeTransformer[1];
             final String place = getPlace(u, pre, suf);
             if (place != null && !places.contains(place)) {
-                content.append("<li><a href=\"" +
-                               StringEscapeUtils.escapeHtml(place) +
-                               "\">" +
-                               StringEscapeUtils.escapeHtml(place) +
-                               "</a></li>\n");
+                content.append("<li><a href=\"").append(StringEscapeUtils.escapeHtml(place)).append("\">")
+                       .append(StringEscapeUtils.escapeHtml(place)).append("</a></li>\n");
                 places.add(place);
             }
         }

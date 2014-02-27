@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 
 /** a class to handle configs for different things. */
 public abstract class Config {
-    private Map<String, SProperties> configs;
+    private final Map<String, SProperties> configs;
 
     protected Map<String, SProperties> getConfigs(){
         return configs;

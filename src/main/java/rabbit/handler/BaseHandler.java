@@ -44,7 +44,7 @@ public class BaseHandler
     /** The resource */
     protected ResourceSource content;
 
-    /** The length of the data beeing handled or -1 if unknown.*/
+    /** The length of the data being handled or -1 if unknown.*/
     protected long size = -1;
     /** The total amount of data that we read. */
     protected long totalRead = 0;
@@ -66,7 +66,7 @@ public class BaseHandler
      * @param request the actual request made.
      * @param response the actual response.
      * @param content the resource.
-     * @param size the size of the data beeing handled.
+     * @param size the size of the data being handled.
      */
     public BaseHandler (final Connection con, final TrafficLoggerHandler tlh,
                         final HttpHeader request, final HttpHeader response,
@@ -105,7 +105,7 @@ public class BaseHandler
      * </xmp>
      * Note that finish is always called, no matter what exceptions are thrown.
      * The middle steps are most probably only performed if the previous steps
-     * have all succeded
+     * have all succeeded
      */
     @Override
     public void handle () {
@@ -175,7 +175,6 @@ public class BaseHandler
      *             if false then the connection may not be restared
      */
     protected void finish (final boolean good) {
-        boolean ok = false;
         try {
             if (content != null) {
                 content.release();
@@ -184,8 +183,6 @@ public class BaseHandler
                 && response.getHeader ("Content-Length") != null) {
                 con.setContentLength(response.getHeader("Content-length"));
             }
-
-            ok = true;
         } finally {
             // and clean up...
             request = null;
@@ -194,7 +191,7 @@ public class BaseHandler
         }
         // Not sure why we need this, seems to call finish multiple times.
         if (con != null) {
-            if (good && ok) {
+            if (good) {
                 con.logAndRestart ();
             } else {
                 con.logAndClose (null);

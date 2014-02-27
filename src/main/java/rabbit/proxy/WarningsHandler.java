@@ -32,9 +32,8 @@ class WarningsHandler {
     }
 
     public void removeWarnings (final HttpHeader header, final boolean remove1xx) {
-        final String rdate = header.getHeader ("Date");
-        final List<String> ws = header.getHeaders ("Warning");
-        final int wl = ws.size ();
+        final String rdate = header.getHeader("Date");
+        final List<String> ws = header.getHeaders("Warning");
         for (final String val : ws) {
             try {
                 final StringBuilder sb = new StringBuilder();
@@ -85,7 +84,7 @@ class WarningsHandler {
                         if (!first) {
                             sb.append(", ");
                         }
-                        sb.append(code + " " + agent + " \"" + text);
+                        sb.append(code).append(" ").append(agent).append(" \"").append(text);
                         sb.append(date != null ? "\" \"" + date + "\"" : "\"");
                         first = false;
                     }

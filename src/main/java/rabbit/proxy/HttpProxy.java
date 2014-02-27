@@ -374,8 +374,7 @@ public class HttpProxy {
 
         final String in = contentFilters + comma + rabbit.filter.HttpBaseFilter.class.getName();
         final String out = rabbit.filter.HttpBaseFilter.class.getName();
-        final String connect = contentFilters;
-        httpHeaderFilterer = new HttpHeaderFilterer (in, out, connect, config, this);
+        httpHeaderFilterer = new HttpHeaderFilterer (in, out, contentFilters, config, this);
     }
 
 

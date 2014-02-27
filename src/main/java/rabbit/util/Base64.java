@@ -4,7 +4,7 @@ package rabbit.util;
  */
 public class Base64 {
 
-    /** dont construct this
+    /** don't construct this
      */
     private Base64 () {
         // nah.
@@ -48,7 +48,7 @@ public class Base64 {
             base64string += "=";           // that should be safe.
         }
         int i = 0;
-        int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
+        int c1, c2, c3 = 0, c4 = 0;
         while (i < base64string.length () &&
                pr2six[base64string.charAt (i)] <= 63) {
             c1 = pr2six[base64string.charAt (i)];
@@ -83,16 +83,16 @@ public class Base64 {
             ch1 = str.charAt (i);
             ch2 = str.charAt (i+1);
             ch3 = str.charAt (i+2);
-            ch = uu_base64[((ch1 >> 2) & 077)];
+            ch = uu_base64[((ch1 >> 2) & 0x3f)];
             ret.append (ch);
 
-            ch = uu_base64[(((ch1 << 4) & 060) | ((ch2 >> 4) & 017))];
+            ch = uu_base64[(((ch1 << 4) & 0x30) | ((ch2 >> 4) & 0xf))];
             ret.append (ch);
 
-            ch = uu_base64[(((ch2 << 2) & 074) | ((ch3 >> 6) & 03))];
+            ch = uu_base64[(((ch2 << 2) & 0x3c) | ((ch3 >> 6) & 0x3))];
             ret.append (ch);
 
-            ch = uu_base64[(ch3 & 077)];
+            ch = uu_base64[(ch3 & 0x3f)];
             ret.append (ch);
         }
 
@@ -105,14 +105,14 @@ public class Base64 {
         ch1 = str.charAt (i);
         ch2 = str.length() > i + 1 ? str.charAt (i+1) : (char)0;
 
-        ch = uu_base64[((ch1 >> 2) & 077)];
+        ch = uu_base64[((ch1 >> 2) & 0x3f)];
         ret.append (ch);
 
-        ch = uu_base64[(((ch1 << 4) & 060) | ((ch2 >> 4) & 017))];
+        ch = uu_base64[(((ch1 << 4) & 0x30) | ((ch2 >> 4) & 0xf))];
         ret.append (ch);
 
         if (str.length () > i + 1) {
-            ch = uu_base64[((ch2 << 2) & 074)];
+            ch = uu_base64[((ch2 << 2) & 0x3c)];
             ret.append (ch);
         } else {
             ret.append ('=');
