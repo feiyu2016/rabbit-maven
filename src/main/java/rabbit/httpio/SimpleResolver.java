@@ -17,24 +17,24 @@ public class SimpleResolver implements Resolver {
      * @param nio the NioHandler to use for running background tasks
      */
     public SimpleResolver (final NioHandler nio) {
-	this.nio = nio;
+        this.nio = nio;
     }
 
     public void getInetAddress (final URL url, final InetAddressListener listener) {
-	final String groupId = getClass ().getSimpleName ();
-	nio.runThreadTask (new ResolvRunner (url, listener), 
-			   new DefaultTaskIdentifier (groupId, url.toString ()));
+        final String groupId = getClass ().getSimpleName ();
+        nio.runThreadTask (new ResolvRunner (url, listener),
+                           new DefaultTaskIdentifier (groupId, url.toString ()));
     }
 
     public int getConnectPort (final int port) {
-	return port;
-    } 
+        return port;
+    }
 
     public boolean isProxyConnected () {
-	return false;
+        return false;
     }
 
     public String getProxyAuthString () {
-	return null;
+        return null;
     }
 }

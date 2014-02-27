@@ -12,8 +12,8 @@ import rabbit.util.TrafficLogger;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class ChunkEnder {
-    private static final byte[] CHUNK_ENDING = 
-    new byte[] {'0', '\r', '\n', '\r', '\n'};
+    private static final byte[] CHUNK_ENDING =
+            new byte[] {'0', '\r', '\n', '\r', '\n'};
 
     /** Send the chunk ending block.
      * @param channel the Channel to send the chunk ender to
@@ -23,11 +23,11 @@ public class ChunkEnder {
      *        complete
      */
     public void sendChunkEnding (final SocketChannel channel, final NioHandler nioHandler,
-				 final TrafficLogger tl, final BlockSentListener bsl) {
-	final ByteBuffer bb = ByteBuffer.wrap (CHUNK_ENDING);
-	final BufferHandle bh = new SimpleBufferHandle (bb);
-	final BlockSender bs = 
-	    new BlockSender (channel, nioHandler, tl, bh, false, bsl);
-	bs.write ();
+                                 final TrafficLogger tl, final BlockSentListener bsl) {
+        final ByteBuffer bb = ByteBuffer.wrap (CHUNK_ENDING);
+        final BufferHandle bh = new SimpleBufferHandle (bb);
+        final BlockSender bs =
+                new BlockSender (channel, nioHandler, tl, bh, false, bsl);
+        bs.write ();
     }
 }

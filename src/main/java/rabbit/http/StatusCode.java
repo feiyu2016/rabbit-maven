@@ -101,22 +101,22 @@ public enum StatusCode {
     private final String description;
 
     private StatusCode (final int code, final String description) {
-	this.code = code;
-	this.description = description;
+        this.code = code;
+        this.description = description;
     }
 
     /** Get the numeric value of the status code
      * @return the status code
      */
     public int getCode () {
-	return code;
+        return code;
     }
 
     /** Get the human readable description of this status code.
      * @return the description
      */
     public String getDescription () {
-	return description;
+        return description;
     }
 
     /** Get a http response line using this status code
@@ -124,6 +124,6 @@ public enum StatusCode {
      * @return the formatted status line
      */
     public String getStatusLine (final String httpVersion) {
-	return httpVersion + " " + code + " " + description;
+        return httpVersion + " " + code + " " + description;
     }
 }

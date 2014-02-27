@@ -17,9 +17,9 @@ public class LineReader {
      *
      * @param strictHttp if true only CRLF will be accepted as newlines, 
      *                   if false single LF will also be accepted.
-     */ 
+     */
     public LineReader (final boolean strictHttp) {
-	this.strictHttp = strictHttp;
+        this.strictHttp = strictHttp;
     }
 
     /** Try to read a line. 
@@ -28,24 +28,24 @@ public class LineReader {
      * @param listener the line listener.
      */
     public void readLine (final ByteBuffer buffer, final LineListener listener) {
-	final StringBuilder sb = new StringBuilder (200);
-	int l = -1;
-	boolean lineEnding = false;
-	while (buffer.hasRemaining ()) {
-	    final byte c = buffer.get ();
-	    if (c == '\n') {
-		if (l == '\r') {
-		    lineEnding = true;
-		    sb.setLength (sb.length () - 1);
-		}
-		if (lineEnding || !strictHttp) {
-		    buffer.mark ();
-		    listener.lineRead (sb.toString ());
-		    return;
-		}
-	    }
-	    sb.append ((char)c);
-	    l = c;
-	}
+        final StringBuilder sb = new StringBuilder (200);
+        int l = -1;
+        boolean lineEnding = false;
+        while (buffer.hasRemaining ()) {
+            final byte c = buffer.get ();
+            if (c == '\n') {
+                if (l == '\r') {
+                    lineEnding = true;
+                    sb.setLength (sb.length () - 1);
+                }
+                if (lineEnding || !strictHttp) {
+                    buffer.mark ();
+                    listener.lineRead (sb.toString ());
+                    return;
+                }
+            }
+            sb.append ((char)c);
+            l = c;
+        }
     }
 }

@@ -18,14 +18,14 @@ public class Closer {
      * @param logger the Logger to use if the close fails
      */
     public static void close (final Closeable c, final Logger logger) {
-	if (c == null)
-	    return;
-	try {
-	    c.close ();
-	} catch (IOException e) {
-	    logger.log (Level.WARNING, 
-			"Failed to close connection: " + c, 
-			e);
-	}
+        if (c == null)
+            return;
+        try {
+            c.close ();
+        } catch (IOException e) {
+            logger.log (Level.WARNING,
+                        "Failed to close connection: " + c,
+                        e);
+        }
     }
 }

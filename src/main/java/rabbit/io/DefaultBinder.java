@@ -8,10 +8,10 @@ import java.net.InetAddress;
  */
 public class DefaultBinder implements SocketBinder {
     public int getPort () {
-	return 0;
+        return 0;
     }
 
     public InetAddress getInetAddress () {
-	return null;
+        return null;
     }
 }

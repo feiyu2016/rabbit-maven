@@ -16,7 +16,7 @@ public interface HttpResponseListener extends AsyncListener {
      *                  if true content is chunked.
      * @param dataSize the contents size or -1 if size is unknown.
      */
-    void httpResponse (HttpHeader response, BufferHandle bufferHandle, 
-		       boolean keepalive, boolean isChunked, long dataSize);
-    
+    void httpResponse (HttpHeader response, BufferHandle bufferHandle,
+                       boolean keepalive, boolean isChunked, long dataSize);
+
 }

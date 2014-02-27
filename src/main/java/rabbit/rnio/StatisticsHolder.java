@@ -27,8 +27,8 @@ public interface StatisticsHolder {
      * @param timeSpent wall clock time spent on the task.
      */
     void changeTaskStatusToFinished (TaskIdentifier ti,
-				     boolean wasOk,
-				     long timeSpent);
+                                     boolean wasOk,
+                                     long timeSpent);
 
     /** Get information about the currently pending tasks.
      * @return a mapping from group ids to the task identifiers

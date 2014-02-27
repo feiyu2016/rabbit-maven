@@ -14,8 +14,8 @@ import rabbit.util.TrafficLogger;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class HttpResponseReader 
-    implements HttpHeaderSentListener, HttpHeaderListener {
+public class HttpResponseReader
+        implements HttpHeaderSentListener, HttpHeaderListener {
 
     private final SocketChannel channel;
     private final NioHandler nioHandler;
@@ -38,55 +38,55 @@ public class HttpResponseReader
      *        been read.
      * @throws IOException if the request can not be sent
      */
-    public HttpResponseReader (final SocketChannel channel, final NioHandler nioHandler, 
-			       final TrafficLogger tl, final BufferHandler bufHandler, 
-			       final HttpHeader header, final boolean fullURI, 
-			       final boolean strictHttp, 
-			       final HttpResponseListener listener)
-	throws IOException {
-	this.channel = channel;
-	this.nioHandler = nioHandler;
-	this.tl = tl;
-	this.bufHandler = bufHandler;
-	this.strictHttp = strictHttp;
-	this.listener = listener;
-	sender = new HttpHeaderSender (channel, nioHandler, tl, 
-				       header, fullURI, this);
+    public HttpResponseReader (final SocketChannel channel, final NioHandler nioHandler,
+                               final TrafficLogger tl, final BufferHandler bufHandler,
+                               final HttpHeader header, final boolean fullURI,
+                               final boolean strictHttp,
+                               final HttpResponseListener listener)
+            throws IOException {
+        this.channel = channel;
+        this.nioHandler = nioHandler;
+        this.tl = tl;
+        this.bufHandler = bufHandler;
+        this.strictHttp = strictHttp;
+        this.listener = listener;
+        sender = new HttpHeaderSender (channel, nioHandler, tl,
+                                       header, fullURI, this);
     }
 
     /** Start the process of sending the header and reading the response.
      */
     public void sendRequestAndWaitForResponse () {
-	sender.sendHeader ();
+        sender.sendHeader ();
     }
-    
+
     public void httpHeaderSent () {
-	try {
-	    final BufferHandle bh = new CacheBufferHandle (bufHandler);
-	    final HttpHeaderReader reader = 
-		new HttpHeaderReader (channel, bh, nioHandler,
-				      tl, false, strictHttp, this);
-	    reader.readHeader ();
-	} catch (IOException e) {
-	    failed (e);
-	}
+        try {
+            final BufferHandle bh = new CacheBufferHandle (bufHandler);
+            final HttpHeaderReader reader =
+                    new HttpHeaderReader (channel, bh, nioHandler,
+                                          tl, false, strictHttp, this);
+            reader.readHeader ();
+        } catch (IOException e) {
+            failed (e);
+        }
     }
-    
-    public void httpHeaderRead (final HttpHeader header, final BufferHandle bh, 
-				final boolean keepalive, final boolean isChunked, 
-				final long dataSize) {
-	listener.httpResponse (header, bh, keepalive, isChunked, dataSize);
+
+    public void httpHeaderRead (final HttpHeader header, final BufferHandle bh,
+                                final boolean keepalive, final boolean isChunked,
+                                final long dataSize) {
+        listener.httpResponse (header, bh, keepalive, isChunked, dataSize);
     }
-    
+
     public void closed () {
-	listener.failed (new IOException ("Connection closed"));
+        listener.failed (new IOException ("Connection closed"));
     }
-    
+
     public void failed (final Exception cause) {
-	listener.failed (cause);
+        listener.failed (cause);
     }
 
     public void timeout () {
-	listener.timeout ();
+        listener.timeout ();
     }
 }

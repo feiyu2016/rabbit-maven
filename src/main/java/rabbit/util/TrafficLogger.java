@@ -14,7 +14,7 @@ public interface TrafficLogger {
      * @return the number of bytes that have been read
      */
     long read ();
-    
+
     /** Log a write
      * @param written the number of bytes written.
      */
@@ -48,7 +48,7 @@ public interface TrafficLogger {
     /** Clear the current log. 
      */
     void clear ();
-    
+
     /** Add the current log into the other TrafficLogger.
      * @param other the traffic logger to add this statistics
      */

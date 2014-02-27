@@ -23,24 +23,24 @@ public class ProxyResolver implements Resolver {
      * @param auth the upstream proxy basic auth string to use for all request
      */
     public ProxyResolver (final InetAddress proxy, final int port, final String auth) {
-	this.proxy = proxy;
-	this.port = port;
-	this.auth = auth;
+        this.proxy = proxy;
+        this.port = port;
+        this.auth = auth;
     }
-    
+
     public void getInetAddress (final URL url, final InetAddressListener listener) {
-	listener.lookupDone (proxy);
+        listener.lookupDone (proxy);
     }
 
     public int getConnectPort (final int wantedPort) {
-	return port;
-    } 
+        return port;
+    }
 
     public boolean isProxyConnected () {
-	return true;
+        return true;
     }
 
     public String getProxyAuthString () {
-	return auth;
+        return auth;
     }
 }

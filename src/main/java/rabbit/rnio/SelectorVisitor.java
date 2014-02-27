@@ -13,6 +13,6 @@ public interface SelectorVisitor {
     void selector (Selector selector);
 
     /** Indicates that all selectors have been visited
-     */ 
+     */
     void  end ();
 }

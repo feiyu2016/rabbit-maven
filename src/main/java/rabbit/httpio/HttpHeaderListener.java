@@ -16,9 +16,9 @@ public interface HttpHeaderListener extends AsyncListener {
      *                  if true content is chunked.
      * @param dataSize the contents size or -1 if size is unknown.
      */
-    void httpHeaderRead (HttpHeader header, BufferHandle bh, 
-			 boolean keepalive, boolean isChunked, long dataSize);
-    
+    void httpHeaderRead (HttpHeader header, BufferHandle bh,
+                         boolean keepalive, boolean isChunked, long dataSize);
+
     /** The socket connection has been closed, either by this end 
      *  or the other side. Quite common on persistent connections.
      */

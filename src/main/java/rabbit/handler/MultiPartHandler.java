@@ -16,7 +16,7 @@ import rabbit.proxy.TrafficLoggerHandler;
  */
 public class MultiPartHandler extends BaseHandler {
     private MultiPartPipe mpp = null;
-    
+
     /** Create a new MultiPartHandler factory.
      */
     public MultiPartHandler () {
@@ -36,13 +36,13 @@ public class MultiPartHandler extends BaseHandler {
 	super (con, tlh, request, response, content, -1);
 	con.setChunking (false);
 
-	//Content-Type: multipart/byteranges; boundary=B-mmrokjxyjnwsfcefrvcg\r\n	
+	//Content-Type: multipart/byteranges; boundary=B-mmrokjxyjnwsfcefrvcg\r\n
 	final String ct = response.getHeader ("Content-Type");
 	mpp = new MultiPartPipe (ct);
     }
 
     @Override
-    public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh, 
+    public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh,
 				   final HttpHeader header, final HttpHeader webHeader,
 				   final ResourceSource content, final long size) {
 	return new MultiPartHandler (con, tlh, header, webHeader, content);
@@ -55,9 +55,9 @@ public class MultiPartHandler extends BaseHandler {
 	return true;
     }
 
-    @Override 
+    @Override
     protected void send () {
-	content.addBlockListener (this);	
+	content.addBlockListener (this);
     }
 
     /* A Typical case: 
@@ -93,9 +93,9 @@ public class MultiPartHandler extends BaseHandler {
     @Override public void bufferRead (final BufferHandle bufHandle) {
 	final ByteBuffer buf = bufHandle.getBuffer ();
 	mpp.parseBuffer (buf);
-	final BlockSender bs = 
+	final BlockSender bs =
 	    new BlockSender (con.getChannel (), con.getNioHandler (),
-			     tlh.getClient (), bufHandle, 
+			     tlh.getClient (), bufHandle,
 			     con.getChunking (), this);
 	bs.write ();
     }

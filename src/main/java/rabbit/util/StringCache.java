@@ -13,16 +13,16 @@ import java.util.WeakHashMap;
 public class StringCache extends WeakHashMap<String, WeakReference<String>> {
 
     private static StringCache instance;
-    
+
     /** Get the shared instance of the string caches.
      * @return the StringCache
      */
     public static synchronized StringCache getSharedInstance () {
-	if (instance == null)
-	    instance = new StringCache ();
-	return instance;
+        if (instance == null)
+            instance = new StringCache ();
+        return instance;
     }
-    
+
     /** Get a cached string with the same contents as the given string.
      *  If the string given is not null then the cache will hold one
      *  entry with the same value as the given string after this method has completed.
@@ -30,16 +30,16 @@ public class StringCache extends WeakHashMap<String, WeakReference<String>> {
      * @return the shared string
      */
     public String getCachedString (final String s) {
-	if (s == null)
-	    return null;
-	synchronized (this) {
-	    WeakReference<String> wr = get (s);
-	    String k; 
-	    if (wr != null && ((k = wr.get ()) != null))
-		return k;
-	    wr = new WeakReference<String> (s);
-	    put (s, wr);  
-	    return s;
-	}
+        if (s == null)
+            return null;
+        synchronized (this) {
+            WeakReference<String> wr = get (s);
+            String k;
+            if (wr != null && ((k = wr.get ()) != null))
+                return k;
+            wr = new WeakReference<String> (s);
+            put (s, wr);
+            return s;
+        }
     }
 }

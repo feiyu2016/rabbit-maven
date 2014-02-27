@@ -14,14 +14,14 @@ public interface Resolver {
      * @param listener the InetAddressListener to notify when lookup is done.
      */
     void getInetAddress (URL url, InetAddressListener listener);
-    
+
     /** Get the port to use for connecting to a given port.
      *  Normally port is returned, but if there is a chained proxy, 
      *  then the proxy port is returned instead.
      * @param port the port number we are trying to use
      * @return the tcp port number to use
      */
-    int getConnectPort (int port); 
+    int getConnectPort (int port);
 
     /** Check if the resolver is using a proxy or not. 
      * @return true if there is an upstream proxy

@@ -14,8 +14,8 @@ import rabbit.rnio.ReadHandler;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public abstract class SimpleBlockReader
-    extends SocketHandlerBase<SocketChannel>
-    implements ReadHandler {
+        extends SocketHandlerBase<SocketChannel>
+        implements ReadHandler {
 
     private static final Logger logger = Logger.getLogger ("rabbit.rnio");
 
@@ -24,33 +24,33 @@ public abstract class SimpleBlockReader
      * @param nioHandler the NioHandler to use for waiting on data
      * @param timeout the timeout time, may be null if not timeout is set
      */
-    public SimpleBlockReader (final SocketChannel sc, 
-			      final NioHandler nioHandler,
-			      final Long timeout) {
-	super (sc, nioHandler, timeout);
+    public SimpleBlockReader (final SocketChannel sc,
+                              final NioHandler nioHandler,
+                              final Long timeout) {
+        super (sc, nioHandler, timeout);
     }
 
     /** Try to read data from the channel.
      */
     public void read () {
-	try {
-	    final ByteBuffer buf = getByteBuffer ();
-	    final int read = sc.read (buf);
-	    if (read == -1) {
-		channelClosed ();
-		putByteBuffer (buf);
-		return;
-	    }
-	    if (read == 0) {
-		putByteBuffer (buf);
-		register ();
-	    } else {
-		buf.flip ();
-		handleBufferRead (buf);
-	    }
-	} catch (IOException e) {
-	    handleIOException (e);
-	}
+        try {
+            final ByteBuffer buf = getByteBuffer ();
+            final int read = sc.read (buf);
+            if (read == -1) {
+                channelClosed ();
+                putByteBuffer (buf);
+                return;
+            }
+            if (read == 0) {
+                putByteBuffer (buf);
+                register ();
+            } else {
+                buf.flip ();
+                handleBufferRead (buf);
+            }
+        } catch (IOException e) {
+            handleIOException (e);
+        }
     }
 
     /** Called before a read attempt is made.
@@ -58,7 +58,7 @@ public abstract class SimpleBlockReader
      * @return the ByteBuffer to read data into
      */
     public ByteBuffer getByteBuffer () {
-	return ByteBuffer.allocate (1024);
+        return ByteBuffer.allocate (1024);
     }
 
     /** Return the ByteBuffer, this method will be called when read gets EOF
@@ -66,15 +66,15 @@ public abstract class SimpleBlockReader
      * @param buf the ByteBuffer that is returned
      */
     public void putByteBuffer (final ByteBuffer buf) {
-	// nothing.
+        // nothing.
     }
 
     /** Handle the exception, default is to log it and to close the channel.
      * @param e the IOException that was the cause of a read failure
      */
     public void handleIOException (final IOException e) {
-	logger.log (Level.WARNING, "Failed to read data", e);
-	Closer.close (sc, logger);
+        logger.log (Level.WARNING, "Failed to read data", e);
+        Closer.close (sc, logger);
     }
 
     /** Do any cleanup that needs to be done when the channel we tried
@@ -87,10 +87,10 @@ public abstract class SimpleBlockReader
      * @throws IOException if data handling fails
      */
     public abstract void handleBufferRead (ByteBuffer buf)
-	throws IOException;
+            throws IOException;
 
     /** Wait for the channel to become read ready.*/
     public void register () {
-	nioHandler.waitForRead (sc, this);
+        nioHandler.waitForRead (sc, this);
     }
 }

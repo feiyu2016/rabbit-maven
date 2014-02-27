@@ -16,32 +16,32 @@ public class TotalTimeSpent {
      *        with
      */
     public void update (final CompletionEntry ce) {
-	if (ce.wasOk)
-	    successful++;
-	else
-	    failures++;
-	totalMillis += ce.timeSpent;
+        if (ce.wasOk)
+            successful++;
+        else
+            failures++;
+        totalMillis += ce.timeSpent;
     }
 
     /** Get the number of successfully completed jobs.
      * @return the number of successful jobs
      */
     public long getSuccessful () {
-	return successful;
+        return successful;
     }
 
     /** Get the number of failed jobs.
      * @return the number of unsuccessful jobs
      */
     public long getFailures () {
-	return failures;
+        return failures;
     }
 
     /** Get the total time spent doing this kind of task.
      * @return the total time take for all jobs
      */
     public long getTotalMillis () {
-	return totalMillis;
+        return totalMillis;
     }
 }
     

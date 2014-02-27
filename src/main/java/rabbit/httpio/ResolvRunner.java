@@ -19,18 +19,18 @@ public class ResolvRunner implements Runnable {
      *        is done
      */
     public ResolvRunner (final URL url, final InetAddressListener ial) {
-	this.url = url;
-	this.ial = ial;
+        this.url = url;
+        this.ial = ial;
     }
 
     /** Run a dns lookup and then notifies the listener on the selector thread.
      */
     public void run () {
-	try {
-	    final InetAddress ia = InetAddress.getByName(url.getHost());
-	    ial.lookupDone (ia);
-	} catch (final UnknownHostException e) {
-	    ial.unknownHost (e);
-	}
+        try {
+            final InetAddress ia = InetAddress.getByName(url.getHost());
+            ial.lookupDone (ia);
+        } catch (final UnknownHostException e) {
+            ial.unknownHost (e);
+        }
     }
 }

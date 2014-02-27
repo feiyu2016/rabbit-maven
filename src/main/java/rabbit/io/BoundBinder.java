@@ -14,14 +14,14 @@ public class BoundBinder implements SocketBinder {
      * @param ia the InetAddress to use
      */
     public BoundBinder (final InetAddress ia) {
-	this.ia = ia;
+        this.ia = ia;
     }
-    
+
     public int getPort () {
-	return 0;
+        return 0;
     }
 
     public InetAddress getInetAddress () {
-	return ia;
+        return ia;
     }
 }

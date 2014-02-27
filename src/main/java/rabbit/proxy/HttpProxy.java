@@ -117,341 +117,341 @@ public class HttpProxy {
      *         be determined
      */
     public HttpProxy () throws UnknownHostException {
-	localhost = InetAddress.getLocalHost ();
+        localhost = InetAddress.getLocalHost ();
     }
 
     private void setupDateParsing () {
-		final TimeZone tz = new SimpleDateFormat ("dd/MMM/yyyy:HH:mm:ss 'GMT'", Locale.US).getTimeZone ();
-		final GregorianCalendar gc = new GregorianCalendar ();
-		gc.setTime (new Date ());
-		final long offset = tz.getOffset (gc.get (Calendar.ERA),
-							   gc.get (Calendar.YEAR),
-							   gc.get (Calendar.MONTH),
-							   gc.get (Calendar.DAY_OF_MONTH),
-							   gc.get (Calendar.DAY_OF_WEEK),
-							   gc.get (Calendar.MILLISECOND));
+        final TimeZone tz = new SimpleDateFormat ("dd/MMM/yyyy:HH:mm:ss 'GMT'", Locale.US).getTimeZone ();
+        final GregorianCalendar gc = new GregorianCalendar ();
+        gc.setTime (new Date ());
+        final long offset = tz.getOffset (gc.get (Calendar.ERA),
+                                          gc.get (Calendar.YEAR),
+                                          gc.get (Calendar.MONTH),
+                                          gc.get (Calendar.DAY_OF_MONTH),
+                                          gc.get (Calendar.DAY_OF_WEEK),
+                                          gc.get (Calendar.MILLISECOND));
 
-		HttpDateParser.setOffset (offset);
+        HttpDateParser.setOffset (offset);
     }
 
     private void setupNioHandler () {
-	final String section = getClass ().getName ();
-	final int cpus = Runtime.getRuntime ().availableProcessors ();
-	final int threads = getInt (section, "num_selector_threads", cpus);
-	final ExecutorService es = Executors.newCachedThreadPool ();
-	final StatisticsHolder sh = new BasicStatisticsHolder ();
-	final Long timeout = Long.valueOf (15000);
-	try {
-	    nioHandler =
-		new MultiSelectorNioHandler (es, sh, threads, timeout);
-	} catch (IOException e) {
-	    logger.log (Level.SEVERE,
-			"Failed to create the NioHandler",
-			e);
-	    stop ();
-	}
+        final String section = getClass ().getName ();
+        final int cpus = Runtime.getRuntime ().availableProcessors ();
+        final int threads = getInt (section, "num_selector_threads", cpus);
+        final ExecutorService es = Executors.newCachedThreadPool ();
+        final StatisticsHolder sh = new BasicStatisticsHolder ();
+        final Long timeout = Long.valueOf (15000);
+        try {
+            nioHandler =
+                    new MultiSelectorNioHandler (es, sh, threads, timeout);
+        } catch (IOException e) {
+            logger.log (Level.SEVERE,
+                        "Failed to create the NioHandler",
+                        e);
+            stop ();
+        }
     }
 
     private ProxyChain setupProxyChainFromFactory (final String pcf) {
-	try {
-	    final Class<? extends ProxyChainFactory> clz =
-		load3rdPartyClass (pcf, ProxyChainFactory.class);
-	    final ProxyChainFactory factory = clz.newInstance ();
-	    final SProperties props = config.getProperties (pcf);
-	    return 
-		factory.getProxyChain (props, nioHandler, logger);
-	} catch (Exception e) {
-	    logger.log (Level.WARNING,
-			"Unable to create the proxy chain " +
-			"will fall back to the default one.",
-			e);
-	}
-	return null;
+        try {
+            final Class<? extends ProxyChainFactory> clz =
+                    load3rdPartyClass (pcf, ProxyChainFactory.class);
+            final ProxyChainFactory factory = clz.newInstance ();
+            final SProperties props = config.getProperties (pcf);
+            return
+                    factory.getProxyChain (props, nioHandler, logger);
+        } catch (Exception e) {
+            logger.log (Level.WARNING,
+                        "Unable to create the proxy chain " +
+                        "will fall back to the default one.",
+                        e);
+        }
+        return null;
     }
 
     /* TODO: remove this method, only kept for backwards compability. */
     private ProxyChain setupProxiedProxyChain (final String pname, final String pport,
-					       final String pauth) {
-	try {
-	    final InetAddress proxy = InetAddress.getByName(pname);
-	    try {
-		final int port = Integer.parseInt (pport);
-		return new ProxiedProxyChain (proxy, port, pauth);
-	    } catch (NumberFormatException e) {
-		logger.severe ("Strange proxyport: '" + pport +
-			       "', will not chain");
-	    }
-	} catch (UnknownHostException e) {
-	    logger.severe ("Unknown proxyhost: '" + pname +
-			   "', will not chain");
-	}
-	return null;
+                                               final String pauth) {
+        try {
+            final InetAddress proxy = InetAddress.getByName(pname);
+            try {
+                final int port = Integer.parseInt (pport);
+                return new ProxiedProxyChain (proxy, port, pauth);
+            } catch (NumberFormatException e) {
+                logger.severe ("Strange proxyport: '" + pport +
+                               "', will not chain");
+            }
+        } catch (UnknownHostException e) {
+            logger.severe ("Unknown proxyhost: '" + pname +
+                           "', will not chain");
+        }
+        return null;
     }
 
     /** Configure the chained proxy rabbit is using (if any).
      */
     private void setupProxyConnection () {
-	final String sec = getClass ().getName ();
-	final String pcf =
-	    config.getProperty (sec, "proxy_chain_factory", "").trim ();
-	final String pname = config.getProperty (sec, "proxyhost", "").trim ();
-	final String pport = config.getProperty (sec, "proxyport", "").trim ();
-	final String pauth = config.getProperty (sec, "proxyauth");
+        final String sec = getClass ().getName ();
+        final String pcf =
+                config.getProperty (sec, "proxy_chain_factory", "").trim ();
+        final String pname = config.getProperty (sec, "proxyhost", "").trim ();
+        final String pport = config.getProperty (sec, "proxyport", "").trim ();
+        final String pauth = config.getProperty (sec, "proxyauth");
 
-	if (!"".equals(pcf)) {
-	    proxyChain = setupProxyChainFromFactory (pcf);
-	} else if (!pname.equals ("") && !pport.equals ("")) {
-	    proxyChain = setupProxiedProxyChain (pname, pport, pauth);
-	}
-	if (proxyChain == null)
-	    proxyChain = new SimpleProxyChain(nioHandler);
+        if (!"".equals(pcf)) {
+            proxyChain = setupProxyChainFromFactory (pcf);
+        } else if (!pname.equals ("") && !pport.equals ("")) {
+            proxyChain = setupProxiedProxyChain (pname, pport, pauth);
+        }
+        if (proxyChain == null)
+            proxyChain = new SimpleProxyChain(nioHandler);
     }
 
     /** Configure the SSL support RabbIT should have.
      */
     private void setupSSLSupport () {
-	String ssl = config.getProperty (getClass ().getName (), "proxySSL", "no");
-	ssl = ssl.trim ();
-	if (ssl.equals ("no")) {
-	    proxySSL = false;
-	} else if (ssl.equals ("yes")) {
-	    proxySSL = true;
-	    sslports = null;
-	} else {
-	    proxySSL = true;
-	    // ok, try to get the portnumbers.
-	    sslports = new ArrayList<Integer> ();
-	    final StringTokenizer st = new StringTokenizer (ssl, ",");
-	    while (st.hasMoreTokens ()) {
-		String s = null;
-		try {
-		    final Integer port = Integer.valueOf(s = st.nextToken());
-		    sslports.add (port);
-		} catch (NumberFormatException e) {
-		    logger.warning ("bad number: '" + s +
-				    "' for ssl port, ignoring.");
-		}
-	    }
-	}
+        String ssl = config.getProperty (getClass ().getName (), "proxySSL", "no");
+        ssl = ssl.trim ();
+        if (ssl.equals ("no")) {
+            proxySSL = false;
+        } else if (ssl.equals ("yes")) {
+            proxySSL = true;
+            sslports = null;
+        } else {
+            proxySSL = true;
+            // ok, try to get the portnumbers.
+            sslports = new ArrayList<Integer> ();
+            final StringTokenizer st = new StringTokenizer (ssl, ",");
+            while (st.hasMoreTokens ()) {
+                String s = null;
+                try {
+                    final Integer port = Integer.valueOf(s = st.nextToken());
+                    sslports.add (port);
+                } catch (NumberFormatException e) {
+                    logger.warning ("bad number: '" + s +
+                                    "' for ssl port, ignoring.");
+                }
+            }
+        }
     }
 
     /** Toogle the strict http flag.
      * @param b the new mode for the strict http flag
      */
     public void setStrictHttp (final boolean b) {
-	this.strictHttp = b;
+        this.strictHttp = b;
     }
 
     /** Check if strict http is turned on or off.
      * @return the strict http flag
      */
     public boolean getStrictHttp () {
-	return strictHttp;
+        return strictHttp;
     }
 
     private void setupConnectionHandler () {
-	if (nioHandler == null) {
-	    logger.info ("nioHandler == null " + this);
-	    return;
-	}
-	conhandler = new ConnectionHandler (counter, proxyChain, nioHandler);
-	final String section = conhandler.getClass ().getName ();
-	conhandler.setup (config.getProperties (section));
+        if (nioHandler == null) {
+            logger.info ("nioHandler == null " + this);
+            return;
+        }
+        conhandler = new ConnectionHandler (counter, proxyChain, nioHandler);
+        final String section = conhandler.getClass ().getName ();
+        conhandler.setup (config.getProperties (section));
     }
 
     private void setupHttpGeneratorFactory () {
-	final String def = StandardHttpGeneratorFactory.class.getName ();
-	final String hgfClass = config.getProperty (getClass ().getName (),
-					      "http_generator_factory", def);
-	try {
-	    final Class<? extends HttpGeneratorFactory> clz =
-		load3rdPartyClass (hgfClass, HttpGeneratorFactory.class);
-	    hgf = clz.newInstance ();
-	} catch (Exception e) {
-	    logger.log (Level.WARNING,
-			"Unable to create the http generator " +
-			"factory, will fall back to the default one.",
-			e);
-	    hgf = new StandardHttpGeneratorFactory ();
-	}
-	final String section = hgf.getClass ().getName ();
-	hgf.setup (config.getProperties (section));
+        final String def = StandardHttpGeneratorFactory.class.getName ();
+        final String hgfClass = config.getProperty (getClass ().getName (),
+                                                    "http_generator_factory", def);
+        try {
+            final Class<? extends HttpGeneratorFactory> clz =
+                    load3rdPartyClass (hgfClass, HttpGeneratorFactory.class);
+            hgf = clz.newInstance ();
+        } catch (Exception e) {
+            logger.log (Level.WARNING,
+                        "Unable to create the http generator " +
+                        "factory, will fall back to the default one.",
+                        e);
+            hgf = new StandardHttpGeneratorFactory ();
+        }
+        final String section = hgf.getClass ().getName ();
+        hgf.setup (config.getProperties (section));
     }
 
     public void setConfig (final Config config) {
-	this.config = config;
-	setupDateParsing ();
-	setupNioHandler ();
-	setupProxyConnection ();
-	final String cn = getClass ().getName ();
-	serverIdentity = config.getProperty (cn, "serverIdentity", VERSION);
-	setStrictHttp(false);
-	setupSSLSupport ();	
-	loadClasses ();
-	openSocket ();
-	setupConnectionHandler ();
-	setupHttpGeneratorFactory ();
-	logger.info (serverIdentity + ": Configuration loaded: ready for action.");
+        this.config = config;
+        setupDateParsing ();
+        setupNioHandler ();
+        setupProxyConnection ();
+        final String cn = getClass ().getName ();
+        serverIdentity = config.getProperty (cn, "serverIdentity", VERSION);
+        setStrictHttp(false);
+        setupSSLSupport ();
+        loadClasses ();
+        openSocket ();
+        setupConnectionHandler ();
+        setupHttpGeneratorFactory ();
+        logger.info (serverIdentity + ": Configuration loaded: ready for action.");
     }
 
     private int getInt (final String section, final String key, final int defaultValue) {
-	final String defVal = Integer.toString (defaultValue);
-	final String configValue = config.getProperty (section, key, defVal).trim ();
-	return Integer.parseInt (configValue);
+        final String defVal = Integer.toString (defaultValue);
+        final String configValue = config.getProperty (section, key, defVal).trim ();
+        return Integer.parseInt (configValue);
     }
 
     /** Open a socket on the specified port
      *  also make the proxy continue accepting connections.
      */
     private void openSocket () {
-	final String section = getClass ().getName ();
-	final int tport = getInt (section, "port", 9666);
+        final String section = getClass ().getName ();
+        final int tport = getInt (section, "port", 9666);
 
-	final String bindIP = config.getProperty (section, "listen_ip");
-	if (tport != port) {
-	    try {
-		closeSocket ();
-		port = tport;
-		ssc = ServerSocketChannel.open ();
-		ssc.configureBlocking (false);
-		if (bindIP == null) {
-		    ssc.socket ().bind (new InetSocketAddress (port));
-		} else {
-		    final InetAddress ia = InetAddress.getByName (bindIP);
-		    logger.info ("listening on inetaddress: " + ia +
-				 ":" + port +
-				 " on inet address: " + ia);
-		    ssc.socket ().bind (new InetSocketAddress (ia, port));
-		}
-		final AcceptorListener listener =
-		    new ProxyConnectionAcceptor (acceptorId++, this);
-		final Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
-		acceptor.register ();
-	    } catch (IOException e) {
-		logger.log (Level.SEVERE,
-			    "Failed to open serversocket on port " + port,
-			    e);
-		stop ();
-	    }
-	}
+        final String bindIP = config.getProperty (section, "listen_ip");
+        if (tport != port) {
+            try {
+                closeSocket ();
+                port = tport;
+                ssc = ServerSocketChannel.open ();
+                ssc.configureBlocking (false);
+                if (bindIP == null) {
+                    ssc.socket ().bind (new InetSocketAddress (port));
+                } else {
+                    final InetAddress ia = InetAddress.getByName (bindIP);
+                    logger.info ("listening on inetaddress: " + ia +
+                                 ":" + port +
+                                 " on inet address: " + ia);
+                    ssc.socket ().bind (new InetSocketAddress (ia, port));
+                }
+                final AcceptorListener listener =
+                        new ProxyConnectionAcceptor (acceptorId++, this);
+                final Acceptor acceptor = new Acceptor (ssc, nioHandler, listener);
+                acceptor.register ();
+            } catch (IOException e) {
+                logger.log (Level.SEVERE,
+                            "Failed to open serversocket on port " + port,
+                            e);
+                stop ();
+            }
+        }
     }
 
     /** Closes the serversocket and makes the proxy stop listening for
      *	connections.
      */
     private void closeSocket () {
-	try {
-	    port = -1;
-	    if (ssc != null) {
-		ssc.close ();
-		ssc = null;
-	    }
-	} catch (IOException e) {
-	    logger.severe ("Failed to close serversocket on port " + port);
-	    stop ();
-	}
+        try {
+            port = -1;
+            if (ssc != null) {
+                ssc.close ();
+                ssc = null;
+            }
+        } catch (IOException e) {
+            logger.severe ("Failed to close serversocket on port " + port);
+            stop ();
+        }
     }
 
     private void closeNioHandler () {
-	if (nioHandler != null)
-	    nioHandler.shutdown ();
+        if (nioHandler != null)
+            nioHandler.shutdown ();
     }
 
     /** Make sure all filters and handlers are available
      */
     private void loadClasses () {
-	final String contentFilters = config.getProperty("Filters", "contentfilters", "");
-	String comma = "";
-	if(contentFilters.length() > 0){
-		comma = ",";
-	}
+        final String contentFilters = config.getProperty("Filters", "contentfilters", "");
+        String comma = "";
+        if(contentFilters.length() > 0){
+            comma = ",";
+        }
 
-	final String in = contentFilters + comma + rabbit.filter.HttpBaseFilter.class.getName();
-	final String out = rabbit.filter.HttpBaseFilter.class.getName();
-	final String connect = contentFilters;
-	httpHeaderFilterer = new HttpHeaderFilterer (in, out, connect, config, this);
+        final String in = contentFilters + comma + rabbit.filter.HttpBaseFilter.class.getName();
+        final String out = rabbit.filter.HttpBaseFilter.class.getName();
+        final String connect = contentFilters;
+        httpHeaderFilterer = new HttpHeaderFilterer (in, out, connect, config, this);
     }
 
 
     /** Run the proxy in a separate thread. */
     public void start () {
-	started = System.currentTimeMillis ();
-	nioHandler.start (new SimpleThreadFactory ());
+        started = System.currentTimeMillis ();
+        nioHandler.start (new SimpleThreadFactory ());
     }
 
     /** Run the proxy in a separate thread. */
     public void stop () {
-	logger.info ("HttpProxy.stop() called, shutting down");
-	synchronized (this) {
-	    closeSocket ();
-	    // TODO: wait for remaining connections.
-	    // TODO: as it is now, it will just close connections in the middle.
-	    closeNioHandler ();
-	}
+        logger.info ("HttpProxy.stop() called, shutting down");
+        synchronized (this) {
+            closeSocket ();
+            // TODO: wait for remaining connections.
+            // TODO: as it is now, it will just close connections in the middle.
+            closeNioHandler ();
+        }
     }
 
     /** Get the NioHandler that this proxy is using.
      * @return the NioHandler in use 
      */
     public NioHandler getNioHandler () {
-	return nioHandler;
+        return nioHandler;
     }
 
     /** Get the time this proxy was started.
      * @return the start time as returned from System.currentTimeMillis()
      */
     public long getStartTime () {
-	return started;
+        return started;
     }
 
     ServerSocketChannel getServerSocketChannel () {
-	return ssc;
+        return ssc;
     }
 
     /** Get the current Counter
      * @return the Ćounter in use
      */
     public Counter getCounter () {
-	return counter;
+        return counter;
     }
 
     HttpHeaderFilterer getHttpHeaderFilterer () {
-	return httpHeaderFilterer;
+        return httpHeaderFilterer;
     }
 
     /** Get the configuration of the proxy.
      * @return the current configuration	
      */
     public Config getConfig () {
-	return config;
+        return config;
     }
 
     /** Get the current server identity.
      * @return the current identity
      */
     public String getServerIdentity () {
-	return serverIdentity;
+        return serverIdentity;
     }
 
     /** Get the local host.
      * @return the InetAddress of the host the proxy is running on.
      */
     public InetAddress getHost () {
-	return localhost;
+        return localhost;
     }
 
     /** Get the port this proxy is using.
      * @return the port number the proxy is listening on.
      */
     public int getPort () {
-	return port;
+        return port;
     }
 
     /** Get the ProxyChain this proxy is currently using
      * @return the current ProxyChain
      */
     public ProxyChain getProxyChain () {
-	return proxyChain;
+        return proxyChain;
     }
 
     /** Try hard to check if the given address matches the proxy.
@@ -461,31 +461,31 @@ public class HttpProxy {
      * @return true if the given hostname and port matches this proxy
      */
     public boolean isSelf (final String uhost, final int urlport) {
-	if (urlport == port) {
-	    final String proxyhost = localhost.getHostName ();
-	    if (uhost.equalsIgnoreCase (proxyhost))
-		return true;
-	    try {
-		final Enumeration<NetworkInterface> e =
-		    NetworkInterface.getNetworkInterfaces();
-		while (e.hasMoreElements ()) {
-		    final NetworkInterface ni = e.nextElement ();
-		    final Enumeration<InetAddress> ei = ni.getInetAddresses ();
-		    while (ei.hasMoreElements ()) {
-			final InetAddress ia = ei.nextElement ();
-			if (ia.getHostAddress ().equalsIgnoreCase (uhost))
-			    return true;
-			if (ia.isLoopbackAddress () &&
-			    ia.getHostName ().equalsIgnoreCase (uhost))
-			    return true;
-		    }
-		}
-	    } catch (SocketException e) {
-		logger.log (Level.WARNING,
-			    "Failed to get network interfaces", e);
-	    }
-	}
-	return false;
+        if (urlport == port) {
+            final String proxyhost = localhost.getHostName ();
+            if (uhost.equalsIgnoreCase (proxyhost))
+                return true;
+            try {
+                final Enumeration<NetworkInterface> e =
+                        NetworkInterface.getNetworkInterfaces();
+                while (e.hasMoreElements ()) {
+                    final NetworkInterface ni = e.nextElement ();
+                    final Enumeration<InetAddress> ei = ni.getInetAddresses ();
+                    while (ei.hasMoreElements ()) {
+                        final InetAddress ia = ei.nextElement ();
+                        if (ia.getHostAddress ().equalsIgnoreCase (uhost))
+                            return true;
+                        if (ia.isLoopbackAddress () &&
+                            ia.getHostName ().equalsIgnoreCase (uhost))
+                            return true;
+                    }
+                }
+            } catch (SocketException e) {
+                logger.log (Level.WARNING,
+                            "Failed to get network interfaces", e);
+            }
+        }
+        return false;
     }
 
     /** Get a WebConnection.
@@ -493,76 +493,76 @@ public class HttpProxy {
      * @param wcl the listener that wants to get the connection.
      */
     public void getWebConnection (final HttpHeader header,
-				  final WebConnectionListener wcl) {
-	conhandler.getConnection (header, wcl);
+                                  final WebConnectionListener wcl) {
+        conhandler.getConnection (header, wcl);
     }
 
     /** Release a WebConnection so that it may be reused if possible.
      * @param wc the WebConnection to release.
      */
     public void releaseWebConnection (final WebConnection wc) {
-	conhandler.releaseConnection (wc);
+        conhandler.releaseConnection (wc);
     }
 
     /** Add a current connection
      * @param con the connection
      */
     public void addCurrentConnection (final Connection con) {
-	synchronized (connections) {
-	    connections.add (con);
-	}
+        synchronized (connections) {
+            connections.add (con);
+        }
     }
 
     /** Remove a current connection.
      * @param con the connection
      */
     public void removeCurrentConnection (final Connection con) {
-	synchronized (connections) {
-	    connections.remove (con);
-	}
+        synchronized (connections) {
+            connections.remove (con);
+        }
     }
 
     /** Get the connection handler.
      * @return the current ConnectionHandler
      */
     public ConnectionHandler getConnectionHandler () {
-	return conhandler;
+        return conhandler;
     }
 
     /** Get all the current connections
      * @return all current connections
      */
     public List<Connection> getCurrentConnections () {
-	synchronized (connections) {
-	    return Collections.unmodifiableList (connections);
-	}
+        synchronized (connections) {
+            return Collections.unmodifiableList (connections);
+        }
     }
 
     /** Update the currently transferred traffic statistics.
      * @param tlh the traffic statistics for some operation
      */
     protected void updateTrafficLog (final TrafficLoggerHandler tlh) {
-	synchronized (this.tlh) {
-	    tlh.addTo (this.tlh);
-	}
+        synchronized (this.tlh) {
+            tlh.addTo (this.tlh);
+        }
     }
 
     /** Get the currently transferred traffic statistics.
      * @return the current TrafficLoggerHandler
      */
     public TrafficLoggerHandler getTrafficLoggerHandler () {
-	return tlh;
+        return tlh;
     }
 
     protected BufferHandler getBufferHandler () {
-	return bufferHandler;
+        return bufferHandler;
     }
 
     /** Get the current HttpGeneratorFactory.
      * @return the HttpGeneratorFactory in use
      */
     public HttpGeneratorFactory getHttpGeneratorFactory () {
-	return hgf;
+        return hgf;
     }
 
     /** Load a 3:rd party class.
@@ -573,8 +573,8 @@ public class HttpProxy {
      * @throws ClassNotFoundException if the class can not be found
      */
     public <T> Class<? extends T> load3rdPartyClass (final String name,
-						     final Class<T> type)
-	throws ClassNotFoundException {
-	return Class.forName(name).asSubclass(type);
+                                                     final Class<T> type)
+            throws ClassNotFoundException {
+        return Class.forName(name).asSubclass(type);
     }
 }

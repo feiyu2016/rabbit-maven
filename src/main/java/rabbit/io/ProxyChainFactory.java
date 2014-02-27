@@ -15,7 +15,7 @@ public interface ProxyChainFactory {
      * @param logger the Logger to log errors to
      * @return the new ProxyChain
      */
-    ProxyChain getProxyChain (SProperties props, 
-			      NioHandler nio, 
-			      Logger logger);
+    ProxyChain getProxyChain (SProperties props,
+                              NioHandler nio,
+                              Logger logger);
 }

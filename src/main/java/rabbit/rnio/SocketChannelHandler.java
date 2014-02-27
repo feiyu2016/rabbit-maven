@@ -5,7 +5,7 @@ package rabbit.rnio;
 public interface SocketChannelHandler {
     /** Signal that the channel has been closed. */
     void closed ();
-    
+
     /** Signal that the select operation timed out. */
     void timeout ();
 

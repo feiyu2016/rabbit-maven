@@ -17,11 +17,11 @@ public interface HttpGenerator {
      * @return a 200 HttpHeader .
      */
     HttpHeader get200 ();
-	
-	/** Returns a 302 found header
-	 * @return a 302 HttpHeader .
-	 */
-	HttpHeader get302 (String newUrl);
+
+    /** Returns a 302 found header
+     * @return a 302 HttpHeader .
+     */
+    HttpHeader get302 (String newUrl);
 
     /** Get a 400 Bad Request header for the given exception.
      * @param exception the Exception handled.

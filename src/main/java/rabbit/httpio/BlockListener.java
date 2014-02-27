@@ -16,5 +16,5 @@ public interface BlockListener extends AsyncListener {
 
     /** The resource have been fully transferred 
      */
-    void finishedRead ();    
+    void finishedRead ();
 }

@@ -24,22 +24,22 @@ public class ProxyConnectionAcceptor implements AcceptorListener {
      * @param proxy the HttpProxy to accept connections for
      */
     public ProxyConnectionAcceptor (final int id, final HttpProxy proxy) {
-	logger.fine ("ProxyConnectionAcceptor created: " + id);
-	this.id = id;
-	this.proxy = proxy;
+        logger.fine ("ProxyConnectionAcceptor created: " + id);
+        this.id = id;
+        this.proxy = proxy;
     }
 
-    public void connectionAccepted (final SocketChannel sc) 
-	throws IOException {
-	proxy.getCounter ().inc ("Socket accepts");
-	if (logger.isLoggable (Level.FINE))
-	    logger.fine ("Accepted connection from: " + sc);
-	final BufferHandler bh = proxy.getBufferHandler ();
-	final Connection c = new Connection (getId (), sc, proxy, bh);
-	c.readRequest ();
+    public void connectionAccepted (final SocketChannel sc)
+            throws IOException {
+        proxy.getCounter ().inc ("Socket accepts");
+        if (logger.isLoggable (Level.FINE))
+            logger.fine ("Accepted connection from: " + sc);
+        final BufferHandler bh = proxy.getBufferHandler ();
+        final Connection c = new Connection (getId (), sc, proxy, bh);
+        c.readRequest ();
     }
 
     private ConnectionId getId () {
-	return new ConnectionId (id, counter.incrementAndGet ());
+        return new ConnectionId (id, counter.incrementAndGet ());
     }
 }

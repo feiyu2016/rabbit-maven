@@ -47,66 +47,66 @@ public class MultiSelectorNioHandler implements NioHandler {
      * @throws IOException if the selectors can not be started
      */
     public MultiSelectorNioHandler (final ExecutorService executorService,
-				    final StatisticsHolder stats,
-				    final int numSelectors, 
-				    final Long defaultTimeout)
-	throws IOException {
-	this.executorService = executorService;
-	this.stats = stats;
+                                    final StatisticsHolder stats,
+                                    final int numSelectors,
+                                    final Long defaultTimeout)
+            throws IOException {
+        this.executorService = executorService;
+        this.stats = stats;
 
-	if (numSelectors < 1) {
-	    final String err = "Must have at least one selector: " + numSelectors;
-	    throw new IllegalArgumentException (err);
-	}
-	selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
-	for (int i = 0; i < numSelectors; i++)
-	    selectorRunners.add (new SingleSelectorRunner (executorService));
-	if (defaultTimeout != null && defaultTimeout.longValue () <= 0) {
-	    final String err = "Default timeout may not be zero or negative";
-	    throw new IllegalArgumentException (err);
-	}
-	this.defaultTimeout = defaultTimeout;
+        if (numSelectors < 1) {
+            final String err = "Must have at least one selector: " + numSelectors;
+            throw new IllegalArgumentException (err);
+        }
+        selectorRunners = new ArrayList<SingleSelectorRunner> (numSelectors);
+        for (int i = 0; i < numSelectors; i++)
+            selectorRunners.add (new SingleSelectorRunner (executorService));
+        if (defaultTimeout != null && defaultTimeout.longValue () <= 0) {
+            final String err = "Default timeout may not be zero or negative";
+            throw new IllegalArgumentException (err);
+        }
+        this.defaultTimeout = defaultTimeout;
     }
 
     public void start (final ThreadFactory tf) {
-	for (SingleSelectorRunner ssr : selectorRunners)
-	    ssr.start (tf);
+        for (SingleSelectorRunner ssr : selectorRunners)
+            ssr.start (tf);
     }
 
     public void shutdown () {
-	final Thread t = new Thread (new Runnable () {
-		public void run () {
-		    executorService.shutdown ();
-		    for (SingleSelectorRunner ssr : selectorRunners)
-			ssr.shutdown ();
-		}
-	    });
-	t.start ();
+        final Thread t = new Thread (new Runnable () {
+            public void run () {
+                executorService.shutdown ();
+                for (SingleSelectorRunner ssr : selectorRunners)
+                    ssr.shutdown ();
+            }
+        });
+        t.start ();
     }
 
     public Long getDefaultTimeout () {
-	if (defaultTimeout == null)
-	    return null;
-	return Long.valueOf (System.currentTimeMillis () + 
-			     defaultTimeout.longValue ());
+        if (defaultTimeout == null)
+            return null;
+        return Long.valueOf (System.currentTimeMillis () +
+                             defaultTimeout.longValue ());
     }
 
     public void runThreadTask (final Runnable r, final TaskIdentifier ti) {
-	stats.addPendingTask (ti);
-	try{
-		executorService.execute (new StatisticsCollector (stats, r, ti));
-	}catch(RejectedExecutionException e){
-		logger.log(Level.WARNING, "Could not launch exeuctor", e);
-	}
+        stats.addPendingTask (ti);
+        try{
+            executorService.execute (new StatisticsCollector (stats, r, ti));
+        }catch(RejectedExecutionException e){
+            logger.log(Level.WARNING, "Could not launch exeuctor", e);
+        }
     }
 
     private SingleSelectorRunner getSelectorRunner () {
-	int index;
-	synchronized (this) {
-	    index = nextIndex++;
-	    nextIndex %= selectorRunners.size ();
-	}
-	return selectorRunners.get (index);
+        int index;
+        synchronized (this) {
+            index = nextIndex++;
+            nextIndex %= selectorRunners.size ();
+        }
+        return selectorRunners.get (index);
     }
 
     /** Run a task on one of the selector threads.
@@ -115,94 +115,94 @@ public class MultiSelectorNioHandler implements NioHandler {
      * @param sr the task to run on the main thread.
      */
     private void runSelectorTask (final SelectableChannel channel,
-				  final SelectorRunnable sr) {
-	// If the channel is already being served by someone, favor that one.
-	for (SingleSelectorRunner ssr : selectorRunners) {
-	    if (ssr.handlesChannel (channel)) {
-		ssr.runSelectorTask (sr);
-		return;
-	    }
-	}
-	// Put it on any selector
-	final SingleSelectorRunner ssr = getSelectorRunner ();
-	ssr.runSelectorTask (sr);
+                                  final SelectorRunnable sr) {
+        // If the channel is already being served by someone, favor that one.
+        for (SingleSelectorRunner ssr : selectorRunners) {
+            if (ssr.handlesChannel (channel)) {
+                ssr.runSelectorTask (sr);
+                return;
+            }
+        }
+        // Put it on any selector
+        final SingleSelectorRunner ssr = getSelectorRunner ();
+        ssr.runSelectorTask (sr);
     }
 
     public void waitForRead (final SelectableChannel channel,
-			     final ReadHandler handler) {
-	if (logger.isLoggable (Level.FINEST))
-	    logger.fine ("Waiting for read for: channel: " + channel +
-			 ", handler: " + handler);
-	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (final SingleSelectorRunner ssr) throws IOException {
-		    ssr.waitForRead (channel, handler);
-		}
-	    });
+                             final ReadHandler handler) {
+        if (logger.isLoggable (Level.FINEST))
+            logger.fine ("Waiting for read for: channel: " + channel +
+                         ", handler: " + handler);
+        runSelectorTask (channel, new SelectorRunnable () {
+            public void run (final SingleSelectorRunner ssr) throws IOException {
+                ssr.waitForRead (channel, handler);
+            }
+        });
     }
 
     public void waitForWrite (final SelectableChannel channel,
-			      final WriteHandler handler) {
-	if (logger.isLoggable (Level.FINEST))
-	    logger.fine ("Waiting for write for: channel: " + channel +
-			 ", handler: " + handler);
-	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (final SingleSelectorRunner ssr) throws IOException {
-		    ssr.waitForWrite (channel, handler);
-		}
-	    });
+                              final WriteHandler handler) {
+        if (logger.isLoggable (Level.FINEST))
+            logger.fine ("Waiting for write for: channel: " + channel +
+                         ", handler: " + handler);
+        runSelectorTask (channel, new SelectorRunnable () {
+            public void run (final SingleSelectorRunner ssr) throws IOException {
+                ssr.waitForWrite (channel, handler);
+            }
+        });
     }
 
     public void waitForAccept (final SelectableChannel channel,
-			       final AcceptHandler handler) {
-	if (logger.isLoggable (Level.FINEST))
-	    logger.fine ("Waiting for accept for: channel: " + channel +
-			 ", handler: " + handler);
-	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (final SingleSelectorRunner ssr) throws IOException {
-		    ssr.waitForAccept (channel, handler);
-		}
-	    });
+                               final AcceptHandler handler) {
+        if (logger.isLoggable (Level.FINEST))
+            logger.fine ("Waiting for accept for: channel: " + channel +
+                         ", handler: " + handler);
+        runSelectorTask (channel, new SelectorRunnable () {
+            public void run (final SingleSelectorRunner ssr) throws IOException {
+                ssr.waitForAccept (channel, handler);
+            }
+        });
     }
 
     public void waitForConnect (final SelectableChannel channel,
-				final ConnectHandler handler) {
-	runSelectorTask (channel, new SelectorRunnable () {
-		public void run (final SingleSelectorRunner ssr) throws IOException {
-		    ssr.waitForConnect (channel, handler);
-		}
-	    });
+                                final ConnectHandler handler) {
+        runSelectorTask (channel, new SelectorRunnable () {
+            public void run (final SingleSelectorRunner ssr) throws IOException {
+                ssr.waitForConnect (channel, handler);
+            }
+        });
     }
 
     public void cancel (final SelectableChannel channel,
-			final SocketChannelHandler handler) {
-	for (SingleSelectorRunner sr : selectorRunners) {
-	    sr.runSelectorTask (new SelectorRunnable () {
-		    public void run (final SingleSelectorRunner ssr) {
-			ssr.cancel (channel, handler);
-		    }
-		});
-	}
+                        final SocketChannelHandler handler) {
+        for (SingleSelectorRunner sr : selectorRunners) {
+            sr.runSelectorTask (new SelectorRunnable () {
+                public void run (final SingleSelectorRunner ssr) {
+                    ssr.cancel (channel, handler);
+                }
+            });
+        }
     }
 
     public void close (final SelectableChannel channel) {
-	for (SingleSelectorRunner sr : selectorRunners) {
-	    sr.runSelectorTask (new SelectorRunnable () {
-		    public void run (final SingleSelectorRunner ssr) {
-			ssr.close (channel);
-		    }
-		});
-	}
+        for (SingleSelectorRunner sr : selectorRunners) {
+            sr.runSelectorTask (new SelectorRunnable () {
+                public void run (final SingleSelectorRunner ssr) {
+                    ssr.close (channel);
+                }
+            });
+        }
     }
 
     public void visitSelectors (final SelectorVisitor visitor) {
-	// TODO: do we need to run on the respective threads?
-	for (SingleSelectorRunner sr : selectorRunners)
-	    sr.visit (visitor);
-	visitor.end ();
+        // TODO: do we need to run on the respective threads?
+        for (SingleSelectorRunner sr : selectorRunners)
+            sr.visit (visitor);
+        visitor.end ();
     }
 
     // TODO: where does this belong?
     public StatisticsHolder getTimingStatistics () {
-	return stats;
+        return stats;
     }
 }

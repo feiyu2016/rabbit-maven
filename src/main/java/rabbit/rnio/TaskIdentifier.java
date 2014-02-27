@@ -10,7 +10,7 @@ public interface TaskIdentifier {
      * @return the group id
      */
     String getGroupId ();
-    
+
     /** Get the description of this task.
      *  The description provides additional information about
      *  the task and can be something like "dns lookup of yahoo.com"

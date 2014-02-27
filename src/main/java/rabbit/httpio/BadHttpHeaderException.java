@@ -13,7 +13,7 @@ public class BadHttpHeaderException extends RuntimeException {
      * @param msg a descriptive error message
      */
     public BadHttpHeaderException (final String msg) {
-	super (msg);
+        super (msg);
     }
 }
 

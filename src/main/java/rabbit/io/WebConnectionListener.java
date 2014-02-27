@@ -10,7 +10,7 @@ public interface WebConnectionListener {
      * @param wc the now open connection
      */
     void connectionEstablished (WebConnection wc);
-    
+
     /** Creating the connection timed out.
      */
     void timeout ();

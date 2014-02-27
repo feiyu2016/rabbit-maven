@@ -18,37 +18,37 @@ public class CacheBufferHandle implements BufferHandle {
      * @param bh the BufferHandler that is the actual cache
      */
     public CacheBufferHandle (final BufferHandler bh) {
-	this.bh = bh;
+        this.bh = bh;
     }
 
     public synchronized boolean isEmpty () {
-	return buffer == null || !buffer.hasRemaining ();
+        return buffer == null || !buffer.hasRemaining ();
     }
-    
+
     public synchronized ByteBuffer getBuffer () {
-	if (buffer == null)
-	    buffer = bh.getBuffer ();
-	return buffer;
+        if (buffer == null)
+            buffer = bh.getBuffer ();
+        return buffer;
     }
-    
+
     public synchronized void possiblyFlush () {
-	if (!mayBeFlushed)
-	    throw new IllegalStateException ("buffer may not be flushed!: " +
-					     System.identityHashCode (buffer));
-	if (buffer == null)
-	    return;
-	if (!buffer.hasRemaining ()) {
-	    bh.putBuffer (buffer);
-	    buffer = null;
-	}
+        if (!mayBeFlushed)
+            throw new IllegalStateException ("buffer may not be flushed!: " +
+                                             System.identityHashCode (buffer));
+        if (buffer == null)
+            return;
+        if (!buffer.hasRemaining ()) {
+            bh.putBuffer (buffer);
+            buffer = null;
+        }
     }
 
     public synchronized void setMayBeFlushed (final boolean mayBeFlushed) {
-	this.mayBeFlushed = mayBeFlushed;
+        this.mayBeFlushed = mayBeFlushed;
     }
 
     @Override public String toString () {
-	return getClass ().getName () + "[buffer: " + buffer + 
-	    ", bh: " + bh + "}";
+        return getClass ().getName () + "[buffer: " + buffer +
+               ", bh: " + bh + "}";
     }
 }

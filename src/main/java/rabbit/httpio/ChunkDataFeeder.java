@@ -1,7 +1,7 @@
 package rabbit.httpio;
 
 /** A feeder of chunked data
- * 
+ *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public interface ChunkDataFeeder {

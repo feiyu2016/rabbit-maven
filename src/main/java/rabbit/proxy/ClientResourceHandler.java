@@ -19,8 +19,8 @@ public interface ClientResourceHandler {
      * @param crtl the listener that want to know when the resource
      *             have been sent or when a failure have occurred.
      */
-    void transfer (WebConnection wc, 
-		   ClientResourceTransferredListener crtl);
+    void transfer (WebConnection wc,
+                   ClientResourceTransferredListener crtl);
 
     /** Add a listener for the client resource data.
      * @param crl the listener

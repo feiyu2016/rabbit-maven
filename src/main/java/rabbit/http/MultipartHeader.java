@@ -13,21 +13,21 @@ public class MultipartHeader extends GeneralHeader {
 
     /** Used for Externalizable, not to be used for other purposes. */
     MultipartHeader () {
-	// empty
+        // empty
     }
-    
+
     /** Create a a new multi-part header using the given separator
      * @param header the separator String.
      */
     public MultipartHeader (final String header) {
-	this.header = header;
+        this.header = header;
     }
-	
+
     @Override public String toString () {
-	final StringBuilder ret = new StringBuilder (header);
-	ret.append (Header.CRLF);
-	ret.append (super.toString ());
-	return ret.toString ();
+        final StringBuilder ret = new StringBuilder (header);
+        ret.append (Header.CRLF);
+        ret.append (super.toString ());
+        return ret.toString ();
     }
 
     /** Write this MultipartHeader to the given output.
@@ -35,15 +35,15 @@ public class MultipartHeader extends GeneralHeader {
      * @throws IOException if writing fails
      */
     public void writeExternal (final ObjectOutput out) throws IOException {
-	out.writeObject (header);
+        out.writeObject (header);
     }
-	
+
     /** Read in the state of this header from the given input.
      * @param in the input to read from
      * @throws IOException if reading fails
      * @throws ClassNotFoundException if the input has bad data.
      */
     public void readExternal (final ObjectInput in) throws IOException, ClassNotFoundException {
-	header = (String)in.readObject ();
+        header = (String)in.readObject ();
     }
 }

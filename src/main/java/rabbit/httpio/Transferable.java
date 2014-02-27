@@ -18,7 +18,7 @@ public interface Transferable {
      *  writable byte channel.
      *
      *  @see java.nio.channels.FileChannel#transferTo(long,long,
-     *                                                WritableByteChannel) 
+     *                                                WritableByteChannel)
      *       transferTo
      *
      * @param position The position within the file at which the transfer 
@@ -31,5 +31,5 @@ public interface Transferable {
      * @throws IOException if data transfer fails
      */
     long transferTo (long position, long count, WritableByteChannel target)
-	throws IOException;
+            throws IOException;
 }

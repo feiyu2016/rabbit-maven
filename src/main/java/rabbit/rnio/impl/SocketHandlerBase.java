@@ -13,7 +13,7 @@ import rabbit.rnio.SocketChannelHandler;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public abstract class SocketHandlerBase<T extends SelectableChannel>
-    implements SocketChannelHandler {
+        implements SocketChannelHandler {
     /** The actual channel */
     public final T sc;
     /** The NioHandler used to wait for opeations. */
@@ -30,37 +30,37 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
      *        is wanted.
      */
     public SocketHandlerBase (final T sc, final NioHandler nioHandler, final Long timeout) {
-	this.sc = sc;
-	this.nioHandler = nioHandler;
-	this.timeout = timeout;
+        this.sc = sc;
+        this.nioHandler = nioHandler;
+        this.timeout = timeout;
     }
-    
+
     /** Will return null to indicate no timeout on accepts.
      */
     public Long getTimeout () {
-	return timeout;
+        return timeout;
     }
-    
+
     /** Returns the class name.
      */
     public String getDescription () {
-	return getClass ().getSimpleName ();
+        return getClass ().getSimpleName ();
     }
 
     /** Will always run on the selector thread so return false.
      * @return false
      */
     public boolean useSeparateThread () {
-	return false;
+        return false;
     }
 
     /** Handle timeouts. Default implementation just calls closed().
      */
     public void timeout () {
-	closed ();
+        closed ();
     }
 
     public void closed () {
-	Closer.close (sc, logger);
+        Closer.close (sc, logger);
     }
 }

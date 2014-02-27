@@ -12,8 +12,8 @@ public interface HttpGeneratorFactory {
      * @param connection the Connection handling the request
      * @return a HttpGenerator
      */
-    HttpGenerator create (String serverIdentity, 
-			  Connection connection);
+    HttpGenerator create (String serverIdentity,
+                          Connection connection);
 
     /** Setup this factory.
      * @param props the config parameters

@@ -18,10 +18,10 @@ public class ProxiedProxyChain implements ProxyChain {
      * @param proxyAuth the http basic proxy authentication token
      */
     public ProxiedProxyChain (final InetAddress proxy, final int port, final String proxyAuth) {
-	resolver = new ProxyResolver (proxy, port, proxyAuth);
+        resolver = new ProxyResolver (proxy, port, proxyAuth);
     }
 
     public Resolver getResolver (final String url) {
-	return resolver;
+        return resolver;
     }
 }

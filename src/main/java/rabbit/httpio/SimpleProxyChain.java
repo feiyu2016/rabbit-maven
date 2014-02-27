@@ -16,10 +16,10 @@ public class SimpleProxyChain implements ProxyChain {
      * @param nio the NioHandler to use for running background tasks
      */
     public SimpleProxyChain (final NioHandler nio) {
-	resolver = new SimpleResolver (nio);
+        resolver = new SimpleResolver (nio);
     }
 
     public Resolver getResolver (final String url) {
-	return resolver;
+        return resolver;
     }
 }

@@ -23,31 +23,31 @@ public class TrafficLoggerHandler {
     /** Create a new TrafficLoggerHandler
      */
     public TrafficLoggerHandler () {
-	client = new SimpleTrafficLogger ();
-	network = new SimpleTrafficLogger ();
-	cache = new SimpleTrafficLogger ();
-	proxy = new SimpleTrafficLogger ();
+        client = new SimpleTrafficLogger ();
+        network = new SimpleTrafficLogger ();
+        cache = new SimpleTrafficLogger ();
+        proxy = new SimpleTrafficLogger ();
     }
 
     /** Get the TrafficLogger with the traffic statistics for client data
      * @return the TrafficLogger for the client data
      */
     public TrafficLogger getClient () {
-	return client;
+        return client;
     }
 
     /** Get the TrafficLogger with the traffic statistics for network data
      * @return the TrafficLogger for network data
      */
     public TrafficLogger getNetwork () {
-	return network;
+        return network;
     }
 
     /** Get the TrafficLogger with the traffic statistics for cache data
      * @return the TrafficLogger for cache data
      */
     public TrafficLogger getCache () {
-	return cache;
+        return cache;
     }
 
     /** Get the TrafficLogger with the traffic statistics for data to
@@ -55,25 +55,25 @@ public class TrafficLoggerHandler {
      * @return the TrafficLogger for the proxy data
      */
     public TrafficLogger getProxy () {
-	return proxy;
+        return proxy;
     }
 
     /** Add our statistics to the given other TrafficLoggerHandler.
      * @param other the TrafficLoggerHandler to update
      */
     public void addTo (final TrafficLoggerHandler other) {
-	client.addTo (other.client);
-	network.addTo (other.network);
-	cache.addTo (other.cache);
-	proxy.addTo (other.proxy);
+        client.addTo (other.client);
+        network.addTo (other.network);
+        cache.addTo (other.cache);
+        proxy.addTo (other.proxy);
     }
 
     /** Zero out all statistics in this TrafficLoggerHandler.
      */
     public void clear () {
-	client.clear ();
-	network.clear ();
-	cache.clear ();
-	proxy.clear ();
+        client.clear ();
+        network.clear ();
+        cache.clear ();
+        proxy.clear ();
     }
 }

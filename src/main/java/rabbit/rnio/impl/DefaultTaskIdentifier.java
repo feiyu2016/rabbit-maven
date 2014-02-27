@@ -9,17 +9,17 @@ import rabbit.rnio.TaskIdentifier;
 public class DefaultTaskIdentifier implements TaskIdentifier {
     private final String groupId;
     private final String description;
-    
+
     public DefaultTaskIdentifier (final String groupId, final String description) {
-	this.groupId = groupId;
-	this.description = description;
+        this.groupId = groupId;
+        this.description = description;
     }
 
     public String getGroupId () {
-	return groupId;
+        return groupId;
     }
-    
+
     public String getDescription () {
-	return description;
+        return description;
     }
 }

@@ -15,9 +15,9 @@ import rabbit.rnio.WriteHandler;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public abstract class SimpleBlockSender 
-    extends SocketHandlerBase<SocketChannel>
-    implements WriteHandler {
+public abstract class SimpleBlockSender
+        extends SocketHandlerBase<SocketChannel>
+        implements WriteHandler {
     private final ByteBuffer buf;
     private static final Logger logger = Logger.getLogger ("rabbit.rnio");
 
@@ -28,53 +28,53 @@ public abstract class SimpleBlockSender
      * @param timeout the timeout in millis, may be null if no timeout
      *        is wanted.
      */
-    public SimpleBlockSender (final SocketChannel sc, 
-			      final NioHandler nioHandler, 
-			      final ByteBuffer buf, 
-			      final Long timeout) {
-	super (sc, nioHandler, timeout);
-	this.buf = buf;
+    public SimpleBlockSender (final SocketChannel sc,
+                              final NioHandler nioHandler,
+                              final ByteBuffer buf,
+                              final Long timeout) {
+        super (sc, nioHandler, timeout);
+        this.buf = buf;
     }
 
     /** Get the buffer we are sending data from.
      * @return the ByteBuffer with the data that is being sent
      */
     public ByteBuffer getBuffer () {
-	return buf;
+        return buf;
     }
 
     public void write () {
-	try {
-	    int written = 0;
-	    do {
-		written = sc.write (buf);
-	    } while (buf.hasRemaining () && written > 0);
-	    if (buf.hasRemaining ())
-		register ();
-	    else
-		done ();
-	} catch (IOException e) {
-	    handleIOException (e);
-	}
+        try {
+            int written = 0;
+            do {
+                written = sc.write (buf);
+            } while (buf.hasRemaining () && written > 0);
+            if (buf.hasRemaining ())
+                register ();
+            else
+                done ();
+        } catch (IOException e) {
+            handleIOException (e);
+        }
     }
 
     /** Handle the exception, default is to log it and to close the channel. 
      * @param e the IOException that is the cause of data write failure
      */
     public void handleIOException (final IOException e) {
-	logger.log (Level.WARNING, "Failed to send data", e);
-	Closer.close (sc, logger);
+        logger.log (Level.WARNING, "Failed to send data", e);
+        Closer.close (sc, logger);
     }
 
     /** The default is to do nothing, override in subclasses if needed.
      */
     public void done () {
-	// empty
+        // empty
     }
 
     /** Register writeWait on the nioHandler 
      */
     public void register () {
-	nioHandler.waitForWrite (sc, this);
+        nioHandler.waitForWrite (sc, this);
     }
 }

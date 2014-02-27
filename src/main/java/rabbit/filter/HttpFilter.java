@@ -19,8 +19,8 @@ public interface HttpFilter {
      *         describing the error (like a 403).
      */
     HttpHeader doHttpInFiltering (SocketChannel socket,
-				  HttpHeader header,
-				  Connection con);
+                                  HttpHeader header,
+                                  Connection con);
 
     /** Test if a socket/header combination is valid or
      *  return a new HttpHeader.
@@ -31,8 +31,8 @@ public interface HttpFilter {
      *         describing the error (like a 403).
      */
     HttpHeader doHttpOutFiltering (SocketChannel socket,
-				   HttpHeader header,
-				   Connection con);
+                                   HttpHeader header,
+                                   Connection con);
 
     /** Test if a socket/header combination is valid or
      *  return a new HttpHeader.
@@ -43,8 +43,8 @@ public interface HttpFilter {
      *         describing the error (like a 403).
      */
     HttpHeader doConnectFiltering (SocketChannel socket,
-				   HttpHeader header,
-				   Connection con);
+                                   HttpHeader header,
+                                   Connection con);
 
     /** Setup this filter.
      * @param properties the SProperties to get the settings from.
