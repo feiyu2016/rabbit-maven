@@ -60,6 +60,7 @@ public class HttpResponseReader
         sender.sendHeader ();
     }
 
+    @Override
     public void httpHeaderSent () {
         try {
             final BufferHandle bh = new CacheBufferHandle (bufHandler);
@@ -72,20 +73,24 @@ public class HttpResponseReader
         }
     }
 
+    @Override
     public void httpHeaderRead (final HttpHeader header, final BufferHandle bh,
                                 final boolean keepalive, final boolean isChunked,
                                 final long dataSize) {
         listener.httpResponse (header, bh, keepalive, isChunked, dataSize);
     }
 
+    @Override
     public void closed () {
         listener.failed (new IOException ("Connection closed"));
     }
 
+    @Override
     public void failed (final Exception cause) {
         listener.failed (cause);
     }
 
+    @Override
     public void timeout () {
         listener.timeout ();
     }

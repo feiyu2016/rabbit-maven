@@ -7,10 +7,12 @@ import java.net.InetAddress;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class DefaultBinder implements SocketBinder {
+    @Override
     public int getPort () {
         return 0;
     }
 
+    @Override
     public InetAddress getInetAddress () {
         return null;
     }

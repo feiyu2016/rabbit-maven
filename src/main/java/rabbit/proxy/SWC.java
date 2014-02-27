@@ -76,6 +76,7 @@ public class SWC implements HttpHeaderSentListener,
         }
     }
 
+    @Override
     public void connectionEstablished (final WebConnection wc) {
         con.getCounter ().inc ("WebConnection established: " +
                                attempts);
@@ -112,6 +113,7 @@ public class SWC implements HttpHeaderSentListener,
         return resolver.isProxyConnected ();
     }
 
+    @Override
     public void httpHeaderSent () {
         if (crh != null) {
             crh.transfer(rh.getWebConnection(), this);
@@ -120,10 +122,12 @@ public class SWC implements HttpHeaderSentListener,
         }
     }
 
+    @Override
     public void clientResourceTransferred () {
         httpHeaderSentTransferDone ();
     }
 
+    @Override
     public void clientResourceAborted (final HttpHeader reason) {
         if (rh != null && rh.getWebConnection () != null) {
             rh.getWebConnection ().setKeepalive (false);
@@ -158,6 +162,7 @@ public class SWC implements HttpHeaderSentListener,
         }
     }
 
+    @Override
     public void httpHeaderRead (final HttpHeader header, final BufferHandle wbh,
                                 final boolean keepalive, final boolean isChunked,
                                 final long dataSize) {
@@ -213,6 +218,7 @@ public class SWC implements HttpHeaderSentListener,
         rh.setContent (rs);
     }
 
+    @Override
     public void closed () {
         if (rh.getWebConnection () != null) {
             closeDownWebConnection ();
@@ -255,15 +261,18 @@ public class SWC implements HttpHeaderSentListener,
 
     private class Looper implements HttpHeaderSentListener {
 
+        @Override
         public void httpHeaderSent () {
             // read the next request...
             readRequest ();
         }
 
+        @Override
         public void timeout () {
             SWC.this.timeout ();
         }
 
+        @Override
         public void failed (final Exception e) {
             SWC.this.failed (e);
         }
@@ -278,6 +287,7 @@ public class SWC implements HttpHeaderSentListener,
         }
     }
 
+    @Override
     public void timeout () {
         // retry
         lastException = new IOException ("timeout");
@@ -285,6 +295,7 @@ public class SWC implements HttpHeaderSentListener,
         establish ();
     }
 
+    @Override
     public void failed (final Exception e) {
         lastException = e;
         con.getCounter ().inc ("WebConnections failed: " +

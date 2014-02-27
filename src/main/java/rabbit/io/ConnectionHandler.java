@@ -113,11 +113,13 @@ public class ConnectionHandler {
         final int rport = resolver.getConnectPort (port);
 
         resolver.getInetAddress (url, new InetAddressListener () {
+            @Override
             public void lookupDone (final InetAddress ia) {
                 final Address a = new Address (ia, rport);
                 getConnection (header, wcl, a);
             }
 
+            @Override
             public void unknownHost (final Exception e) {
                 wcl.failed (e);
             }
@@ -255,18 +257,22 @@ public class ConnectionHandler {
             nioHandler.waitForRead (wc.getChannel (), this);
         }
 
+        @Override
         public void read () {
             closeChannel ();
         }
 
+        @Override
         public void closed () {
             closeChannel ();
         }
 
+        @Override
         public void timeout () {
             closeChannel ();
         }
 
+        @Override
         public Long getTimeout () {
             return timeout;
         }
@@ -283,10 +289,12 @@ public class ConnectionHandler {
             }
         }
 
+        @Override
         public boolean useSeparateThread () {
             return false;
         }
 
+        @Override
         public String getDescription () {
             return "ConnectionHandler$CloseListener: address: " +
                    wc.getAddress ();

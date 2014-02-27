@@ -33,6 +33,7 @@ class ContentTransferHandler extends ResourceHandlerBase
         super.doTransfer ();
     }
 
+    @Override
     public void modifyRequest (final HttpHeader header) {
         // nothing.
     }
@@ -57,6 +58,7 @@ class ContentTransferHandler extends ResourceHandlerBase
         bs.write ();
     }
 
+    @Override
     public void blockSent () {
         transferred += toTransfer;
         if (transferred < dataSize) {

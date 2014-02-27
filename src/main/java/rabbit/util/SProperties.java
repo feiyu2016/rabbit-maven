@@ -36,6 +36,7 @@ public class SProperties extends HashMap<String, String> {
      *  @param value the value to set, or null to remove a value
      *  @return the previous value, if any
      */
+    @Override
     public String put (final String key, final String value) {
         if(value == null){
             return remove(key);

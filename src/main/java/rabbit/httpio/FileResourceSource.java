@@ -70,10 +70,12 @@ public class FileResourceSource implements ResourceSource {
     /** FileChannels can be used, will always return true.
      * @return true
      */
+    @Override
     public boolean supportsTransfer () {
         return true;
     }
 
+    @Override
     public long length () {
         try {
             return fc.size ();
@@ -83,6 +85,7 @@ public class FileResourceSource implements ResourceSource {
         }
     }
 
+    @Override
     public long transferTo (final long position, final long count,
                             final WritableByteChannel target)
             throws IOException {
@@ -100,6 +103,7 @@ public class FileResourceSource implements ResourceSource {
 
     /** Generally we do not come into this method, but it can happen..
      */
+    @Override
     public void addBlockListener (final BlockListener listener) {
         this.listener = listener;
         // Get buffer on selector thread.
@@ -111,6 +115,7 @@ public class FileResourceSource implements ResourceSource {
     }
 
     private class ReadBlock implements Runnable {
+        @Override
         public void run () {
             try {
                 final ByteBuffer buffer = bufHandle.getBuffer ();
@@ -141,6 +146,7 @@ public class FileResourceSource implements ResourceSource {
         listener.bufferRead (bufHandle);
     }
 
+    @Override
     public void release () {
         Closer.close (fc, logger);
         listener = null;

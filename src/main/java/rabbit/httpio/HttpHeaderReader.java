@@ -82,6 +82,7 @@ public class HttpHeaderReader extends BaseSocketHandler
         reader.timeout ();
     }
 
+    @Override
     public void read () {
         logger.finest ("HttpHeaderReader reading data");
         try {

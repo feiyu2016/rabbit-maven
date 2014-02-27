@@ -21,10 +21,12 @@ public class CacheBufferHandle implements BufferHandle {
         this.bh = bh;
     }
 
+    @Override
     public synchronized boolean isEmpty () {
         return buffer == null || !buffer.hasRemaining ();
     }
 
+    @Override
     public synchronized ByteBuffer getBuffer () {
         if (buffer == null) {
             buffer = bh.getBuffer();
@@ -32,6 +34,7 @@ public class CacheBufferHandle implements BufferHandle {
         return buffer;
     }
 
+    @Override
     public synchronized void possiblyFlush () {
         if (!mayBeFlushed) {
             throw new IllegalStateException("buffer may not be flushed!: " +
@@ -46,6 +49,7 @@ public class CacheBufferHandle implements BufferHandle {
         }
     }
 
+    @Override
     public synchronized void setMayBeFlushed (final boolean mayBeFlushed) {
         this.mayBeFlushed = mayBeFlushed;
     }

@@ -147,6 +147,7 @@ class SingleSelectorRunner implements Runnable {
                              final ReadHandler handler)
             throws IOException {
         updateSelectionKey (channel, handler, new ChannelOpsUpdater () {
+            @Override
             public void addHandler (final ChannelOpsHandler coh) {
                 coh.setReadHandler (handler);
             }
@@ -157,6 +158,7 @@ class SingleSelectorRunner implements Runnable {
                               final WriteHandler handler)
             throws IOException {
         updateSelectionKey (channel, handler, new ChannelOpsUpdater () {
+            @Override
             public void addHandler (final ChannelOpsHandler coh) {
                 coh.setWriteHandler (handler);
             }
@@ -167,6 +169,7 @@ class SingleSelectorRunner implements Runnable {
                                final AcceptHandler handler)
             throws IOException {
         updateSelectionKey (channel, handler, new ChannelOpsUpdater () {
+            @Override
             public void addHandler (final ChannelOpsHandler coh) {
                 coh.setAcceptHandler (handler);
             }
@@ -177,12 +180,14 @@ class SingleSelectorRunner implements Runnable {
                                 final ConnectHandler handler)
             throws IOException {
         updateSelectionKey (channel, handler, new ChannelOpsUpdater () {
+            @Override
             public void addHandler (final ChannelOpsHandler coh) {
                 coh.setConnectHandler (handler);
             }
         });
     }
 
+    @Override
     public void run () {
         long lastRun = System.currentTimeMillis ();
         int counter = 0;

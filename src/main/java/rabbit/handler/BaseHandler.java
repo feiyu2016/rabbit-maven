@@ -82,6 +82,7 @@ public class BaseHandler
         this.size = size;
     }
 
+    @Override
     public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh,
                                    final HttpHeader header, final HttpHeader webHeader,
                                    final ResourceSource content, final long size) {
@@ -106,6 +107,7 @@ public class BaseHandler
      * The middle steps are most probably only performed if the previous steps
      * have all succeded
      */
+    @Override
     public void handle () {
         if (request.isDot9Request ()) {
             send ();
@@ -117,6 +119,7 @@ public class BaseHandler
     /**
      * ®return false if this handler never modifies the content.
      */
+    @Override
     public boolean changesContentSize () {
         return false;
     }
@@ -132,6 +135,7 @@ public class BaseHandler
         }
     }
 
+    @Override
     public void httpHeaderSent () {
         prepare ();
     }
@@ -223,15 +227,18 @@ public class BaseHandler
     }
 
     private class ContentTransferListener implements TransferListener {
+        @Override
         public void transferOk () {
             finishData ();
         }
 
+        @Override
         public void failed (final Exception cause) {
             BaseHandler.this.failed (cause);
         }
     }
 
+    @Override
     public void bufferRead (final BufferHandle bufHandle) {
         if (con == null) {
             // not sure why this can happen, client has closed connection.
@@ -247,10 +254,12 @@ public class BaseHandler
         bs.write ();
     }
 
+    @Override
     public void blockSent () {
         content.addBlockListener (BaseHandler.this);
     }
 
+    @Override
     public void finishedRead () {
         if (size > 0 && totalRead != size) {
             setPartialContent(size);
@@ -259,12 +268,15 @@ public class BaseHandler
     }
 
     private class Finisher implements BlockSentListener {
+        @Override
         public void blockSent () {
             finish (true);
         }
+        @Override
         public void failed (final Exception cause) {
             BaseHandler.this.failed (cause);
         }
+        @Override
         public void timeout () {
             BaseHandler.this.timeout ();
         }
@@ -287,6 +299,7 @@ public class BaseHandler
         }
     }
 
+    @Override
     public void failed (final Exception cause) {
         if (con != null) {
             String st;
@@ -314,6 +327,7 @@ public class BaseHandler
         finish (false);
     }
 
+    @Override
     public void timeout () {
         if (con != null) {
             getLogger().warning("BaseHandler: timeout: uri: " +
@@ -322,6 +336,7 @@ public class BaseHandler
         finish (false);
     }
 
+    @Override
     public void setup (final SProperties properties, final HttpProxy proxy) {
         // nothing to do.
     }

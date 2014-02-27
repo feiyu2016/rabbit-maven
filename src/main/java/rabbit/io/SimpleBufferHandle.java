@@ -16,10 +16,12 @@ public class SimpleBufferHandle implements BufferHandle {
         this.buffer = buffer;
     }
 
+    @Override
     public boolean isEmpty () {
         return !buffer.hasRemaining ();
     }
 
+    @Override
     public ByteBuffer getBuffer () {
         return buffer;
     }
@@ -32,12 +34,14 @@ public class SimpleBufferHandle implements BufferHandle {
         return false; // we only give out small buffers
     }
 
+    @Override
     public void possiblyFlush () {
         if (!buffer.hasRemaining ()) {
             buffer = null;
         }
     }
 
+    @Override
     public void setMayBeFlushed (final boolean mayBeFlushed) {
         // ignore
     }

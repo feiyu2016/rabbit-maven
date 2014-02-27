@@ -20,20 +20,24 @@ public class SimpleResolver implements Resolver {
         this.nio = nio;
     }
 
+    @Override
     public void getInetAddress (final URL url, final InetAddressListener listener) {
         final String groupId = getClass ().getSimpleName ();
         nio.runThreadTask (new ResolvRunner (url, listener),
                            new DefaultTaskIdentifier (groupId, url.toString ()));
     }
 
+    @Override
     public int getConnectPort (final int port) {
         return port;
     }
 
+    @Override
     public boolean isProxyConnected () {
         return false;
     }
 
+    @Override
     public String getProxyAuthString () {
         return null;
     }

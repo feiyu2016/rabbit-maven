@@ -37,12 +37,14 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
 
     /** Will return null to indicate no timeout on accepts.
      */
+    @Override
     public Long getTimeout () {
         return timeout;
     }
 
     /** Returns the class name.
      */
+    @Override
     public String getDescription () {
         return getClass ().getSimpleName ();
     }
@@ -50,16 +52,19 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
     /** Will always run on the selector thread so return false.
      * @return false
      */
+    @Override
     public boolean useSeparateThread () {
         return false;
     }
 
     /** Handle timeouts. Default implementation just calls closed().
      */
+    @Override
     public void timeout () {
         closed ();
     }
 
+    @Override
     public void closed () {
         Closer.close (sc, logger);
     }

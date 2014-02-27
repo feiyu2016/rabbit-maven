@@ -69,14 +69,17 @@ public class MultiSelectorNioHandler implements NioHandler {
         this.defaultTimeout = defaultTimeout;
     }
 
+    @Override
     public void start (final ThreadFactory tf) {
         for (SingleSelectorRunner ssr : selectorRunners) {
             ssr.start (tf);
         }
     }
 
+    @Override
     public void shutdown () {
         final Thread t = new Thread (new Runnable () {
+            @Override
             public void run () {
                 executorService.shutdown ();
                 for (SingleSelectorRunner ssr : selectorRunners) {
@@ -87,6 +90,7 @@ public class MultiSelectorNioHandler implements NioHandler {
         t.start ();
     }
 
+    @Override
     public Long getDefaultTimeout () {
         if (defaultTimeout == null) {
             return null;
@@ -95,6 +99,7 @@ public class MultiSelectorNioHandler implements NioHandler {
                              defaultTimeout.longValue ());
     }
 
+    @Override
     public void runThreadTask (final Runnable r, final TaskIdentifier ti) {
         stats.addPendingTask (ti);
         try{
@@ -132,6 +137,7 @@ public class MultiSelectorNioHandler implements NioHandler {
         ssr.runSelectorTask (sr);
     }
 
+    @Override
     public void waitForRead (final SelectableChannel channel,
                              final ReadHandler handler) {
         if (logger.isLoggable (Level.FINEST)) {
@@ -139,12 +145,14 @@ public class MultiSelectorNioHandler implements NioHandler {
                         ", handler: " + handler);
         }
         runSelectorTask (channel, new SelectorRunnable () {
+            @Override
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForRead (channel, handler);
             }
         });
     }
 
+    @Override
     public void waitForWrite (final SelectableChannel channel,
                               final WriteHandler handler) {
         if (logger.isLoggable (Level.FINEST)) {
@@ -152,12 +160,14 @@ public class MultiSelectorNioHandler implements NioHandler {
                         ", handler: " + handler);
         }
         runSelectorTask (channel, new SelectorRunnable () {
+            @Override
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForWrite (channel, handler);
             }
         });
     }
 
+    @Override
     public void waitForAccept (final SelectableChannel channel,
                                final AcceptHandler handler) {
         if (logger.isLoggable (Level.FINEST)) {
@@ -165,25 +175,30 @@ public class MultiSelectorNioHandler implements NioHandler {
                         ", handler: " + handler);
         }
         runSelectorTask (channel, new SelectorRunnable () {
+            @Override
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForAccept (channel, handler);
             }
         });
     }
 
+    @Override
     public void waitForConnect (final SelectableChannel channel,
                                 final ConnectHandler handler) {
         runSelectorTask (channel, new SelectorRunnable () {
+            @Override
             public void run (final SingleSelectorRunner ssr) throws IOException {
                 ssr.waitForConnect (channel, handler);
             }
         });
     }
 
+    @Override
     public void cancel (final SelectableChannel channel,
                         final SocketChannelHandler handler) {
         for (SingleSelectorRunner sr : selectorRunners) {
             sr.runSelectorTask (new SelectorRunnable () {
+                @Override
                 public void run (final SingleSelectorRunner ssr) {
                     ssr.cancel (channel, handler);
                 }
@@ -191,9 +206,11 @@ public class MultiSelectorNioHandler implements NioHandler {
         }
     }
 
+    @Override
     public void close (final SelectableChannel channel) {
         for (SingleSelectorRunner sr : selectorRunners) {
             sr.runSelectorTask (new SelectorRunnable () {
+                @Override
                 public void run (final SingleSelectorRunner ssr) {
                     ssr.close (channel);
                 }
@@ -201,6 +218,7 @@ public class MultiSelectorNioHandler implements NioHandler {
         }
     }
 
+    @Override
     public void visitSelectors (final SelectorVisitor visitor) {
         // TODO: do we need to run on the respective threads?
         for (SingleSelectorRunner sr : selectorRunners) {

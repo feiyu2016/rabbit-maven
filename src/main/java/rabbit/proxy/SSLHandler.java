@@ -108,6 +108,7 @@ public class SSLHandler implements TunnelDoneListener {
             request.setRequestURI ("http://" + uri);
         }
 
+        @Override
         public void connectionEstablished (final WebConnection wce) {
             wc = wce;
             if (resolver.isProxyConnected ()) {
@@ -119,6 +120,7 @@ public class SSLHandler implements TunnelDoneListener {
             }
         }
 
+        @Override
         public void timeout () {
             final String err =
                     "SSLHandler: Timeout waiting for web connection: " + uri;
@@ -126,6 +128,7 @@ public class SSLHandler implements TunnelDoneListener {
             closeDown ();
         }
 
+        @Override
         public void failed (final Exception e) {
             warn ("SSLHandler: failed to get web connection to: " + uri, e);
             closeDown ();
@@ -167,6 +170,7 @@ public class SSLHandler implements TunnelDoneListener {
     }
 
     private class ChainResponseHandler implements HttpResponseListener {
+        @Override
         public void httpResponse (final HttpHeader response, final BufferHandle rbh,
                                   final boolean keepalive, final boolean isChunked,
                                   final long dataSize) {
@@ -178,12 +182,14 @@ public class SSLHandler implements TunnelDoneListener {
             }
         }
 
+        @Override
         public void failed (final Exception cause) {
             warn ("SSLHandler: failed to get chained response: " +
                   request.getRequestURI (), cause);
             closeDown ();
         }
 
+        @Override
         public void timeout () {
             final String err = "SSLHandler: Timeout waiting for chained response: " +
                                request.getRequestURI ();
@@ -216,16 +222,19 @@ public class SSLHandler implements TunnelDoneListener {
             this.server2client = server2client;
         }
 
+        @Override
         public void httpHeaderSent () {
             tunnelData (server2client);
         }
 
+        @Override
         public void timeout () {
             logger.warning ("SSLHandler: Timeout when sending http header: " +
                             request.getRequestURI ());
             closeDown ();
         }
 
+        @Override
         public void failed (final Exception e) {
             warn ("SSLHandler: Exception when sending http header: " +
                   request.getRequestURI (), e);
@@ -243,6 +252,7 @@ public class SSLHandler implements TunnelDoneListener {
         tunnel.start ();
     }
 
+    @Override
     public void tunnelClosed () {
         if (wc != null) {
             con.logAndClose (null);

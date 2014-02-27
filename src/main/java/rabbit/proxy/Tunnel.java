@@ -137,28 +137,34 @@ public class Tunnel {
             }
         }
 
+        @Override
         public void closed () {
             logger.info ("Tunnel closed");
             closeDown ();
         }
 
+        @Override
         public void timeout () {
             logger.warning ("Tunnel got timeout");
             closeDown ();
         }
 
+        @Override
         public boolean useSeparateThread () {
             return false;
         }
 
+        @Override
         public String getDescription () {
             return "Tunnel part from: " + from + " to: " + to;
         }
 
+        @Override
         public Long getTimeout () {
             return null;
         }
 
+        @Override
         public void read () {
             try {
                 if (!from.isOpen ()) {
@@ -185,6 +191,7 @@ public class Tunnel {
             }
         }
 
+        @Override
         public void write () {
             writeData ();
         }

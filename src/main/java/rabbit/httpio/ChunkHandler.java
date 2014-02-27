@@ -273,6 +273,7 @@ public class ChunkHandler {
     private static class EmptyLineHandler implements LineListener {
         private boolean ok = false;
         private boolean lineRead = false;
+        @Override
         public void lineRead (final String line) {
             lineRead = true;
             ok = "".equals (line);
@@ -297,6 +298,7 @@ public class ChunkHandler {
     }
 
     private class ChunkSizeHandler implements LineListener {
+        @Override
         public void lineRead (final String line) {
             final StringTokenizer st = new StringTokenizer (line, "\t \n\r(;");
             if (st.hasMoreTokens ()) {
@@ -316,6 +318,7 @@ public class ChunkHandler {
     }
 
     private class ExtensionHandler implements LineListener {
+        @Override
         public void lineRead (final String line) {
             readExtension = false;
         }

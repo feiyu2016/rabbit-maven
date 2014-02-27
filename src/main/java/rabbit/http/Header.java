@@ -80,11 +80,13 @@ public class Header implements Storable {
         value = getCachedString (value);
     }
 
+    @Override
     public void write (final DataOutput out) throws IOException {
         out.writeUTF (type);
         out.writeUTF (value);
     }
 
+    @Override
     public void read (final DataInput in) throws IOException {
         type = getCachedString (in.readUTF ());
         value = getCachedString (in.readUTF ());

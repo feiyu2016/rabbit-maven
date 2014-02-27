@@ -13,14 +13,23 @@ import rabbit.rnio.WriteHandler;
 class ChannelOpsHandler {
     private static class NullHandler
             implements ReadHandler, WriteHandler, AcceptHandler, ConnectHandler {
+        @Override
         public void closed () { /* empty */ }
+        @Override
         public void timeout () { /* empty */ }
+        @Override
         public boolean useSeparateThread () { return false; }
+        @Override
         public String getDescription () { return "NullHandler"; }
+        @Override
         public Long getTimeout () { return null; }
+        @Override
         public void read () { /* empty */ }
+        @Override
         public void write () { /* empty */ }
+        @Override
         public void accept () { /* empty */ }
+        @Override
         public void connect () { /* empty */ }
         @Override public String toString () { return "NullHandler"; }
     }
@@ -105,6 +114,7 @@ class ChannelOpsHandler {
                              final ReadHandler rh) {
         if (rh.useSeparateThread ()) {
             executorService.execute (new Runnable () {
+                @Override
                 public void run () {
                     rh.read ();
                 }
@@ -118,6 +128,7 @@ class ChannelOpsHandler {
                               final WriteHandler wh) {
         if (wh.useSeparateThread ()) {
             executorService.execute (new Runnable () {
+                @Override
                 public void run () {
                     wh.write ();
                 }
@@ -131,6 +142,7 @@ class ChannelOpsHandler {
                                final AcceptHandler ah) {
         if (ah.useSeparateThread ()) {
             executorService.execute (new Runnable () {
+                @Override
                 public void run () {
                     ah.accept ();
                 }
@@ -144,6 +156,7 @@ class ChannelOpsHandler {
                                 final ConnectHandler ch) {
         if (ch.useSeparateThread ()) {
             executorService.execute (new Runnable () {
+                @Override
                 public void run () {
                     ch.connect ();
                 }

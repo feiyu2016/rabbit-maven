@@ -60,6 +60,7 @@ public class WebConnectionResourceSource
         this.dataSize = dataSize;
     }
 
+    @Override
     public String getDescription () {
         return "WebConnectionResourceSource: length: "+ dataSize +
                ", read: " + totalRead + ", chunked: " + isChunked +
@@ -69,20 +70,24 @@ public class WebConnectionResourceSource
     /** FileChannels can not be used, will always return false.
      * @return false
      */
+    @Override
     public boolean supportsTransfer () {
         return false;
     }
 
+    @Override
     public long length () {
         return dataSize;
     }
 
+    @Override
     public long transferTo (final long position, final long count,
                             final WritableByteChannel target)
             throws IOException {
         throw new IllegalStateException ("transferTo can not be used.");
     }
 
+    @Override
     public void addBlockListener (final BlockListener listener) {
         if (this.listener != null) {
             throw new RuntimeException("Trying to overwrite block listener: " +
@@ -102,6 +107,7 @@ public class WebConnectionResourceSource
         }
     }
 
+    @Override
     public void finishedRead () {
         cleanupAndFinish ();
     }
@@ -110,6 +116,7 @@ public class WebConnectionResourceSource
         listener.finishedRead ();
     }
 
+    @Override
     public void register () {
         timeout = nioHandler.getDefaultTimeout ();
         nioHandler.waitForRead (wc.getChannel (), this);
@@ -129,6 +136,7 @@ public class WebConnectionResourceSource
         bufHandle.possiblyFlush ();
     }
 
+    @Override
     public void readMore () {
         if (!bufHandle.isEmpty ()) {
             final ByteBuffer buffer = bufHandle.getBuffer ();
@@ -141,6 +149,7 @@ public class WebConnectionResourceSource
         register ();
     }
 
+    @Override
     public void read () {
         final ByteBuffer buffer = bufHandle.getBuffer ();
 
@@ -170,10 +179,12 @@ public class WebConnectionResourceSource
         }
     }
 
+    @Override
     public boolean useSeparateThread () {
         return false;
     }
 
+    @Override
     public void closed () {
         if (listener != null) {
             listener.failed (new IOException ("channel closed"));
@@ -183,6 +194,7 @@ public class WebConnectionResourceSource
         }
     }
 
+    @Override
     public void timeout () {
         if (listener != null) {
             listener.timeout ();
@@ -192,10 +204,12 @@ public class WebConnectionResourceSource
         }
     }
 
+    @Override
     public Long getTimeout () {
         return timeout;
     }
 
+    @Override
     public void release () {
         if (!bufHandle.isEmpty () && wc.getKeepalive () &&
             (dataSize < 0 || totalRead != dataSize)) {

@@ -29,6 +29,7 @@ class StatisticsCollector implements Runnable {
 
     /** Run the task.
      */
+    @Override
     public void run () {
         stats.changeTaskStatusToRunning (ti);
         final long started = System.currentTimeMillis ();

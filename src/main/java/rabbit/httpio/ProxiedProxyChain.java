@@ -21,6 +21,7 @@ public class ProxiedProxyChain implements ProxyChain {
         resolver = new ProxyResolver (proxy, port, proxyAuth);
     }
 
+    @Override
     public Resolver getResolver (final String url) {
         return resolver;
     }

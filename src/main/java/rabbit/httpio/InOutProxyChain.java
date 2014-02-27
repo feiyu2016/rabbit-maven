@@ -25,6 +25,7 @@ public class InOutProxyChain implements ProxyChain {
         proxiedResolver = new ProxyResolver (proxy, port, proxyAuth);
     }
 
+    @Override
     public Resolver getResolver (final String url) {
         final Matcher m = insidePattern.matcher (url);
         if (m.find ()) {

@@ -28,18 +28,22 @@ public class ProxyResolver implements Resolver {
         this.auth = auth;
     }
 
+    @Override
     public void getInetAddress (final URL url, final InetAddressListener listener) {
         listener.lookupDone (proxy);
     }
 
+    @Override
     public int getConnectPort (final int wantedPort) {
         return port;
     }
 
+    @Override
     public boolean isProxyConnected () {
         return true;
     }
 
+    @Override
     public String getProxyAuthString () {
         return auth;
     }

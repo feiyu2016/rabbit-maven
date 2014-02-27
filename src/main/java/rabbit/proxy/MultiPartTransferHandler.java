@@ -29,6 +29,7 @@ class MultiPartTransferHandler extends ResourceHandlerBase
         mpp = new MultiPartPipe (ctHeader);
     }
 
+    @Override
     public void modifyRequest (final HttpHeader header) {
         // nothing.
     }
@@ -44,6 +45,7 @@ class MultiPartTransferHandler extends ResourceHandlerBase
                                  tlh.getNetwork (), sbh, false, this);
         bs.write ();
     }
+    @Override
     public void blockSent () {
         if (!mpp.isFinished ()) {
             doTransfer();

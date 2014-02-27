@@ -31,6 +31,7 @@ public class CachingBufferHandler implements BufferHandler {
         return b;
     }
 
+    @Override
     public ByteBuffer getBuffer () {
         return getBuffer (cache, 4096);
     }
@@ -39,6 +40,7 @@ public class CachingBufferHandler implements BufferHandler {
         bufs.add (bh);
     }
 
+    @Override
     public void putBuffer (final ByteBuffer buffer) {
         if (buffer == null) {
             throw new IllegalArgumentException("null buffer not allowed");
@@ -51,6 +53,7 @@ public class CachingBufferHandler implements BufferHandler {
         }
     }
 
+    @Override
     public ByteBuffer growBuffer (final ByteBuffer buffer) {
         final ByteBuffer lb = getBuffer (largeCache, 128 * 1024);
         if (buffer != null) {

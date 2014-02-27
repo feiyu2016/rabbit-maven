@@ -64,14 +64,17 @@ public class HttpHeaderSender implements BlockSentListener {
         }
     }
 
+    @Override
     public void timeout () {
         sender.timeout ();
     }
 
+    @Override
     public void failed (final Exception cause) {
         sender.failed (cause);
     }
 
+    @Override
     public void blockSent () {
         sender.httpHeaderSent ();
     }

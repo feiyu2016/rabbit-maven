@@ -30,6 +30,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
 
     /**  Will store the variables and call doTransfer ()
      */
+    @Override
     public void transfer (final WebConnection wc,
                           final ClientResourceTransferredListener crtl) {
         this.wc = wc;
@@ -45,6 +46,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
         }
     }
 
+    @Override
     public void addContentListener (final ClientResourceListener crl) {
         if (resourceListeners == null) {
             resourceListeners = new ArrayList<ClientResourceListener>();
@@ -72,6 +74,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
     private class Reader implements ReadHandler {
         private final Long timeout = con.getNioHandler ().getDefaultTimeout ();
 
+        @Override
         public void read () {
             try {
                 final ByteBuffer buffer = bufHandle.getBuffer ();
@@ -90,24 +93,29 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
             }
         }
 
+        @Override
         public void closed () {
             bufHandle.possiblyFlush ();
             listener.failed (new IOException ("Connection closed"));
         }
 
+        @Override
         public void timeout () {
             bufHandle.possiblyFlush ();
             listener.timeout ();
         }
 
+        @Override
         public boolean useSeparateThread () {
             return false;
         }
 
+        @Override
         public String getDescription () {
             return toString ();
         }
 
+        @Override
         public Long getTimeout () {
             return timeout;
         }

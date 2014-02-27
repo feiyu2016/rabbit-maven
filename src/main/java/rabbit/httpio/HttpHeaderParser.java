@@ -119,6 +119,7 @@ public class HttpHeaderParser implements LineListener {
     }
 
     /** Handle a newly read line. */
+    @Override
     public void lineRead (final String line) {
         if (line.length () == 0) {
             headerRead = header != null;

@@ -17,10 +17,12 @@ public class BoundBinder implements SocketBinder {
         this.ia = ia;
     }
 
+    @Override
     public int getPort () {
         return 0;
     }
 
+    @Override
     public InetAddress getInetAddress () {
         return ia;
     }

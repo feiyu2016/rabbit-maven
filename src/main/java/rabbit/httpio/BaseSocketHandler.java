@@ -51,24 +51,29 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
     }
 
     /** Does nothing by default */
+    @Override
     public void closed () {
         // empty
     }
 
     /** Does nothing by default */
+    @Override
     public void timeout () {
         // empty
     }
 
     /** Runs on the selector thread by default */
+    @Override
     public boolean useSeparateThread () {
         return false;
     }
 
+    @Override
     public String getDescription () {
         return getClass ().getName () + ":" + channel;
     }
 
+    @Override
     public Long getTimeout () {
         return timeout;
     }

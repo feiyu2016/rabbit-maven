@@ -56,6 +56,7 @@ public class TransferHandler implements Runnable {
                                   new DefaultTaskIdentifier (groupId, desc));
     }
 
+    @Override
     public void run () {
         try {
             while (count > 0) {
@@ -83,28 +84,34 @@ public class TransferHandler implements Runnable {
     private class WriteWaiter implements WriteHandler {
         private final Long timeout = nioHandler.getDefaultTimeout ();
 
+        @Override
         public void closed () {
             listener.failed (new IOException ("channel closed"));
         }
 
+        @Override
         public void timeout () {
             listener.failed (new IOException ("write timed out"));
         }
 
+        @Override
         public boolean useSeparateThread () {
             return true;
         }
 
+        @Override
         public String getDescription () {
             final Socket s = channel.socket ();
             final Address a = new Address (s.getInetAddress (), s.getPort ());
             return "TransferHandler$WriteWaiter: address: " + a;
         }
 
+        @Override
         public Long getTimeout () {
             return timeout;
         }
 
+        @Override
         public void write () {
             TransferHandler.this.run ();
         }

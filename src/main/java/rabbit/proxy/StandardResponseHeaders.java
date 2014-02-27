@@ -44,6 +44,7 @@ class StandardResponseHeaders implements HttpGenerator {
      * getHeader ("HTTP/1.0 200 OK");
      * @return a new HttpHeader.
      */
+    @Override
     public HttpHeader getHeader () {
         return getHeader (rabbit.http.StatusCode._200);
     }
@@ -67,6 +68,7 @@ class StandardResponseHeaders implements HttpGenerator {
     /** Get a 200 Ok header
      * @return a 200 HttpHeader .
      */
+    @Override
     public HttpHeader get200 () {
         return getHeader (rabbit.http.StatusCode._200);
     }
@@ -74,6 +76,7 @@ class StandardResponseHeaders implements HttpGenerator {
     /** Get a 302 header
      * @return a 302 HttpHeader
      */
+    @Override
     public HttpHeader get302 (final String newURL){
         final HttpHeader header = getHeader (rabbit.http.StatusCode._302);
         header.setHeader("Location", newURL);
@@ -85,6 +88,7 @@ class StandardResponseHeaders implements HttpGenerator {
      * @return a HttpHeader for the exception.
      */
     private static final String UTF8 = "UTF-8";
+    @Override
     public HttpHeader get400 (final Exception exception) {
         // in most cases we should have a header out already, but to be sure...
         final HttpHeader header = getHeader (rabbit.http.StatusCode._400);
@@ -99,6 +103,7 @@ class StandardResponseHeaders implements HttpGenerator {
     /** Get a 403 Forbidden header.
      * @return a HttpHeader.
      */
+    @Override
     public HttpHeader get403 () {
         // in most cases we should have a header out already, but to be sure...
         final HttpHeader header = getHeader (rabbit.http.StatusCode._403);
@@ -111,6 +116,7 @@ class StandardResponseHeaders implements HttpGenerator {
     /** Get a 404 File not found.
      * @return a HttpHeader.
      */
+    @Override
     public HttpHeader get404 (final String file) {
         // in most cases we should have a header out already, but to be sure...
         final HttpHeader header = getHeader (rabbit.http.StatusCode._404);
@@ -124,6 +130,7 @@ class StandardResponseHeaders implements HttpGenerator {
     /** Get a 414 Request-URI Too Long
      * @return a suitable HttpHeader.
      */
+    @Override
     public HttpHeader get414 () {
         final HttpHeader header = getHeader (rabbit.http.StatusCode._414);
         final String page = HtmlPage.getPageHeader (con, rabbit.http.StatusCode._414) + "</body></html>\n";
@@ -135,6 +142,7 @@ class StandardResponseHeaders implements HttpGenerator {
      * @param exception the Exception made.
      * @return a suitable HttpHeader.
      */
+    @Override
     public HttpHeader get500 (final String url, final Throwable exception) {
         // in most cases we should have a header out already, but to be sure...
         // normally this only thrashes the page... Too bad.
@@ -163,6 +171,7 @@ class StandardResponseHeaders implements HttpGenerator {
      * @param e the Exception made.
      * @return a suitable HttpHeader.
      */
+    @Override
     public HttpHeader get504 (final String uri, final Throwable e) {
         final HttpHeader header = getHeader (rabbit.http.StatusCode._504);
         try {

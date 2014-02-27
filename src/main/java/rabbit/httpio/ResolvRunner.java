@@ -25,6 +25,7 @@ public class ResolvRunner implements Runnable {
 
     /** Run a dns lookup and then notifies the listener on the selector thread.
      */
+    @Override
     public void run () {
         try {
             final InetAddress ia = InetAddress.getByName(url.getHost());

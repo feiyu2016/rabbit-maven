@@ -223,6 +223,7 @@ public class HttpBaseFilter implements HttpFilter {
         return null;
     }
 
+    @Override
     public HttpHeader doHttpInFiltering (final SocketChannel socket,
                                          final HttpHeader header, final Connection con) {
         // ok, no real header then don't do a thing.
@@ -329,6 +330,7 @@ public class HttpBaseFilter implements HttpFilter {
         return true;
     }
 
+    @Override
     public HttpHeader doHttpOutFiltering (final SocketChannel socket,
                                           final HttpHeader header, final Connection con) {
         boolean useCache = true;
@@ -384,11 +386,13 @@ public class HttpBaseFilter implements HttpFilter {
         return null;
     }
 
+    @Override
     public HttpHeader doConnectFiltering (final SocketChannel socket,
                                           final HttpHeader header, final Connection con) {
         return null;
     }
 
+    @Override
     public void setup (final SProperties properties, final HttpProxy proxy) {
         removes.clear ();
         final String rs = "Connection,Proxy-Connection,Keep-Alive,Public,Transfer-Encoding,Upgrade,Proxy-Authorization,TE,Proxy-Authenticate,Trailer";

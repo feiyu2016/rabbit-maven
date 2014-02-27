@@ -36,6 +36,7 @@ public class Acceptor extends SocketHandlerBase<ServerSocketChannel>
 
     /** Accept a SocketChannel.
      */
+    @Override
     public void accept () {
         try {
             final SocketChannel s = sc.accept ();

@@ -64,15 +64,18 @@ public class BasicStatisticsHolder implements StatisticsHolder {
         }
     }
 
+    @Override
     public synchronized void addPendingTask (final TaskIdentifier ti) {
         addTask (ti, pendingTasks);
     }
 
+    @Override
     public synchronized void changeTaskStatusToRunning (final TaskIdentifier ti) {
         removeTask (ti, pendingTasks);
         addTask (ti, runningTasks);
     }
 
+    @Override
     public synchronized void changeTaskStatusToFinished (final TaskIdentifier ti,
                                                          final boolean wasOk,
                                                          final long timeSpent) {
@@ -133,22 +136,27 @@ public class BasicStatisticsHolder implements StatisticsHolder {
         return ret;
     }
 
+    @Override
     public synchronized Map<String, List<TaskIdentifier>> getPendingTasks () {
         return copy (pendingTasks);
     }
 
+    @Override
     public synchronized Map<String, List<TaskIdentifier>> getRunningTasks () {
         return copy (runningTasks);
     }
 
+    @Override
     public synchronized Map<String, List<CompletionEntry>> getLatest () {
         return copy (latest);
     }
 
+    @Override
     public synchronized Map<String, List<CompletionEntry>> getLongest () {
         return copy (longest);
     }
 
+    @Override
     public synchronized Map<String, TotalTimeSpent> getTotalTimeSpent () {
         return Collections.unmodifiableMap (total);
     }

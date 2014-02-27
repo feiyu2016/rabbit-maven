@@ -13,6 +13,7 @@ import rabbit.util.SProperties;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class InOutProxyChainFactory implements ProxyChainFactory {
+    @Override
     public ProxyChain getProxyChain (final SProperties props,
                                      final NioHandler nio,
                                      final Logger logger) {

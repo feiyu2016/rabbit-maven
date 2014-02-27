@@ -29,6 +29,7 @@ public class ProxyConnectionAcceptor implements AcceptorListener {
         this.proxy = proxy;
     }
 
+    @Override
     public void connectionAccepted (final SocketChannel sc)
             throws IOException {
         proxy.getCounter ().inc ("Socket accepts");

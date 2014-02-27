@@ -78,6 +78,7 @@ public class BlockSender extends BaseSocketHandler implements WriteHandler {
         sender.failed (new IOException ("channel was closed"));
     }
 
+    @Override
     public void write () {
         try {
             writeBuffer ();

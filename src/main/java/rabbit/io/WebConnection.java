@@ -65,6 +65,7 @@ public class WebConnection implements Closeable {
         return channel;
     }
 
+    @Override
     public void close () throws IOException {
         counter.inc ("WebConnections closed");
         channel.close ();
@@ -114,27 +115,33 @@ public class WebConnection implements Closeable {
             nioHandler.waitForConnect (channel, this);
         }
 
+        @Override
         public void closed () {
             wcl.failed (new IOException ("channel closed before connect"));
         }
 
+        @Override
         public void timeout () {
             closeDown ();
             wcl.timeout ();
         }
 
+        @Override
         public boolean useSeparateThread () {
             return false;
         }
 
+        @Override
         public String getDescription () {
             return "WebConnection$ConnectListener: address: " + address;
         }
 
+        @Override
         public Long getTimeout () {
             return timeout;
         }
 
+        @Override
         public void connect () {
             try {
                 channel.finishConnect ();

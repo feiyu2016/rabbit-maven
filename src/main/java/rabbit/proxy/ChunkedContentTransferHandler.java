@@ -33,6 +33,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
         chunkHandler.setBlockListener (this);
     }
 
+    @Override
     public void modifyRequest (final HttpHeader header) {
         header.setHeader ("Transfer-Encoding", "chunked");
     }
@@ -41,6 +42,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
         chunkHandler.handleData (bufHandle);
     }
 
+    @Override
     public void bufferRead (final BufferHandle bufHandle) {
         fireResouceDataRead (bufHandle);
         final BlockSender bs =
@@ -49,6 +51,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
         bs.write ();
     }
 
+    @Override
     public void finishedRead () {
         final ChunkEnder ce = new ChunkEnder ();
         sentEndChunk = true;
@@ -56,10 +59,12 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
                             tlh.getNetwork (), this);
     }
 
+    @Override
     public void register () {
         waitForRead ();
     }
 
+    @Override
     public void readMore () {
         if (!bufHandle.isEmpty ()) {
             bufHandle.getBuffer().compact();
@@ -67,6 +72,7 @@ class ChunkedContentTransferHandler extends ResourceHandlerBase
         register ();
     }
 
+    @Override
     public void blockSent () {
         if (sentEndChunk) {
             listener.clientResourceTransferred();

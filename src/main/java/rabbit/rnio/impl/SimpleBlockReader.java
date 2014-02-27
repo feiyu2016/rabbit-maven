@@ -32,6 +32,7 @@ public abstract class SimpleBlockReader
 
     /** Try to read data from the channel.
      */
+    @Override
     public void read () {
         try {
             final ByteBuffer buf = getByteBuffer ();

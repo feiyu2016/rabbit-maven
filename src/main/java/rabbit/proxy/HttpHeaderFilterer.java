@@ -51,6 +51,7 @@ class HttpHeaderFilterer {
     }
 
     private static class InFilterer implements FilterHandler {
+        @Override
         public HttpHeader filter (final HttpFilter hf, final SocketChannel channel,
                                   final HttpHeader in, final Connection con) {
             return hf.doHttpInFiltering (channel, in, con);
@@ -58,6 +59,7 @@ class HttpHeaderFilterer {
     }
 
     private static class OutFilterer implements FilterHandler {
+        @Override
         public HttpHeader filter (final HttpFilter hf, final SocketChannel channel,
                                   final HttpHeader in, final Connection con) {
             return hf.doHttpOutFiltering (channel, in, con);
@@ -65,6 +67,7 @@ class HttpHeaderFilterer {
     }
 
     private static class ConnectFilterer implements FilterHandler {
+        @Override
         public HttpHeader filter (final HttpFilter hf, final SocketChannel channel,
                                   final HttpHeader in, final Connection con) {
             return hf.doConnectFiltering (channel, in, con);

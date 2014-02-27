@@ -19,6 +19,7 @@ public class SimpleProxyChain implements ProxyChain {
         resolver = new SimpleResolver (nio);
     }
 
+    @Override
     public Resolver getResolver (final String url) {
         return resolver;
     }

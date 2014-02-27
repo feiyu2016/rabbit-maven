@@ -147,6 +147,7 @@ public class Connection {
     }
 
     private class RequestListener implements HttpHeaderListener {
+        @Override
         public void httpHeaderRead (final HttpHeader header, final BufferHandle bh,
                                     final boolean keepalive, final boolean isChunked,
                                     final long dataSize) {
@@ -154,14 +155,17 @@ public class Connection {
             requestRead (header, bh, isChunked, dataSize);
         }
 
+        @Override
         public void closed () {
             closeDown ();
         }
 
+        @Override
         public void timeout () {
             closeDown ();
         }
 
+        @Override
         public void failed (final Exception e) {
             handleFailedRequestRead (e);
         }
@@ -225,6 +229,7 @@ public class Connection {
                                                ".filterAndHandleRequest: ",
                                                request.getRequestURI ());
             getNioHandler ().runThreadTask (new Runnable () {
+                @Override
                 public void run () {
                     filterAndHandleRequest ();
                 }
@@ -432,6 +437,7 @@ public class Connection {
             this.rh = rh;
         }
 
+        @Override
         public void tunnelClosed () {
             logAndClose (rh);
         }
@@ -731,12 +737,14 @@ public class Connection {
     }
 
     private abstract class SendAndDoListener implements HttpHeaderSentListener {
+        @Override
         public void timeout () {
             status = "Response sending timed out, logging and closing.";
             logger.info ("Timeout when sending http header");
             logAndClose (null);
         }
 
+        @Override
         public void failed (final Exception e) {
             status =
                     "Response sending failed: " + e + ", logging and closing.";
@@ -746,6 +754,7 @@ public class Connection {
     }
 
     private class SendAndRestartListener extends SendAndDoListener {
+        @Override
         public void httpHeaderSent () {
             readRequest ();
         }
@@ -792,6 +801,7 @@ public class Connection {
     }
 
     private class SendAndCloseListener extends SendAndDoListener {
+        @Override
         public void httpHeaderSent () {
             status = "Response sent, logging and closing.";
             logAndClose (null);
