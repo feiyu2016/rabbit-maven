@@ -10,13 +10,13 @@
     <version>5.0-SNAPSHOT</version>
     <url>https://github.com/toonetown/rabbit-maven</url>
     
-	<licenses>
-		<license>
-			<name>New BSD License</name>
-			<url>http://opensource.org/licenses/BSD-3-Clause</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>New BSD License</name>
+            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     
     <packaging>jar</packaging>
 

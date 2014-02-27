@@ -55,7 +55,7 @@ public abstract class SimpleBlockReader
     }
 
     /** Called before a read attempt is made.
-     *	The default is to create a new 1kB big ByteBuffer and return it.
+     *    The default is to create a new 1kB big ByteBuffer and return it.
      * @return the ByteBuffer to read data into
      */
     public ByteBuffer getByteBuffer () {

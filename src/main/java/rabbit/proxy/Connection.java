@@ -90,7 +90,7 @@ public class Connection {
      * @param proxy the HttpProxy that this connection belongs to.
      * @param bufHandler the BufferHandler to use for getting ByteBuffers.
      */
-    public Connection (final ConnectionId id,	final SocketChannel channel,
+    public Connection (final ConnectionId id,    final SocketChannel channel,
                        final  HttpProxy proxy, final BufferHandler bufHandler) {
         this.id = id;
         this.channel = channel;
@@ -562,7 +562,7 @@ public class Connection {
     }
 
     /** Set keepalive to a new value. Note that keepalive can only be
-     *	promoted down.
+     *    promoted down.
      * @param keepalive the new keepalive value.
      */
     public void setKeepalive (final boolean keepalive) {

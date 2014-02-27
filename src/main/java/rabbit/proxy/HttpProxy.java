@@ -342,7 +342,7 @@ public class HttpProxy {
     }
 
     /** Closes the serversocket and makes the proxy stop listening for
-     *	connections.
+     *    connections.
      */
     private void closeSocket () {
         try {
@@ -425,7 +425,7 @@ public class HttpProxy {
     }
 
     /** Get the configuration of the proxy.
-     * @return the current configuration	
+     * @return the current configuration
      */
     public Config getConfig () {
         return config;

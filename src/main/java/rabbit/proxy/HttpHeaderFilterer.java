@@ -31,7 +31,7 @@ class HttpHeaderFilterer {
         loadHttpFilters (connect, connectFilters, config, proxy);
     }
 
-    private static interface FilterHandler {
+    private interface FilterHandler {
         HttpHeader filter (HttpFilter hf, SocketChannel channel,
                            HttpHeader in, Connection con);
     }

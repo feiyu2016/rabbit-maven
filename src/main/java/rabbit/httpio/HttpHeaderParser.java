@@ -173,9 +173,9 @@ public class HttpHeaderParser implements LineListener {
                 case 'h':
                 case 'H':
                     if (msg.toLowerCase (Locale.US).startsWith ("http/")) {
-		    /* ignoring header since it looks
-		     * like a duplicate responseline
-		     */
+            /* ignoring header since it looks
+             * like a duplicate responseline
+             */
                         return;
                     }
                     // fallthrough
@@ -189,13 +189,13 @@ public class HttpHeaderParser implements LineListener {
         }
         // ok, the header may be empty, so trim away whites.
         String value = msg.substring (i + 1);
-	
-	/* there are some sites with broken headers
-	 * like http://docs1.excite.com/functions.js
-	 * which returns lines such as this (20040416) /robo
-	 * msg is: 'Cache-control: must-revalidate"'
-	 * so we only check for append when in strict mode...
-	 */
+
+    /* there are some sites with broken headers
+     * like http://docs1.excite.com/functions.js
+     * which returns lines such as this (20040416) /robo
+     * msg is: 'Cache-control: must-revalidate"'
+     * so we only check for append when in strict mode...
+     */
         if (strictHttp) {
             append = checkQuotes(value);
         }

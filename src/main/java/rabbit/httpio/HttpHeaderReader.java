@@ -173,13 +173,13 @@ public class HttpHeaderReader extends BaseSocketHandler
                 ischunked = false;
 
                 if (chunked != null && chunked.equalsIgnoreCase ("chunked")) {
-		    /* If we handle chunked data we must read the whole page
-		     * before continuing, since the chunk footer must be 
-		     * appended to the header (read the RFC)...
-		     * 
-		     * As of RFC 2616 this is not true anymore...
-		     * this means that we throw away footers and it is legal.
-		     */
+            /* If we handle chunked data we must read the whole page
+             * before continuing, since the chunk footer must be
+             * appended to the header (read the RFC)...
+             *
+             * As of RFC 2616 this is not true anymore...
+             * this means that we throw away footers and it is legal.
+             */
                     ischunked = true;
                     header.removeHeader ("Content-Length");
                     dataSize = -1;

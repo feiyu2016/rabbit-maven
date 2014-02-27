@@ -82,12 +82,12 @@ public class HttpBaseFilter implements HttpFilter {
             handleProxyAuthentication(uap, con);
         }
 
-	/*
-	 * Java URL:s doesn't handle user/pass in the URL as in rfc1738:
-	 * //<user>:<password>@<host>:<port>/<url-path>
-	 *
-	 * Convert these to an Authorization header and remove from URI.
-	 */
+    /*
+     * Java URL:s doesn't handle user/pass in the URL as in rfc1738:
+     * //<user>:<password>@<host>:<port>/<url-path>
+     *
+     * Convert these to an Authorization header and remove from URI.
+     */
         final String requestURI = header.getRequestURI();
 
         int s3, s4, s5;
@@ -391,7 +391,8 @@ public class HttpBaseFilter implements HttpFilter {
     @Override
     public void setup (final SProperties properties, final HttpProxy proxy) {
         removes.clear ();
-        final String rs = "Connection,Proxy-Connection,Keep-Alive,Public,Transfer-Encoding,Upgrade,Proxy-Authorization,TE,Proxy-Authenticate,Trailer";
+        final String rs = "Connection,Proxy-Connection,Keep-Alive,Public,Transfer-Encoding,Upgrade," +
+                          "Proxy-Authorization,TE,Proxy-Authenticate,Trailer";
         final String[] sts = rs.split (",");
         for (String r : sts) {
             removes.add (r.trim ());

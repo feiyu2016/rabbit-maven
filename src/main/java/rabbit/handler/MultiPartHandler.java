@@ -20,7 +20,7 @@ public class MultiPartHandler extends BaseHandler {
     /** Create a new MultiPartHandler factory.
      */
     public MultiPartHandler () {
-	// empty
+    // empty
     }
 
     /** Create a new BaseHansler for the given request.
@@ -31,33 +31,33 @@ public class MultiPartHandler extends BaseHandler {
      * @param content the resource.
      */
     public MultiPartHandler (final Connection con, final TrafficLoggerHandler tlh,
-			     final HttpHeader request, final HttpHeader response,
-			     final ResourceSource content) {
-	super (con, tlh, request, response, content, -1);
-	con.setChunking (false);
+                 final HttpHeader request, final HttpHeader response,
+                 final ResourceSource content) {
+    super (con, tlh, request, response, content, -1);
+    con.setChunking (false);
 
-	//Content-Type: multipart/byteranges; boundary=B-mmrokjxyjnwsfcefrvcg\r\n
-	final String ct = response.getHeader ("Content-Type");
-	mpp = new MultiPartPipe (ct);
+    //Content-Type: multipart/byteranges; boundary=B-mmrokjxyjnwsfcefrvcg\r\n
+    final String ct = response.getHeader ("Content-Type");
+    mpp = new MultiPartPipe (ct);
     }
 
     @Override
     public Handler getNewInstance (final Connection con, final TrafficLoggerHandler tlh,
-				   final HttpHeader header, final HttpHeader webHeader,
-				   final ResourceSource content, final long size) {
-	return new MultiPartHandler (con, tlh, header, webHeader, content);
+                   final HttpHeader header, final HttpHeader webHeader,
+                   final ResourceSource content, final long size) {
+    return new MultiPartHandler (con, tlh, header, webHeader, content);
     }
 
     /** We may remove trailers, so we may modify the content.
      * ®return true this handler modifies the content.
      */
     @Override public boolean changesContentSize () {
-	return true;
+    return true;
     }
 
     @Override
     protected void send () {
-	content.addBlockListener (this);
+    content.addBlockListener (this);
     }
 
     /* A Typical case: 
@@ -91,12 +91,12 @@ public class MultiPartHandler extends BaseHandler {
      * This is not a fully correct handling, but it seems to work well enough.
      */
     @Override public void bufferRead (final BufferHandle bufHandle) {
-	final ByteBuffer buf = bufHandle.getBuffer ();
-	mpp.parseBuffer (buf);
-	final BlockSender bs =
-	    new BlockSender (con.getChannel (), con.getNioHandler (),
-			     tlh.getClient (), bufHandle,
-			     con.getChunking (), this);
-	bs.write ();
+    final ByteBuffer buf = bufHandle.getBuffer ();
+    mpp.parseBuffer (buf);
+    final BlockSender bs =
+        new BlockSender (con.getChannel (), con.getNioHandler (),
+                 tlh.getClient (), bufHandle,
+                 con.getChunking (), this);
+    bs.write ();
     }
 }

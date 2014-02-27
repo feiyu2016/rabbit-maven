@@ -79,7 +79,7 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
     }
 
     protected Logger getLogger () {
-        return 	logger;
+        return     logger;
     }
 
     protected void closeDown () {

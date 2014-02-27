@@ -81,10 +81,10 @@ public class SWC implements HttpHeaderSentListener,
         con.getCounter ().inc ("WebConnection established: " +
                                attempts);
         rh.setWebConnection (wc);
-	/* TODO: handle this
- 	if (header.getContentStream () != null)
-	    header.setHeader ("Transfer-Encoding", "chunked");
-	*/
+    /* TODO: handle this
+     if (header.getContentStream () != null)
+        header.setHeader ("Transfer-Encoding", "chunked");
+    */
 
         // we cant retry if we sent the header...
         safe = wc.getReleasedAt() > 0 || ((method.equals("GET") || method.equals("HEAD")));
