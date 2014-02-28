@@ -1,5 +1,7 @@
 package rabbit.io;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -10,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 import rabbit.http.HttpHeader;
@@ -23,10 +23,8 @@ import rabbit.util.SProperties;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class ConnectionHandler {
-    // The logger to use
-    private static final Logger logger = Logger.getLogger(ConnectionHandler.class.getName());
-
     // The counter to use.
     private final Counter counter;
 
@@ -240,7 +238,7 @@ public class ConnectionHandler {
         try {
             wc.close();
         } catch (IOException e) {
-            logger.warning("Failed to close WebConnection: " + wc);
+            log.warn("Failed to close WebConnection: {}", wc);
         }
     }
 
@@ -283,9 +281,7 @@ public class ConnectionHandler {
                 removeFromPool(wc, activeConnections);
                 wc.close();
             } catch (IOException e) {
-                final String err =
-                        "CloseListener: Failed to close web connection: " + e;
-                logger.warning(err);
+                log.warn("CloseListener: Failed to close web connection: {}", e);
             }
         }
 
@@ -317,23 +313,18 @@ public class ConnectionHandler {
         try {
             setKeepaliveTime(Long.parseLong(kat));
         } catch (NumberFormatException e) {
-            final String err =
-                    "Bad number for ConnectionHandler keepalivetime: '" + kat + "'";
-            logger.warning(err);
+            log.warn("Bad number for ConnectionHandler keepalivetime: '{}'", kat);
         }
         final String bindIP = config.getProperty("bind_ip");
         if (bindIP != null) {
             try {
                 final InetAddress ia = InetAddress.getByName(bindIP);
                 if (ia != null) {
-                    logger.info("Will bind to: " + ia +
-                                " for outgoing traffic");
+                    log.info("Will bind to: {} for outgoing traffic", ia);
                     socketBinder = new BoundBinder(ia);
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE,
-                           "Failed to find inet address for: " + bindIP,
-                           e);
+                log.error("Failed to find inet address for: {}", bindIP, e);
             }
         }
     }

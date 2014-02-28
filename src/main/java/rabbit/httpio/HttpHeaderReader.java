@@ -1,9 +1,10 @@
 package rabbit.httpio;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 import rabbit.http.HttpHeader;
@@ -14,6 +15,7 @@ import rabbit.util.TrafficLogger;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class HttpHeaderReader extends BaseSocketHandler
         implements ReadHandler {
     private final HttpHeaderListener reader;
@@ -84,7 +86,7 @@ public class HttpHeaderReader extends BaseSocketHandler
 
     @Override
     public void read() {
-        logger.finest("HttpHeaderReader reading data");
+        log.trace("HttpHeaderReader reading data");
         try {
             // read http request
             // make sure we have room for reading.
@@ -117,9 +119,7 @@ public class HttpHeaderReader extends BaseSocketHandler
     private void parseBuffer(ByteBuffer buffer) throws IOException {
         buffer.mark();
         final boolean done = headerParser.handleBuffer(buffer);
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("HttpHeaderReader.parseBuffer: done " + done);
-        }
+        log.trace("HttpHeaderReader.parseBuffer: done {}", done);
         if (!done) {
             buffer.reset();
             if (buffer.position() > 0) {

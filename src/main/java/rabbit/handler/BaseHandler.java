@@ -1,12 +1,13 @@
 package rabbit.handler;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import rabbit.http.HttpHeader;
 import rabbit.httpio.BlockListener;
 import rabbit.httpio.BlockSender;
@@ -31,6 +32,7 @@ import rabbit.util.SProperties;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class BaseHandler
         implements Handler, HandlerFactory, HttpHeaderSentListener, BlockListener,
                    BlockSentListener {
@@ -52,8 +54,6 @@ public class BaseHandler
 
     /** The flag for the last empty chunk */
     private boolean emptyChunkSent = false;
-
-    private static final Logger logger = Logger.getLogger(BaseHandler.class.getName());
 
     /** For creating the factory.
      */
@@ -88,10 +88,6 @@ public class BaseHandler
                                   final HttpHeader header, final HttpHeader webHeader,
                                   final ResourceSource content, final long size) {
         return new BaseHandler(con, tlh, header, webHeader, content, size);
-    }
-
-    private Logger getLogger() {
-        return logger;
     }
 
     /** Handle the request.
@@ -288,9 +284,7 @@ public class BaseHandler
         try {
             FileHelper.delete(f);
         } catch (IOException e) {
-            getLogger().log(Level.WARNING,
-                            "Failed to delete file",
-                            e);
+            log.warn("Failed to delete file", e);
         }
     }
 
@@ -315,9 +309,7 @@ public class BaseHandler
             } else {
                 st = getStackTrace(cause);
             }
-            getLogger().warning("BaseHandler: error handling request: " +
-                                request.getRequestURI() + ": " +
-                                st);
+            log.warn("BaseHandler: error handling request: {}: {}", request.getRequestURI(), st);
             con.setStatusCode("500");
             String ei = con.getExtraInfo();
             ei = ei == null ? cause.toString() : (ei + ", " + cause);
@@ -329,8 +321,7 @@ public class BaseHandler
     @Override
     public void timeout() {
         if (con != null) {
-            getLogger().warning("BaseHandler: timeout: uri: " +
-                                request.getRequestURI());
+            log.warn("BaseHandler: timeout: uri: {}", request.getRequestURI());
         }
         finish(false);
     }

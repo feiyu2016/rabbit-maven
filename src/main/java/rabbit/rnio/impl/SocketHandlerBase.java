@@ -1,7 +1,8 @@
 package rabbit.rnio.impl;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.nio.channels.SelectableChannel;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.SocketChannelHandler;
 
@@ -12,16 +13,14 @@ import rabbit.rnio.SocketChannelHandler;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public abstract class SocketHandlerBase<T extends SelectableChannel>
-        implements SocketChannelHandler {
+@Slf4j
+public abstract class SocketHandlerBase<T extends SelectableChannel> implements SocketChannelHandler {
     /** The actual channel */
     final T sc;
     /** The NioHandler used to wait for opeations. */
     final NioHandler nioHandler;
     /** The timeout for the current operation */
     private final Long timeout;
-
-    private static final Logger logger = Logger.getLogger("rabbit.rnio");
 
     /**
      * @param sc the channel to handle
@@ -66,6 +65,6 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
 
     @Override
     public void closed() {
-        Closer.close(sc, logger);
+        Closer.close(sc);
     }
 }

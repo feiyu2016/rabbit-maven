@@ -1,5 +1,7 @@
 package rabbit.rnio.impl;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -14,8 +16,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.AcceptHandler;
 import rabbit.rnio.ConnectHandler;
 import rabbit.rnio.ReadHandler;
@@ -25,10 +25,10 @@ import rabbit.rnio.WriteHandler;
 
 /** A selector handler.
  */
+@Slf4j
 class SingleSelectorRunner implements Runnable {
     private final Selector selector;
     private final AtomicBoolean running = new AtomicBoolean(false);
-    private static final Logger logger = Logger.getLogger("rabbit.rnio");
     private final ExecutorService executorService;
 
     /** The queue to get back on the main thread. */
@@ -83,9 +83,7 @@ class SingleSelectorRunner implements Runnable {
             }
             selector.close();
         } catch (InterruptedException | IOException e) {
-            logger.log(Level.WARNING,
-                       "Got exception while closing selector",
-                       e);
+            log.warn("Got exception while closing selector", e);
         }
     }
 
@@ -100,8 +98,7 @@ class SingleSelectorRunner implements Runnable {
             throws IOException {
         SelectionKey sk = channel.keyFor(selector);
         if (!channel.isOpen()) {
-            logger.warning("channel: " + channel + " is closed, wont register: " +
-                           "handler: " + handler + ", updater: " + updater);
+            log.warn("channel: {}, is closed, won't register handler: {}, updater: {}", channel, handler, updater);
             if (sk != null && sk.isValid()) {
                 final ChannelOpsHandler coh = (ChannelOpsHandler) sk.attachment();
                 cancelKeyAndCloseChannel(sk);
@@ -111,10 +108,7 @@ class SingleSelectorRunner implements Runnable {
             return;
         }
 
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.fine("SingleSelectorRunner." + id + ": updating " +
-                        "selection key for: " + sk);
-        }
+        log.trace("SingleSelectorRunner.{}: updating selection key for: {}", id, sk);
         if (sk == null) {
             final ChannelOpsHandler coh = new ChannelOpsHandler();
             updater.addHandler(coh);
@@ -125,18 +119,15 @@ class SingleSelectorRunner implements Runnable {
                 updater.addHandler(coh);
                 sk.interestOps(coh.getInterestOps());
             } else {
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.fine("SingleSelectorRunner." + id +
-                                ": sk not valid, calling closed()");
-                }
+                log.trace("SingleSelectorRunner.{}: sk not valid, calling closed()", id);
                 cancelKeyAndCloseChannel(sk);
                 coh.closed();
                 handler.closed();
             }
         }
-        if (logger.isLoggable(Level.FINEST) && sk != null && sk.isValid()) {
-            logger.fine("SingleSelectorRunner." + id + ": sk.interestOps " +
-                        sk.interestOps());
+
+        if (sk != null && sk.isValid()) {
+            log.trace("SingleSelectorRunner.{}: sk.interestOps {}", id, sk.interestOps());
         }
     }
 
@@ -192,9 +183,7 @@ class SingleSelectorRunner implements Runnable {
         runReturnedTasks();
         while (running.get()) {
             try {
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest(id + ": going into select: " + sleepTime);
-                }
+                log.trace("{}: going into select: {}", id, sleepTime);
                 selector.select(sleepTime);
                 final long now = System.currentTimeMillis();
                 final long diff = now - lastRun;
@@ -202,9 +191,7 @@ class SingleSelectorRunner implements Runnable {
                     counter = 0;
                 }
 
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest(id + ": after select, time taken: " + diff);
-                }
+                log.trace("{}: after select, time taken: {}", id, diff);
                 cancelTimeouts(now);
                 int num = handleSelects();
                 int rt;
@@ -230,14 +217,10 @@ class SingleSelectorRunner implements Runnable {
 
                 lastRun = now;
             } catch (IOException e) {
-                logger.warning(id + ": Failed to select, " +
-                               "shutting down selector: " + e +
-                               "\n" + getStackTrace(e));
+                log.warn("{}: Failed to select, shutting down selector: {}", id, e, e);
                 shutdown();
             } catch (Exception e) {
-                logger.warning(id + ": Unknown error: " + e +
-                               " attemting to ignore\n" +
-                               getStackTrace(e));
+                log.warn("{}: Unknown error: {} attempting to ignore", id, e, e);
             }
         }
     }
@@ -280,9 +263,7 @@ class SingleSelectorRunner implements Runnable {
      */
     private void tryAvoidSpinning(final int counter, final long now, final long diff)
             throws IOException {
-        logger.warning(id + ": Trying to avoid spinning, may close some " +
-                       "channels: counter: " + counter + ", now: " + now +
-                       ", diff: " + diff);
+        log.warn("{}: Trying to avoid spinning, may close some channels: counter: {}, {}, {}", id, counter, now, diff);
         // Keys are generally writable, try to flip OP_WRITE
         // so that the selector will remove the bad keys.
         final Collection<SelectionKey> triedKeys = new HashSet<>();
@@ -305,17 +286,14 @@ class SingleSelectorRunner implements Runnable {
         // If we have any keys left here they are in an unknown state
         // cancel them and hope for the best.
         if (!triedKeys.isEmpty()) {
-            logger.warning(id + ": Some keys did not get writable, " +
-                           "trying to close them");
+            log.warn("{}: Some keys did not get writable, trying to close them", id);
             for (SelectionKey sk : triedKeys) {
-                logger.warning(id + ": Non writable key: " + sk +
-                               ", attachment: " + sk.attachment());
+                log.warn("{}: Non writable key: {}, attachement: {}", id, sk, sk.attachment());
                 sk.cancel();
             }
             selector.selectNow();
         }
-        logger.info(id + ": Spin evasion complete, " +
-                    "hopefully system is ok again.");
+        log.info("{}: Spin evasion complete, hopefully system is ok again.", id);
     }
 
     private void cancelTimeouts(final long now) {
@@ -339,23 +317,17 @@ class SingleSelectorRunner implements Runnable {
             final SelectableChannel sc = sk.channel();
             sc.close();
         } catch (IOException e) {
-            logger.log(Level.WARNING,
-                       id + ": Failed to shutdown and close socket",
-                       e);
+            log.warn("{}: Failed to shutdown and close socket", id, e);
         }
     }
 
     private int handleSelects() {
         final Set<SelectionKey> selected = selector.selectedKeys();
         final int ret = selected.size();
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(id + ": Selector handling " + ret + " selected keys");
-        }
+        log.trace("{}: Selector handling {} selected keys", id, ret);
         for (SelectionKey sk : selected) {
             final ChannelOpsHandler coh = (ChannelOpsHandler) sk.attachment();
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest(id + ": ChanneOpsHandler " + coh);
-            }
+            log.trace("{}: ChanneOpsHandler {}", id, coh);
             if (sk.isValid()) {
                 coh.handle(executorService, sk);
             } else {
@@ -374,19 +346,15 @@ class SingleSelectorRunner implements Runnable {
             returnedTasks2 = toRun;
         }
         final int s = returnedTasks2.size();
-        if (s > 0 && logger.isLoggable(Level.FINEST)) {
-            logger.finest(id + ": Selector running " + s + " returned tasks");
+        if (s > 0) {
+            log.trace("{}: Selector running {} returned tasks", id, s);
         }
         for (SelectorRunnable aReturnedTasks2 : returnedTasks2) {
             try {
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest(id + ": Selector running task " + aReturnedTasks2);
-                }
+                log.trace("{}: Selector running task {}", id, aReturnedTasks2);
                 aReturnedTasks2.run(this);
             } catch (IOException e) {
-                logger.log(Level.WARNING,
-                           "Got exception when running returned task",
-                           e);
+                log.warn("Got exception when running returned task", e);
             }
         }
         returnedTasks2.clear();
@@ -397,8 +365,7 @@ class SingleSelectorRunner implements Runnable {
         if (!running.get()) {
             synchronized (this) {
                 if (selectorThread != null) {
-                    final String err = "Trying to add selector task while not running: " + sr;
-                    logger.finest(err);
+                    log.trace("Trying to add selector task while not running: {}", sr);
                     return;
                 }
             }

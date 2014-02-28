@@ -28,11 +28,26 @@
 
         <!-- Versions of jars and plugins -->
         <version.commons-lang>2.5</version.commons-lang>
+        <version.lombok>1.12.2</version.lombok>
+        <version.slf4j>1.7.6</version.slf4j>
         <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
         <version.maven-assembly-plugin>2.4</version.maven-assembly-plugin>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${version.lombok}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${version.slf4j}</version>
+        </dependency>
+
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>

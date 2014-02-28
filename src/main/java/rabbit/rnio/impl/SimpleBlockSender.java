@@ -1,10 +1,10 @@
 package rabbit.rnio.impl;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.WriteHandler;
 
@@ -15,11 +15,11 @@ import rabbit.rnio.WriteHandler;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public abstract class SimpleBlockSender
         extends SocketHandlerBase<SocketChannel>
         implements WriteHandler {
     private final ByteBuffer buf;
-    private static final Logger logger = Logger.getLogger("rabbit.rnio");
 
     /**
      * @param sc the channel to handle
@@ -64,8 +64,8 @@ public abstract class SimpleBlockSender
      * @param e the IOException that is the cause of data write failure
      */
     private void handleIOException(final IOException e) {
-        logger.log(Level.WARNING, "Failed to send data", e);
-        Closer.close(sc, logger);
+        log.warn("Failed to send data", e);
+        Closer.close(sc);
     }
 
     /** The default is to do nothing, override in subclasses if needed.

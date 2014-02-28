@@ -1,9 +1,9 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.http.HttpHeader;
 import rabbit.httpio.HttpHeaderSender;
 import rabbit.httpio.HttpHeaderSentListener;
@@ -22,6 +22,7 @@ import rabbit.rnio.impl.Closer;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class SSLHandler implements TunnelDoneListener {
     private final HttpProxy proxy;
     private final Connection con;
@@ -32,7 +33,6 @@ public class SSLHandler implements TunnelDoneListener {
     private BufferHandle bh;
     private BufferHandle sbh;
     private WebConnection wc;
-    private static final Logger logger = Logger.getLogger(SSLHandler.class.getName());
 
     /** Create a new SSLHandler
      * @param proxy the HttpProxy this SSL connection is serving
@@ -61,7 +61,7 @@ public class SSLHandler implements TunnelDoneListener {
             try {
                 port = Integer.valueOf(hp.substring(c + 1));
             } catch (NumberFormatException e) {
-                logger.warning("Connect to odd port: " + e);
+                log.warn("Connect to odd port: {}", e);
                 return false;
             }
         }
@@ -122,9 +122,7 @@ public class SSLHandler implements TunnelDoneListener {
 
         @Override
         public void timeout() {
-            final String err =
-                    "SSLHandler: Timeout waiting for web connection: " + uri;
-            logger.warning(err);
+            log.warn("SSLHandler: Timeout waiting for web connection: {}", uri);
             closeDown();
         }
 
@@ -142,13 +140,13 @@ public class SSLHandler implements TunnelDoneListener {
         if (sbh != null) {
             sbh.possiblyFlush();
         }
-        Closer.close(wc, logger);
+        Closer.close(wc);
         wc = null;
         con.logAndClose(null);
     }
 
     private void warn(final String err, final Exception e) {
-        logger.log(Level.WARNING, err, e);
+        log.warn(err, e);
     }
 
     private void setupChain() {
@@ -191,9 +189,7 @@ public class SSLHandler implements TunnelDoneListener {
 
         @Override
         public void timeout() {
-            final String err = "SSLHandler: Timeout waiting for chained response: " +
-                               request.getRequestURI();
-            logger.warning(err);
+            log.warn("SSLHandler: Timeout waiting for chained response: {}", request.getRequestURI());
             closeDown();
         }
     }
@@ -229,8 +225,7 @@ public class SSLHandler implements TunnelDoneListener {
 
         @Override
         public void timeout() {
-            logger.warning("SSLHandler: Timeout when sending http header: " +
-                           request.getRequestURI());
+            log.warn("SSLHandler: Timeout when sending http header: {}", request.getRequestURI());
             closeDown();
         }
 
@@ -256,7 +251,7 @@ public class SSLHandler implements TunnelDoneListener {
     public void tunnelClosed() {
         if (wc != null) {
             con.logAndClose(null);
-            Closer.close(wc, logger);
+            Closer.close(wc);
         }
         wc = null;
     }

@@ -1,10 +1,10 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 import rabbit.rnio.WriteHandler;
@@ -16,9 +16,9 @@ import rabbit.util.TrafficLogger;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class Tunnel {
     private final NioHandler nioHandler;
-    private static final Logger logger = Logger.getLogger(Tunnel.class.getName());
     private final OneWayTunnel fromToTo;
     private final OneWayTunnel toToFrom;
     private final TunnelDoneListener listener;
@@ -42,9 +42,7 @@ public class Tunnel {
                   final SocketChannel to, final BufferHandle toHandle,
                   final TrafficLogger toLogger,
                   final TunnelDoneListener listener) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Tunnel created from: " + from + " to: " + to);
-        }
+        log.trace("Tunnel created from: {} to: {}", from, to);
         this.nioHandler = nioHandler;
         fromToTo = new OneWayTunnel(from, to, fromHandle, fromLogger);
         toToFrom = new OneWayTunnel(to, from, toHandle, toLogger);
@@ -54,9 +52,7 @@ public class Tunnel {
     /** Start tunneling data in both directions.
      */
     public void start() {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Tunnel started");
-        }
+        log.trace("Tunnel started");
         fromToTo.start();
         toToFrom.start();
     }
@@ -76,10 +72,7 @@ public class Tunnel {
         }
 
         public void start() {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("OneWayTunnel started: bh.isEmpty: " +
-                              bh.isEmpty());
-            }
+            log.trace("OneWayTunnel started: bh.isEmpty: {}", bh.isEmpty());
             if (bh.isEmpty()) {
                 waitForRead();
             } else {
@@ -110,7 +103,7 @@ public class Tunnel {
         private void writeData() {
             try {
                 if (!to.isOpen()) {
-                    logger.warning("Tunnel to is closed, not writing data");
+                    log.warn("Tunnel to is closed, not writing data");
                     closeDown();
                     return;
                 }
@@ -119,9 +112,7 @@ public class Tunnel {
                     int written;
                     do {
                         written = to.write(buf);
-                        if (logger.isLoggable(Level.FINEST)) {
-                            logger.finest("OneWayTunnel wrote: " + written);
-                        }
+                        log.trace("OneWayTunnel wrote: {}", written);
                         tl.write(written);
                     } while (written > 0 && buf.hasRemaining());
                 }
@@ -132,20 +123,20 @@ public class Tunnel {
                     waitForRead();
                 }
             } catch (IOException e) {
-                logger.warning("Got exception writing to tunnel: " + e);
+                log.warn("Got exception writing to tunnel: {}", e);
                 closeDown();
             }
         }
 
         @Override
         public void closed() {
-            logger.info("Tunnel closed");
+            log.info("Tunnel closed");
             closeDown();
         }
 
         @Override
         public void timeout() {
-            logger.warning("Tunnel got timeout");
+            log.warn("Tunnel got timeout");
             closeDown();
         }
 
@@ -168,15 +159,13 @@ public class Tunnel {
         public void read() {
             try {
                 if (!from.isOpen()) {
-                    logger.warning("Tunnel to is closed, not reading data");
+                    log.warn("Tunnel to is closed, not reading data");
                     return;
                 }
                 final ByteBuffer buffer = bh.getBuffer();
                 buffer.clear();
                 final int read = from.read(buffer);
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("OneWayTunnel read: " + read);
-                }
+                log.trace("OneWayTunnel read: {}", read);
                 if (read == -1) {
                     buffer.position(buffer.limit());
                     closeDown();
@@ -186,7 +175,7 @@ public class Tunnel {
                     writeData();
                 }
             } catch (IOException e) {
-                logger.warning("Got exception reading from tunnel: " + e);
+                log.warn("Got exception reading from tunnel: {}", e);
                 closeDown();
             }
         }
@@ -206,8 +195,8 @@ public class Tunnel {
             listener.tunnelClosed();
         } else {
             // hmm? no listeners, then close down
-            Closer.close(fromToTo.from, logger);
-            Closer.close(toToFrom.from, logger);
+            Closer.close(fromToTo.from);
+            Closer.close(toToFrom.from);
         }
     }
 }

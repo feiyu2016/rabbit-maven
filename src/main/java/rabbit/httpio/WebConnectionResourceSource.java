@@ -1,9 +1,10 @@
 package rabbit.httpio;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 import rabbit.io.BufferHandle;
@@ -15,9 +16,8 @@ import rabbit.util.TrafficLogger;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class WebConnectionResourceSource
-        implements ResourceSource, ReadHandler, ChunkDataFeeder {
-    private static final Logger logger = Logger.getLogger(WebConnectionResourceSource.class.getName());
+@Slf4j
+public class WebConnectionResourceSource implements ResourceSource, ReadHandler, ChunkDataFeeder {
 
     private final ConnectionHandler con;
     private final NioHandler nioHandler;
@@ -190,7 +190,7 @@ public class WebConnectionResourceSource
             listener.failed(new IOException("channel closed"));
             listener = null;
         } else {
-            logger.severe("Got close but no listener to tell!");
+            log.error("Got close but no listener to tell!");
         }
     }
 
@@ -200,7 +200,7 @@ public class WebConnectionResourceSource
             listener.timeout();
             listener = null;
         } else {
-            logger.severe("Got timeout but no listener to tell!");
+            log.error("Got timeout but no listener to tell!");
         }
     }
 

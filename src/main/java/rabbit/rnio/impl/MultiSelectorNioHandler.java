@@ -1,5 +1,7 @@
 package rabbit.rnio.impl;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
@@ -7,8 +9,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.AcceptHandler;
 import rabbit.rnio.ConnectHandler;
 import rabbit.rnio.NioHandler;
@@ -24,15 +24,13 @@ import rabbit.rnio.WriteHandler;
  * <p>Any tasks that should run on a background thread are passed to the
  * {@link ExecutorService} that was given in the constructor.
  *
- * <p>This class will log using the "rabbit.rnio" {@link Logger}.
- *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class MultiSelectorNioHandler implements NioHandler {
     /** The executor service. */
     private final ExecutorService executorService;
     private final List<SingleSelectorRunner> selectorRunners;
-    private static final Logger logger = Logger.getLogger("rabbit.rnio");
     private final StatisticsHolder stats;
     private final Long defaultTimeout;
     private int nextIndex = 0;
@@ -105,7 +103,7 @@ public class MultiSelectorNioHandler implements NioHandler {
         try {
             executorService.execute(new StatisticsCollector(stats, r, ti));
         } catch (RejectedExecutionException e) {
-            logger.log(Level.WARNING, "Could not launch exeuctor", e);
+            log.warn("Could not launch exeuctor", e);
         }
     }
 
@@ -140,10 +138,7 @@ public class MultiSelectorNioHandler implements NioHandler {
     @Override
     public void waitForRead(final SelectableChannel channel,
                             final ReadHandler handler) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.fine("Waiting for read for: channel: " + channel +
-                        ", handler: " + handler);
-        }
+        log.trace("Waiting for read for: channel: {}, handler: {}", channel, handler);
         runSelectorTask(channel, new SelectorRunnable() {
             @Override
             public void run(final SingleSelectorRunner ssr) throws IOException {
@@ -155,10 +150,7 @@ public class MultiSelectorNioHandler implements NioHandler {
     @Override
     public void waitForWrite(final SelectableChannel channel,
                              final WriteHandler handler) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.fine("Waiting for write for: channel: " + channel +
-                        ", handler: " + handler);
-        }
+        log.trace("Waiting for write for: channel: {}, handler: {}", channel, handler);
         runSelectorTask(channel, new SelectorRunnable() {
             @Override
             public void run(final SingleSelectorRunner ssr) throws IOException {
@@ -170,10 +162,7 @@ public class MultiSelectorNioHandler implements NioHandler {
     @Override
     public void waitForAccept(final SelectableChannel channel,
                               final AcceptHandler handler) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.fine("Waiting for accept for: channel: " + channel +
-                        ", handler: " + handler);
-        }
+        log.trace("Waiting for accept for: channel: {}, handler{}", channel, handler);
         runSelectorTask(channel, new SelectorRunnable() {
             @Override
             public void run(final SingleSelectorRunner ssr) throws IOException {

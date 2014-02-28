@@ -1,9 +1,10 @@
 package rabbit.httpio;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Locale;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.logging.Logger;
 import rabbit.http.Header;
 import rabbit.http.HttpHeader;
 
@@ -11,6 +12,7 @@ import rabbit.http.HttpHeader;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class HttpHeaderParser implements LineListener {
 
     private final boolean request;
@@ -20,8 +22,6 @@ public class HttpHeaderParser implements LineListener {
     private Header head = null;
     private boolean append = false;
     private boolean headerRead = false;
-
-    private static final Logger logger = Logger.getLogger(HttpHeaderParser.class.getName());
 
     private static final ByteBuffer HTTP_IDENTIFIER =
             ByteBuffer.wrap(new byte[]{(byte) 'H', (byte) 'T', (byte) 'T',
@@ -75,14 +75,13 @@ public class HttpHeaderParser implements LineListener {
         // some broken web servers (apache/2.0.4x) send multiple last-chunks
         if (buffer.remaining() > 4 &&
             matchBuffer(buffer, EXTRA_LAST_CHUNK)) {
-            logger.warning("Found a last-chunk, trying to ignore it.");
+            log.warn("Found a last-chunk, trying to ignore it.");
             buffer.position(buffer.position() + EXTRA_LAST_CHUNK.capacity());
             return verifyResponse(buffer);
         }
 
         if (buffer.remaining() > 4 && !matchBuffer(buffer, HTTP_IDENTIFIER)) {
-            logger.warning("http response header with odd start:" +
-                           getBufferStartString(buffer, 5));
+            log.warn("http response header with odd start: {}", getBufferStartString(buffer, 5));
             // Create a http/0.9 response...
             header = new HttpHeader();
             return true;

@@ -1,8 +1,9 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import rabbit.httpio.ResourceSource;
 import rabbit.rnio.impl.Closer;
@@ -24,6 +25,7 @@ import rabbit.io.WebConnectionListener;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class SWC implements HttpHeaderSentListener,
                             HttpHeaderListener, WebConnectionListener,
                             ClientResourceTransferredListener {
@@ -41,7 +43,6 @@ public class SWC implements HttpHeaderSentListener,
     private char status = '0';
 
     private Exception lastException;
-    private static final Logger logger = Logger.getLogger(SWC.class.getName());
 
     /** Create a new connection establisher.
      * @param con the Connection handling the request
@@ -255,7 +256,7 @@ public class SWC implements HttpHeaderSentListener,
             }
         } catch (NumberFormatException e) {
             // if we cant parse it, we leave the Age header..
-            logger.warning("Bad age: " + age);
+            log.warn("Bad age: {}", age);
         }
     }
 
@@ -283,7 +284,7 @@ public class SWC implements HttpHeaderSentListener,
         rh.setWebConnection(null);
         if (wc != null) {
             con.getNioHandler().close(wc.getChannel());
-            Closer.close(wc, logger);
+            Closer.close(wc);
         }
     }
 

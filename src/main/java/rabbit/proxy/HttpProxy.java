@@ -1,5 +1,7 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Locale;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -15,8 +17,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +49,7 @@ import rabbit.util.SProperties;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class HttpProxy {
 
     /** Current version */
@@ -62,9 +63,6 @@ public class HttpProxy {
 
     /** The identity of this server. */
     private String serverIdentity = VERSION;
-
-    /** The logger of this proxy. */
-    private static final Logger logger =  Logger.getLogger(HttpProxy.class.getName());
 
     /** The id sequence for acceptors. */
     private static int acceptorId = 0;
@@ -145,9 +143,7 @@ public class HttpProxy {
             nioHandler =
                     new MultiSelectorNioHandler(es, sh, threads, timeout);
         } catch (IOException e) {
-            logger.log(Level.SEVERE,
-                       "Failed to create the NioHandler",
-                       e);
+            log.error("Failed to create the NioHandler", e);
             stop();
         }
     }
@@ -158,13 +154,9 @@ public class HttpProxy {
                     load3rdPartyClass(pcf, ProxyChainFactory.class);
             final ProxyChainFactory factory = clz.newInstance();
             final SProperties props = config.getProperties(pcf);
-            return
-                    factory.getProxyChain(props, nioHandler, logger);
+            return factory.getProxyChain(props, nioHandler);
         } catch (Exception e) {
-            logger.log(Level.WARNING,
-                       "Unable to create the proxy chain " +
-                       "will fall back to the default one.",
-                       e);
+            log.warn("Unable to create the proxy chain will fall back to the default one.", e);
         }
         return null;
     }
@@ -178,12 +170,10 @@ public class HttpProxy {
                 final int port = Integer.parseInt(pport);
                 return new ProxiedProxyChain(proxy, port, pauth);
             } catch (NumberFormatException e) {
-                logger.severe("Strange proxyport: '" + pport +
-                              "', will not chain");
+                log.error("Strange proxyport: '{}', will not chain", pport);
             }
         } catch (UnknownHostException e) {
-            logger.severe("Unknown proxyhost: '" + pname +
-                          "', will not chain");
+            log.error("Unknown proxyhost: '{}', will not chain", pname);
         }
         return null;
     }
@@ -232,8 +222,7 @@ public class HttpProxy {
                         final Integer port = Integer.valueOf(s = st.nextToken());
                         sslports.add(port);
                     } catch (NumberFormatException e) {
-                        logger.warning("bad number: '" + s +
-                                       "' for ssl port, ignoring.");
+                        log.warn("bad number: '{}' for ssl port, ignoring.", s);
                     }
                 }
                 break;
@@ -256,7 +245,7 @@ public class HttpProxy {
 
     private void setupConnectionHandler() {
         if (nioHandler == null) {
-            logger.info("nioHandler == null " + this);
+            log.info("nioHandler == null");
             return;
         }
         conhandler = new ConnectionHandler(counter, proxyChain, nioHandler);
@@ -273,10 +262,7 @@ public class HttpProxy {
                     load3rdPartyClass(hgfClass, HttpGeneratorFactory.class);
             hgf = clz.newInstance();
         } catch (Exception e) {
-            logger.log(Level.WARNING,
-                       "Unable to create the http generator " +
-                       "factory, will fall back to the default one.",
-                       e);
+            log.warn("Unable to create the http generator factory, will fall back to the default one.", e);
             hgf = new StandardHttpGeneratorFactory();
         }
         final String section = hgf.getClass().getName();
@@ -296,7 +282,7 @@ public class HttpProxy {
         openSocket();
         setupConnectionHandler();
         setupHttpGeneratorFactory();
-        logger.info(serverIdentity + ": Configuration loaded: ready for action.");
+        log.info("{}: Configuration loaded: ready for action.", serverIdentity);
     }
 
     private int getInt(final String section, final String key, final int defaultValue) {
@@ -323,9 +309,7 @@ public class HttpProxy {
                     ssc.socket().bind(new InetSocketAddress(port));
                 } else {
                     final InetAddress ia = InetAddress.getByName(bindIP);
-                    logger.info("listening on inetaddress: " + ia +
-                                ":" + port +
-                                " on inet address: " + ia);
+                    log.info("listening on inetaddress: {}:{} on inetAddress: {}", ia, port, ia);
                     ssc.socket().bind(new InetSocketAddress(ia, port));
                 }
                 final AcceptorListener listener =
@@ -333,9 +317,7 @@ public class HttpProxy {
                 final Acceptor acceptor = new Acceptor(ssc, nioHandler, listener);
                 acceptor.register();
             } catch (IOException e) {
-                logger.log(Level.SEVERE,
-                           "Failed to open serversocket on port " + port,
-                           e);
+                log.error("Failed to open serversocket on port {}", port, e);
                 stop();
             }
         }
@@ -352,7 +334,7 @@ public class HttpProxy {
                 ssc = null;
             }
         } catch (IOException e) {
-            logger.severe("Failed to close serversocket on port " + port);
+            log.error("Failed to close serversocket on port {}", port);
             stop();
         }
     }
@@ -386,7 +368,7 @@ public class HttpProxy {
 
     /** Run the proxy in a separate thread. */
     public void stop() {
-        logger.info("HttpProxy.stop() called, shutting down");
+        log.info("HttpProxy.stop() called, shutting down");
         synchronized (this) {
             closeSocket();
             // TODO: wait for remaining connections.
@@ -489,8 +471,7 @@ public class HttpProxy {
                     }
                 }
             } catch (SocketException e) {
-                logger.log(Level.WARNING,
-                           "Failed to get network interfaces", e);
+                log.warn("Failed to get network interfaces", e);
             }
         }
         return false;

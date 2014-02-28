@@ -1,5 +1,7 @@
 package rabbit.filter;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Collection;
 import java.util.Locale;
 import java.math.BigInteger;
@@ -9,7 +11,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+
 import rabbit.http.HttpDateParser;
 import rabbit.http.HttpHeader;
 import rabbit.io.ProxyChain;
@@ -25,6 +27,7 @@ import rabbit.util.SProperties;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class HttpBaseFilter implements HttpFilter {
     /** Constant for requests that want an unfiltered resource. */
     private static final String NOPROXY = "http://noproxy.";
@@ -32,7 +35,6 @@ public class HttpBaseFilter implements HttpFilter {
     private static final BigInteger ONE = BigInteger.ONE;
 
     private final Collection<String> removes = new ArrayList<>();
-    private static final Logger logger = Logger.getLogger(HttpBaseFilter.class.getName());
 
     private static final String BASIC = "Basic";
     /** We got a proxy authentication, handle it...
@@ -211,7 +213,7 @@ public class HttpBaseFilter implements HttpFilter {
             final BigInteger b3 = bi.subtract(ONE);
             header.setHeader("Max-Forwards", b3.toString());
         } catch (NumberFormatException e) {
-            logger.warning("Bad number for Max-Forwards: '" + val + "'");
+            log.warn("Bad number for Max-Forwards: '{}'", val);
         }
         return null;
     }

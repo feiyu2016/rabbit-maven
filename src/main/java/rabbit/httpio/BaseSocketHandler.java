@@ -1,8 +1,9 @@
 package rabbit.httpio;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 import rabbit.rnio.SocketChannelHandler;
@@ -13,15 +14,13 @@ import rabbit.io.BufferHandle;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public abstract class BaseSocketHandler implements SocketChannelHandler {
     /** The client channel. */
     private final SocketChannel channel;
 
     /** The nio handler we are using. */
     private final NioHandler nioHandler;
-
-    /** The logger to use. */
-    static final Logger logger = Logger.getLogger(BaseSocketHandler.class.getName());
 
     /** The buffer handle. */
     private final BufferHandle bh;
@@ -76,10 +75,6 @@ public abstract class BaseSocketHandler implements SocketChannelHandler {
     @Override
     public Long getTimeout() {
         return timeout;
-    }
-
-    Logger getLogger() {
-        return     logger;
     }
 
     void closeDown() {

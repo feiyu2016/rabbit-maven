@@ -1,8 +1,9 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 import rabbit.http.HttpDateParser;
 import rabbit.http.HttpHeader;
 
@@ -10,6 +11,7 @@ import rabbit.http.HttpHeader;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 class WarningsHandler {
     private int nextNonBlank(final CharSequence s, int start) {
         char c;
@@ -92,8 +94,7 @@ class WarningsHandler {
                     header.removeValue(val);
                 }
             } catch (StringIndexOutOfBoundsException e) {
-                final Logger logger = Logger.getLogger(getClass().getName());
-                logger.warning("bad warning header: '" + val + "'");
+                log.warn("bad warning header: '{}'", val);
             }
         }
     }

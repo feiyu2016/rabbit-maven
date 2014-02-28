@@ -1,12 +1,12 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.filter.HttpFilter;
 import rabbit.http.HttpHeader;
 import rabbit.util.Config;
@@ -15,6 +15,7 @@ import rabbit.util.Config;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 class HttpHeaderFilterer {
     private final List<HttpFilter> httpInFilters;
     private final List<HttpFilter> httpOutFilters;
@@ -109,7 +110,6 @@ class HttpHeaderFilterer {
 
     private void loadHttpFilters(final String filters, final Collection<HttpFilter> ls,
                                  final Config config, final HttpProxy proxy) {
-        final Logger log = Logger.getLogger(getClass().getName());
         final String[] filterArray = filters.split(",");
         for (String className : filterArray) {
             className = className.trim();
@@ -124,17 +124,11 @@ class HttpHeaderFilterer {
                 hf.setup(config.getProperties(className), proxy);
                 ls.add(hf);
             } catch (ClassNotFoundException ex) {
-                log.log(Level.WARNING,
-                        "Could not load http filter class: '" +
-                        className + "'", ex);
+                log.warn("Could not load http filter class: '{}'", className, ex);
             } catch (InstantiationException ex) {
-                log.log(Level.WARNING,
-                        "Could not instansiate http filter: '" +
-                        className + "'", ex);
+                log.warn("Could not instansiate http filter: '{}'", className, ex);
             } catch (IllegalAccessException ex) {
-                log.log(Level.WARNING,
-                        "Could not access http filter: '" +
-                        className + "'", ex);
+                log.warn("Could not access http filter: '{}'", className, ex);
             }
         }
     }

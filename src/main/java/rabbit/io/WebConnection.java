@@ -1,13 +1,13 @@
 package rabbit.io;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.ConnectHandler;
 import rabbit.rnio.NioHandler;
 import rabbit.util.Counter;
@@ -16,6 +16,7 @@ import rabbit.util.Counter;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class WebConnection implements Closeable {
     private final int id;
     private final Address address;
@@ -24,7 +25,6 @@ public class WebConnection implements Closeable {
     private SocketChannel channel;
     private long releasedAt = -1;
     private boolean keepalive = true;
-    private static final Logger logger = Logger.getLogger(WebConnection.class.getName());
 
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
@@ -157,9 +157,7 @@ public class WebConnection implements Closeable {
                 close();
                 nioHandler.close(channel);
             } catch (IOException e) {
-                logger.log(Level.WARNING,
-                           "Failed to close down WebConnection",
-                           e);
+                log.warn("Failed to close down WebConnection", e);
             }
         }
 

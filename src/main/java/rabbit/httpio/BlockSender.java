@@ -1,10 +1,11 @@
 package rabbit.httpio;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
 import rabbit.io.BufferHandle;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.WriteHandler;
@@ -14,6 +15,7 @@ import rabbit.util.TrafficLogger;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class BlockSender extends BaseSocketHandler implements WriteHandler {
     private ByteBuffer chunkBuffer;
     private final ByteBuffer end;
@@ -43,9 +45,7 @@ public class BlockSender extends BaseSocketHandler implements WriteHandler {
             try {
                 chunkBuffer = ByteBuffer.wrap(s.getBytes("ASCII"));
             } catch (UnsupportedEncodingException e) {
-                getLogger().log(Level.WARNING,
-                                "BlockSender: ASCII not found!",
-                                e);
+                log.warn("BlockSender: ASCII not found!", e);
             }
             end = ByteBuffer.wrap(new byte[] {'\r', '\n'});
             buffers = new ByteBuffer[]{chunkBuffer, buffer, end};

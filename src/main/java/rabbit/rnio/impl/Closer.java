@@ -2,8 +2,6 @@ package rabbit.rnio.impl;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /** A helper class that can close resources without throwing exceptions.
  *
@@ -15,18 +13,11 @@ public class Closer {
      *  If an exception is thrown when calling close() it will be logged 
      *  to the logger.
      * @param c the object to close
-     * @param logger the Logger to use if the close fails
      */
-    public static void close(final Closeable c, final Logger logger) {
+    public static void close(final Closeable c) {
         if (c == null) {
             return;
         }
-        try {
-            c.close();
-        } catch (IOException e) {
-            logger.log(Level.WARNING,
-                       "Failed to close connection: " + c,
-                       e);
-        }
+        try { c.close(); } catch (IOException ignored) {}
     }
 }

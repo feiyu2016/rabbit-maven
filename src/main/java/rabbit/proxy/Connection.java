@@ -1,12 +1,12 @@
 package rabbit.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Locale;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import rabbit.rnio.BufferHandler;
 import rabbit.rnio.NioHandler;
@@ -37,6 +37,7 @@ import rabbit.util.Counter;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class Connection {
     /** The id of this connection. */
     private final ConnectionId id;
@@ -81,8 +82,6 @@ public class Connection {
     private final HttpGenerator responseHandler;
 
     private final TrafficLoggerHandler tlh = new TrafficLoggerHandler();
-
-    private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
     /** Create a new Connection
      * @param id the ConnectionId of this connection.
@@ -135,10 +134,10 @@ public class Connection {
             // Send response and close
             sendAndClose(err);
         } else if (connectionReset(t)) {
-            logger.log(Level.INFO, "Exception when reading request: " + t);
+            log.info("Exception when reading request: {}", t);
             closeDown();
         } else {
-            logger.log(Level.INFO, "Exception when reading request", t);
+            log.info("Exception when reading request", t);
             closeDown();
         }
     }
@@ -171,7 +170,7 @@ public class Connection {
     private void handleInternalError(final Throwable t) {
         extraInfo =
                 extraInfo != null ? extraInfo + t.toString() : t.toString();
-        logger.log(Level.WARNING, "Internal Error", t);
+        log.warn("Internal Error", t);
         final HttpHeader internalError =
                 responseHandler.get500(request.getRequestURI(), t);
         // Send response and close
@@ -181,7 +180,7 @@ public class Connection {
     private void requestRead(final HttpHeader request, final BufferHandle bh,
                              final boolean isChunked, final long dataSize) {
         if (request == null) {
-            logger.warning("Got a null request");
+            log.warn("Got a null request");
             closeDown();
             return;
         }
@@ -287,11 +286,9 @@ public class Connection {
      */
     public void webConnectionSetupFailed(final RequestHandler rh, final Exception cause) {
         if (cause instanceof UnknownHostException) {
-            logger.warning(cause.toString() + ": " +
-                           request.getRequestURI());
+            log.warn("{}: {}", cause.toString(), request.getRequestURI());
         } else {
-            logger.warning("Failed to set up web connection to: " +
-                           request.getRequestURI() + ", cause: " + cause);
+            log.warn("Failed to set up web connection to: {}, cause: {}", request.getRequestURI(), cause);
         }
         doGateWayTimeout(cause);
     }
@@ -524,7 +521,7 @@ public class Connection {
     }
 
     private void closeDown() {
-        Closer.close(channel, logger);
+        Closer.close(channel);
         if (!requestHandle.isEmpty()) {
             // empty the buffer...
             final ByteBuffer buf = requestHandle.getBuffer();
@@ -717,8 +714,7 @@ public class Connection {
                                              header, false, sar);
                 hhs.sendHeader();
             } catch (IOException e) {
-                logger.log(Level.WARNING,
-                           "IOException when sending header", e);
+                log.warn("IOException when sending header", e);
                 closeDown();
             }
         }
@@ -728,15 +724,14 @@ public class Connection {
         @Override
         public void timeout() {
             status = "Response sending timed out, logging and closing.";
-            logger.info("Timeout when sending http header");
+            log.info("Timeout when sending http header");
             logAndClose(null);
         }
 
         @Override
         public void failed(final Exception e) {
-            status =
-                    "Response sending failed: " + e + ", logging and closing.";
-            logger.log(Level.INFO, "Exception when sending http header", e);
+            status = "Response sending failed: " + e + ", logging and closing.";
+            log.info("Exception when sending http header", e);
             logAndClose(null);
         }
     }
@@ -763,7 +758,7 @@ public class Connection {
                                          tlh.getClient(), header, false, scl);
             hhs.sendHeader();
         } catch (IOException e) {
-            logger.log(Level.WARNING, "IOException when sending header", e);
+            log.warn("IOException when sending header", e);
             closeDown();
         }
     }

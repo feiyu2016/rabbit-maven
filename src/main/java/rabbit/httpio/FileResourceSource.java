@@ -1,5 +1,7 @@
 package rabbit.httpio;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,8 +9,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import rabbit.rnio.BufferHandler;
 import rabbit.rnio.NioHandler;
@@ -22,6 +22,7 @@ import rabbit.io.CacheBufferHandle;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
+@Slf4j
 public class FileResourceSource implements ResourceSource {
     private FileChannel fc;
 
@@ -29,8 +30,6 @@ public class FileResourceSource implements ResourceSource {
     private BlockListener listener;
     private NioHandler nioHandler;
     private BufferHandle bufHandle;
-
-    private static final Logger logger = Logger.getLogger(FileResourceSource.class.getName());
 
     /** Create a new FileResourceSource using the given filename
      * @param filename the file for this resource
@@ -80,7 +79,7 @@ public class FileResourceSource implements ResourceSource {
         try {
             return fc.size();
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error getting length", e);
+            log.warn("Error getting length", e);
             return -1;
         }
     }
@@ -148,7 +147,7 @@ public class FileResourceSource implements ResourceSource {
 
     @Override
     public void release() {
-        Closer.close(fc, logger);
+        Closer.close(fc);
         listener = null;
         nioHandler = null;
         bufHandle.possiblyFlush();

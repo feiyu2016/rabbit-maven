@@ -1,10 +1,10 @@
 package rabbit.rnio.impl;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rabbit.rnio.NioHandler;
 import rabbit.rnio.ReadHandler;
 
@@ -13,11 +13,8 @@ import rabbit.rnio.ReadHandler;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public abstract class SimpleBlockReader
-        extends SocketHandlerBase<SocketChannel>
-        implements ReadHandler {
-
-    private static final Logger logger = Logger.getLogger("rabbit.rnio");
+@Slf4j
+public abstract class SimpleBlockReader extends SocketHandlerBase<SocketChannel> implements ReadHandler {
 
     /** Create a new block reader.
      * @param sc the channel to read from
@@ -74,8 +71,8 @@ public abstract class SimpleBlockReader
      * @param e the IOException that was the cause of a read failure
      */
     private void handleIOException(final IOException e) {
-        logger.log(Level.WARNING, "Failed to read data", e);
-        Closer.close(sc, logger);
+        log.warn("Failed to read data", e);
+        Closer.close(sc);
     }
 
     /** Do any cleanup that needs to be done when the channel we tried
