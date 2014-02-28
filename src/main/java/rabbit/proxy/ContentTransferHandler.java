@@ -26,7 +26,8 @@ class ContentTransferHandler extends ResourceHandlerBase
         this.dataSize = dataSize;
     }
 
-    @Override protected void doTransfer() {
+    @Override
+    void doTransfer() {
         if (transferred >= dataSize) {
             listener.clientResourceTransferred();
             return;

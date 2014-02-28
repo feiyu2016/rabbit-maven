@@ -23,12 +23,12 @@ import rabbit.io.CacheBufferHandle;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 public class FileResourceSource implements ResourceSource {
-    protected FileChannel fc;
+    private FileChannel fc;
 
     // used for block handling.
     private BlockListener listener;
     private NioHandler nioHandler;
-    protected BufferHandle bufHandle;
+    private BufferHandle bufHandle;
 
     private static final Logger logger = Logger.getLogger(FileResourceSource.class.getName());
 
@@ -38,8 +38,8 @@ public class FileResourceSource implements ResourceSource {
      * @param bufHandler the BufferHandler to use when reading and writing
      * @throws IOException if the file is a valid file
      */
-    public FileResourceSource(final String filename, final NioHandler nioHandler,
-                              final BufferHandler bufHandler)
+    private FileResourceSource(final String filename, final NioHandler nioHandler,
+                               final BufferHandler bufHandler)
             throws IOException {
         this(new File(filename), nioHandler, bufHandler);
     }
@@ -50,8 +50,8 @@ public class FileResourceSource implements ResourceSource {
      * @param bufHandler the BufferHandler to use when reading and writing
      * @throws IOException if the file is a valid file
      */
-    public FileResourceSource(final File f, final NioHandler nioHandler,
-                              final BufferHandler bufHandler)
+    private FileResourceSource(final File f, final NioHandler nioHandler,
+                               final BufferHandler bufHandler)
             throws IOException {
         if (!f.exists()) {
             throw new FileNotFoundException("File: " + f.getName() +

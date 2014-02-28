@@ -109,7 +109,7 @@ public class SWC implements HttpHeaderSentListener,
     /** Check if the full uri should be included in the request.
      * @return true if the upstream server need the full uri in the request
      */
-    public boolean useFullURI() {
+    private boolean useFullURI() {
         return resolver.isProxyConnected();
     }
 

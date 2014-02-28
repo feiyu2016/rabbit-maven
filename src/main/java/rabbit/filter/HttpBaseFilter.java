@@ -27,7 +27,7 @@ import rabbit.util.SProperties;
  */
 public class HttpBaseFilter implements HttpFilter {
     /** Constant for requests that want an unfiltered resource. */
-    public static final String NOPROXY = "http://noproxy.";
+    private static final String NOPROXY = "http://noproxy.";
     private static final BigInteger ZERO = BigInteger.ZERO;
     private static final BigInteger ONE = BigInteger.ONE;
 

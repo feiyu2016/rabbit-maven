@@ -35,20 +35,20 @@ public class BaseHandler
         implements Handler, HandlerFactory, HttpHeaderSentListener, BlockListener,
                    BlockSentListener {
     /** The Connection handling the request.*/
-    protected Connection con;
+    Connection con;
     /** The traffic logger handler. */
-    protected TrafficLoggerHandler tlh;
+    TrafficLoggerHandler tlh;
     /** The actual request made. */
-    protected HttpHeader request;
+    private HttpHeader request;
     /** The actual response. */
-    protected HttpHeader response;
+    private HttpHeader response;
     /** The resource */
-    protected ResourceSource content;
+    ResourceSource content;
 
     /** The length of the data being handled or -1 if unknown.*/
-    protected long size = -1;
+    private long size = -1;
     /** The total amount of data that we read. */
-    protected long totalRead = 0;
+    private long totalRead = 0;
 
     /** The flag for the last empty chunk */
     private boolean emptyChunkSent = false;
@@ -69,9 +69,9 @@ public class BaseHandler
      * @param content the resource.
      * @param size the size of the data being handled.
      */
-    public BaseHandler(final Connection con, final TrafficLoggerHandler tlh,
-                       final HttpHeader request, final HttpHeader response,
-                       final ResourceSource content, final long size) {
+    BaseHandler(final Connection con, final TrafficLoggerHandler tlh,
+                final HttpHeader request, final HttpHeader response,
+                final ResourceSource content, final long size) {
         this.con = con;
         this.tlh = tlh;
         this.request = request;
@@ -90,7 +90,7 @@ public class BaseHandler
         return new BaseHandler(con, tlh, header, webHeader, content, size);
     }
 
-    protected Logger getLogger() {
+    private Logger getLogger() {
         return logger;
     }
 
@@ -125,7 +125,7 @@ public class BaseHandler
         return false;
     }
 
-    protected void sendHeader() {
+    private void sendHeader() {
         try {
             final HttpHeaderSender hhs =
                     new HttpHeaderSender(con.getChannel(), con.getNioHandler(),
@@ -144,14 +144,14 @@ public class BaseHandler
     /** This method is used to prepare the data for the resource being sent.
      *  This method does nothing here.
      */
-    protected void prepare() {
+    private void prepare() {
         send();
     }
 
     /** This method is used to finish the data for the resource being sent.
      *  This method will send an end chunk if needed and then call finish
      */
-    protected void finishData() {
+    private void finishData() {
         if (con.getChunking() && !emptyChunkSent) {
             emptyChunkSent = true;
             final BlockSentListener bsl = new Finisher();
@@ -166,7 +166,7 @@ public class BaseHandler
     /** Mark the current response as a partial response.
      * @param shouldbe the number of byte that the resource ought to be
      */
-    protected void setPartialContent(final long shouldbe) {
+    private void setPartialContent(final long shouldbe) {
         response.setHeader("RabbIT-Partial", Long.toString(shouldbe));
     }
 
@@ -175,7 +175,7 @@ public class BaseHandler
      * @param good if true then the connection may be restarted,
      *             if false then the connection may not be restared
      */
-    protected void finish(final boolean good) {
+    private void finish(final boolean good) {
         try {
             if (content != null) {
                 content.release();
@@ -204,11 +204,11 @@ public class BaseHandler
     /** Check if this handler supports direct transfers.
      * @return this handler always return true.
      */
-    protected boolean mayTransfer() {
+    private boolean mayTransfer() {
         return true;
     }
 
-    protected void send() {
+    void send() {
         if (mayTransfer() && content.length() > 0 && content.supportsTransfer()) {
             final TransferListener tl = new ContentTransferListener();
             final TransferHandler th =
@@ -277,7 +277,7 @@ public class BaseHandler
         }
     }
 
-    String getStackTrace(final Exception cause) {
+    private String getStackTrace(final Exception cause) {
         final StringWriter sw = new StringWriter();
         final PrintWriter ps = new PrintWriter(sw);
         cause.printStackTrace(ps);

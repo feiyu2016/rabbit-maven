@@ -4,7 +4,7 @@ package rabbit.httpio;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class BadHttpHeaderException extends RuntimeException {
+class BadHttpHeaderException extends RuntimeException {
     /** Serial version.
      */
     public static final long serialVersionUID  = 1L;

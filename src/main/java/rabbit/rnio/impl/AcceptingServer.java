@@ -19,7 +19,7 @@ import rabbit.rnio.StatisticsHolder;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class AcceptingServer {
+class AcceptingServer {
     private final ServerSocketChannel ssc;
     private final AcceptorListener listener;
     private final NioHandler nioHandler;

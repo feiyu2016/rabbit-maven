@@ -300,7 +300,7 @@ public class Connection {
      *  Currently will only check if the Authorization starts with NTLM or Negotiate.
      * @return true if the current request needs to be handled by a tunnel
      */
-    protected boolean mustTunnel() {
+    private boolean mustTunnel() {
         final String auth = request.getHeader("Authorization");
         return auth != null &&
                (auth.startsWith("NTLM") || auth.startsWith("Negotiate"));
@@ -456,7 +456,7 @@ public class Connection {
      * @param status the status code of the error.
      * @param message the error message to tell the client.
      */
-    public void doError(final int status, final String message) {
+    private void doError(final int status, final String message) {
         this.statusCode = Integer.toString(500);
         final HttpHeader header =
                 responseHandler.get400(new IOException(message));
@@ -703,7 +703,7 @@ public class Connection {
         }
     }
 
-    void sendAndRestart(final HttpHeader header) {
+    private void sendAndRestart(final HttpHeader header) {
         status = "Sending response.";
         setStatusesFromHeader(header);
         if (!keepalive) {

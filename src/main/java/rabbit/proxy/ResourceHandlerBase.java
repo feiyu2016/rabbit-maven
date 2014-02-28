@@ -13,16 +13,16 @@ import rabbit.io.WebConnection;
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
 abstract class ResourceHandlerBase implements ClientResourceHandler {
-    protected final Connection con;
-    protected final BufferHandle bufHandle;
-    protected final TrafficLoggerHandler tlh;
-    protected WebConnection wc;
-    protected ClientResourceTransferredListener listener;
+    final Connection con;
+    final BufferHandle bufHandle;
+    final TrafficLoggerHandler tlh;
+    WebConnection wc;
+    ClientResourceTransferredListener listener;
     private List<ClientResourceListener> resourceListeners;
 
-    public ResourceHandlerBase(final Connection con,
-                               final BufferHandle bufHandle,
-                               final TrafficLoggerHandler tlh) {
+    ResourceHandlerBase(final Connection con,
+                        final BufferHandle bufHandle,
+                        final TrafficLoggerHandler tlh) {
         this.con = con;
         this.bufHandle = bufHandle;
         this.tlh = tlh;
@@ -38,7 +38,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
         doTransfer();
     }
 
-    protected void doTransfer() {
+    void doTransfer() {
         if (!bufHandle.isEmpty()) {
             sendBuffer();
         } else {
@@ -54,7 +54,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
         resourceListeners.add(crl);
     }
 
-    public void fireResouceDataRead(final BufferHandle bufHandle) {
+    void fireResouceDataRead(final BufferHandle bufHandle) {
         if (resourceListeners == null) {
             return;
         }
@@ -65,7 +65,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
 
     abstract void sendBuffer();
 
-    protected void waitForRead() {
+    void waitForRead() {
         bufHandle.possiblyFlush();
         final ReadHandler sh = new Reader();
         con.getNioHandler().waitForRead(con.getChannel(), sh);
@@ -126,6 +126,7 @@ abstract class ResourceHandlerBase implements ClientResourceHandler {
         listener.timeout();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void failed(final Exception e) {
         bufHandle.possiblyFlush();
         listener.failed(e);

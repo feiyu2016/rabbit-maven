@@ -9,7 +9,7 @@ import rabbit.util.SProperties;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class HtmlPage {
+class HtmlPage {
 
     private static SProperties config = setup();
 
@@ -44,7 +44,7 @@ public class HtmlPage {
      * @param title the title of this page.
      * @return a HTMLHeader.
      */
-    public static String getPageHeader(final Connection con, final String title) {
+    private static String getPageHeader(final Connection con, final String title) {
         return ("<html><head><title>" + title + "</title></head>\n" +
                 "<body bgcolor=\"" + config.getProperty("bodybgcolor") +
                 "\" text=\"" + config.getProperty("bodytext") +
@@ -76,7 +76,7 @@ public class HtmlPage {
     /** Setup this class for usage
      * @return some default properties with color codes
      */
-    public static SProperties setup() {
+    private static SProperties setup() {
         config = new SProperties();
         config.put("bodybgcolor", "WHITE");
         config.put("bodytext", "BLACK");

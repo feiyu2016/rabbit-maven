@@ -9,7 +9,7 @@ import rabbit.io.InetAddressListener;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class ResolvRunner implements Runnable {
+class ResolvRunner implements Runnable {
     private final URL url;
     private final InetAddressListener ial;
 

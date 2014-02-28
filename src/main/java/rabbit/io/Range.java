@@ -4,7 +4,7 @@ package rabbit.io;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public class Range {
+class Range {
     private final long start;
     private final long end;
 

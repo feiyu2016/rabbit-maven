@@ -11,20 +11,14 @@ import java.util.StringTokenizer;
 public abstract class Config {
     private final Map<String, SProperties> configs;
 
-    protected Map<String, SProperties> getConfigs() {
-        return configs;
-    }
-
     /** create an empty Config (has only section "" with no data in it)
      */
     public Config() {
         configs = new HashMap<>();
-        final SProperties current = new SProperties(); // the main thing.
-        configs.put("", current);
-        populateConfigs(configs);
+        populateConfig();
     }
     /** Called during constructor to populate the configs object */
-    protected abstract void populateConfigs(final Map<String, SProperties> configs);
+    protected abstract void populateConfig();
 
     /** get the available sections
      * @return an Enumeration of the available sections (including the empty section).
@@ -39,14 +33,6 @@ public abstract class Config {
      */
     public SProperties getProperties(final String sectionName) {
         return configs.get(sectionName);
-    }
-
-    /** set the properties for a given section
-     * @param sectionName the section we want to set the properties for.
-     * @param prop the SProperties for the sections
-     */
-    public void setProperties(final String sectionName, final SProperties prop) {
-        configs.put(sectionName, prop);
     }
 
     /** get a property for given key in specified section

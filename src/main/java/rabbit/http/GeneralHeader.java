@@ -16,11 +16,11 @@ public class GeneralHeader implements Storable {
 
     /** The headers of this Header in order.
      */
-    protected final ArrayList<Header> headers = new ArrayList<>();
+    private final ArrayList<Header> headers = new ArrayList<>();
 
     /** Create a new HTTPHeader from scratch
      */
-    public GeneralHeader() {
+    GeneralHeader() {
         // empty
     }
 
@@ -43,7 +43,7 @@ public class GeneralHeader implements Storable {
     /** Fill the given StringBuilder with text from this header.
      * @param sb the StringBuilder this header is written to
      */
-    protected void fillBuffer(final StringBuilder sb) {
+    void fillBuffer(final StringBuilder sb) {
         for (final Header h : headers) {
             sb.append(h.getType());
             sb.append(": ");

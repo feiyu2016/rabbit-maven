@@ -52,7 +52,7 @@ import rabbit.util.SProperties;
 public class HttpProxy {
 
     /** Current version */
-    public static final String VERSION = "RabbIT proxy version 4.10";
+    private static final String VERSION = "RabbIT proxy version 5.0";
 
     /** The current config of this proxy. */
     private Config config;
@@ -99,9 +99,9 @@ public class HttpProxy {
     private final Counter counter = new Counter();
 
     /** Are we allowed to proxy ssl? */
-    protected boolean proxySSL = false;
+    boolean proxySSL = false;
     /** The List of acceptable ssl-ports. */
-    protected List<Integer> sslports = null;
+    List<Integer> sslports = null;
 
     /** All the currently active connections. */
     private final List<Connection> connections = new ArrayList<>();
@@ -562,7 +562,7 @@ public class HttpProxy {
         return tlh;
     }
 
-    protected BufferHandler getBufferHandler() {
+    BufferHandler getBufferHandler() {
         return bufferHandler;
     }
 

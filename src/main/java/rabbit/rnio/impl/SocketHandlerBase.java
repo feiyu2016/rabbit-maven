@@ -15,11 +15,11 @@ import rabbit.rnio.SocketChannelHandler;
 public abstract class SocketHandlerBase<T extends SelectableChannel>
         implements SocketChannelHandler {
     /** The actual channel */
-    public final T sc;
+    final T sc;
     /** The NioHandler used to wait for opeations. */
-    public final NioHandler nioHandler;
+    final NioHandler nioHandler;
     /** The timeout for the current operation */
-    public final Long timeout;
+    private final Long timeout;
 
     private static final Logger logger = Logger.getLogger("rabbit.rnio");
 
@@ -29,7 +29,7 @@ public abstract class SocketHandlerBase<T extends SelectableChannel>
      * @param timeout the timeout in millis, may be null if no timeout
      *        is wanted.
      */
-    public SocketHandlerBase(final T sc, final NioHandler nioHandler, final Long timeout) {
+    SocketHandlerBase(final T sc, final NioHandler nioHandler, final Long timeout) {
         this.sc = sc;
         this.nioHandler = nioHandler;
         this.timeout = timeout;

@@ -7,7 +7,7 @@ import rabbit.httpio.AsyncListener;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public interface ClientResourceTransferredListener extends AsyncListener {
+interface ClientResourceTransferredListener extends AsyncListener {
 
     /** The client resource have been successfully transferred.
      */

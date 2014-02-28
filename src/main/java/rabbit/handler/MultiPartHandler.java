@@ -31,9 +31,9 @@ public class MultiPartHandler extends BaseHandler {
      * @param response the actual response.
      * @param content the resource.
      */
-    public MultiPartHandler(final Connection con, final TrafficLoggerHandler tlh,
-                            final HttpHeader request, final HttpHeader response,
-                            final ResourceSource content) {
+    private MultiPartHandler(final Connection con, final TrafficLoggerHandler tlh,
+                             final HttpHeader request, final HttpHeader response,
+                             final ResourceSource content) {
         super(con, tlh, request, response, content, -1);
         con.setChunking(false);
 

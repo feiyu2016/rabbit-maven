@@ -58,7 +58,7 @@ public abstract class SimpleBlockReader
      *    The default is to create a new 1kB big ByteBuffer and return it.
      * @return the ByteBuffer to read data into
      */
-    public ByteBuffer getByteBuffer() {
+    private ByteBuffer getByteBuffer() {
         return ByteBuffer.allocate(1024);
     }
 
@@ -66,14 +66,14 @@ public abstract class SimpleBlockReader
      *  or no data. The default is to do nothing.
      * @param buf the ByteBuffer that is returned
      */
-    public void putByteBuffer(final ByteBuffer buf) {
+    private void putByteBuffer(final ByteBuffer buf) {
         // nothing.
     }
 
     /** Handle the exception, default is to log it and to close the channel.
      * @param e the IOException that was the cause of a read failure
      */
-    public void handleIOException(final IOException e) {
+    private void handleIOException(final IOException e) {
         logger.log(Level.WARNING, "Failed to read data", e);
         Closer.close(sc, logger);
     }
@@ -91,7 +91,7 @@ public abstract class SimpleBlockReader
             throws IOException;
 
     /** Wait for the channel to become read ready.*/
-    public void register() {
+    private void register() {
         nioHandler.waitForRead(sc, this);
     }
 }

@@ -54,7 +54,7 @@ class StandardResponseHeaders implements HttpGenerator {
      * @param sc the StatusCode to get a header for
      * @return a new HttpHeader.
      */
-    public HttpHeader getHeader(final StatusCode sc) {
+    private HttpHeader getHeader(final StatusCode sc) {
         final HttpHeader ret = new HttpHeader();
         ret.setStatusLine(sc.getStatusLine("HTTP/1.1"));
         ret.setHeader("Server", serverIdentity);
@@ -204,7 +204,7 @@ class StandardResponseHeaders implements HttpGenerator {
         return header;
     }
 
-    public CharSequence getPlaces(final URL u) {
+    private CharSequence getPlaces(final URL u) {
         final StringBuilder content = new StringBuilder();
         content.append("<ul>");
         final Collection<String> places = new HashSet<>();

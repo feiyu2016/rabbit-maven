@@ -6,7 +6,7 @@ import java.net.InetAddress;
  *
  * @author <a href="mailto:robo@khelekore.org">Robert Olofsson</a>
  */
-public interface SocketBinder {
+interface SocketBinder {
     /** Get the port number to bind to, use 0 to let the system pick a port.
      * @return the port number to use
      */

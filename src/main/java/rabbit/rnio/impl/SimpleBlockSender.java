@@ -63,20 +63,20 @@ public abstract class SimpleBlockSender
     /** Handle the exception, default is to log it and to close the channel. 
      * @param e the IOException that is the cause of data write failure
      */
-    public void handleIOException(final IOException e) {
+    private void handleIOException(final IOException e) {
         logger.log(Level.WARNING, "Failed to send data", e);
         Closer.close(sc, logger);
     }
 
     /** The default is to do nothing, override in subclasses if needed.
      */
-    public void done() {
+    private void done() {
         // empty
     }
 
     /** Register writeWait on the nioHandler 
      */
-    public void register() {
+    private void register() {
         nioHandler.waitForWrite(sc, this);
     }
 }

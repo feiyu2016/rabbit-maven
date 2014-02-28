@@ -66,7 +66,7 @@ public class ConnectionHandler {
     /** Set the keep alive time for this handler.
      * @param milis the keep alive time in miliseconds.
      */
-    public void setKeepaliveTime(final long milis) {
+    private void setKeepaliveTime(final long milis) {
         keepaliveTime = milis;
     }
 
