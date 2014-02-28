@@ -30,7 +30,6 @@ import rabbit.util.SProperties;
 @Slf4j
 public class HttpBaseFilter implements HttpFilter {
     /** Constant for requests that want an unfiltered resource. */
-    private static final String NOPROXY = "http://noproxy.";
     private static final BigInteger ZERO = BigInteger.ZERO;
     private static final BigInteger ONE = BigInteger.ONE;
 
@@ -106,17 +105,6 @@ public class HttpBaseFilter implements HttpFilter {
             header.setRequestURI(requestURI.substring(0, s3 + 2) +
                                  requestURI.substring(s5 + 1));
         }
-    }
-
-    /** Check if this is a noproxy request, and if so handle it.
-     * @param requri the requested resource.
-     * @param header the actual request.
-     * @return the new request URI
-     */
-    private String handleNoProxyRequest(String requri, final HttpHeader header) {
-        requri = "http://" + requri.substring(NOPROXY.length());
-        header.setRequestURI(requri);
-        return requri;
     }
 
     /** Check that the requested URL is valid and if it is a meta request.
@@ -277,10 +265,6 @@ public class HttpBaseFilter implements HttpFilter {
         con.setKeepalive(mayKeepAlive);
 
         String requri = header.getRequestURI();
-        if (requri.toLowerCase(Locale.US).startsWith(NOPROXY)) {
-            requri = handleNoProxyRequest(requri, header);
-        }
-
         final HttpHeader headerr = handleURLSetup(requri, header, con);
         if (headerr != null) {
             return headerr;
