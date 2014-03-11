@@ -74,6 +74,12 @@ public abstract class Config {
         }
         p.put(key, value);
     }
+    public void setProperty(final Class clazz, final String key, final String value) {
+        setProperty(clazz.getName(), key, value);
+    }
+    public void setProperty(final String key, final String value) {
+        setProperty("", key, value);
+    }
 
     /** Get a string describing this Config
      */
