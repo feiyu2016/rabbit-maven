@@ -73,9 +73,6 @@ public class HttpProxy {
     /** The connection handler */
     private ConnectionHandler conhandler;
 
-    /** The local adress of the proxy. */
-    private InetAddress localhost;
-
     /** The port the proxy is using. */
     private int port = -1;
 
@@ -110,13 +107,7 @@ public class HttpProxy {
     /** The factory for http header generator */
     private HttpGeneratorFactory hgf;
 
-    /** Create a new HttpProxy.
-     * @throws UnknownHostException if the local host address can not
-     *         be determined
-     */
-    public HttpProxy() throws UnknownHostException {
-        localhost = InetAddress.getLocalHost();
-    }
+    public HttpProxy() {}
 
     private void setupDateParsing() {
         final TimeZone tz = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss 'GMT'", Locale.US).getTimeZone();
@@ -420,13 +411,6 @@ public class HttpProxy {
         return serverIdentity;
     }
 
-    /** Get the local host.
-     * @return the InetAddress of the host the proxy is running on.
-     */
-    public InetAddress getHost() {
-        return localhost;
-    }
-
     /** Get the port this proxy is using.
      * @return the port number the proxy is listening on.
      */
@@ -439,42 +423,6 @@ public class HttpProxy {
      */
     public ProxyChain getProxyChain() {
         return proxyChain;
-    }
-
-    /** Try hard to check if the given address matches the proxy.
-     *  Will use the localhost name and all ip addresses.
-     * @param uhost the host name to check
-     * @param urlport the port number to check
-     * @return true if the given hostname and port matches this proxy
-     */
-    public boolean isSelf(final String uhost, final int urlport) {
-        if (urlport == port) {
-            final String proxyhost = localhost.getHostName();
-            if (uhost.equalsIgnoreCase(proxyhost)) {
-                return true;
-            }
-            try {
-                final Enumeration<NetworkInterface> e =
-                        NetworkInterface.getNetworkInterfaces();
-                while (e.hasMoreElements()) {
-                    final NetworkInterface ni = e.nextElement();
-                    final Enumeration<InetAddress> ei = ni.getInetAddresses();
-                    while (ei.hasMoreElements()) {
-                        final InetAddress ia = ei.nextElement();
-                        if (ia.getHostAddress().equalsIgnoreCase(uhost)) {
-                            return true;
-                        }
-                        if (ia.isLoopbackAddress() &&
-                            ia.getHostName().equalsIgnoreCase(uhost)) {
-                            return true;
-                        }
-                    }
-                }
-            } catch (SocketException e) {
-                log.warn("Failed to get network interfaces", e);
-            }
-        }
-        return false;
     }
 
     /** Get a WebConnection.
