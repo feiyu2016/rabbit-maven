@@ -27,9 +27,9 @@
         <project.reporting.outputEncoding>${sourceEncoding}</project.reporting.outputEncoding>
 
         <!-- Versions of jars and plugins -->
-        <version.commons-lang>2.5</version.commons-lang>
-        <version.lombok>1.12.2</version.lombok>
-        <version.slf4j>1.7.6</version.slf4j>
+        <version.commons-lang>2.6</version.commons-lang>
+        <version.lombok>1.12.6</version.lombok>
+        <version.slf4j>1.7.7</version.slf4j>
         <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
         <version.maven-assembly-plugin>2.4</version.maven-assembly-plugin>
     </properties>
