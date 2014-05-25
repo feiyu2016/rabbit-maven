@@ -143,8 +143,12 @@ public class FilterHandler extends GZipHandler {
 		beginIndex += look.length ();
 		String charSet = ct.substring (beginIndex).trim ();
 		charSet = charSet.replace ("_", "").replace ("-", "");
+		if (charSet.endsWith (";"))
+		    charSet = charSet.substring (0, charSet.length () - 1);
 		if (charSet.equalsIgnoreCase("iso88591"))
 		    cs = "ISO8859_1";
+		if (charSet.equalsIgnoreCase("utf8"))
+		    cs = "utf-8";
 		else
 		    cs = charSet;
 	    }
